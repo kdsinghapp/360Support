@@ -100,7 +100,7 @@
           <TouchableOpacity
   
           onPress={()=>{
-            navigation.navigate(ScreenNameEnum.STEP_TWO)
+            navigation.navigate(ScreenNameEnum.SELECT_ROLE)
           }}
             style={[
               styles.btn,

@@ -86,7 +86,7 @@ export default function Step4() {
         <TouchableOpacity
 
         onPress={()=>{
-          navigation.navigate(ScreenNameEnum.BOTTOM_TAB)
+          navigation.navigate(ScreenNameEnum.SOCIAL_LOGIN)
         }}
           style={[
             styles.btn,
@@ -101,14 +101,14 @@ export default function Step4() {
               fontWeight: '600',
               lineHeight: 25,
             }}>
-          Yes, Continue!
+           Continue!
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
 
-        onPress={()=>{
-          navigation.navigate(ScreenNameEnum.SOCIAL_LOGIN)
-        }}
+onPress={()=>{
+  navigation.goBack()
+}}
           style={[
             styles.btn,
             {

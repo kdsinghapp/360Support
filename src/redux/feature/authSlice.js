@@ -16,8 +16,8 @@ const initialState = {
 };
 
 export const login = createAsyncThunk('login', async (params, thunkApi) => {
-  console.log('===============login=====================');
-  console.log(params.data);
+  console.log('===============login=====================',params.data);
+
 
   try {
     const config = {
@@ -26,28 +26,28 @@ export const login = createAsyncThunk('login', async (params, thunkApi) => {
         Accept:'application/json'
       }
     };
-    const response = await API.post('/auth/login', params.data,config);
+    const response = await API.post('/login', params.data,config);
 
-
-    if (response.data.success) {
+console.log('=================response.data ===================');
+console.log(response.data);
+console.log('=============Login api=======================');
+    if (response.data.status) {
       thunkApi.dispatch(loginSuccess(response.data.data));
-      params.navigation.navigate(ScreenNameEnum.ASK_LOCATION);
+     params.navigation.navigate(ScreenNameEnum.WELCOME_SCREEN,);
       Alert.alert(
         'Success',
         response.data.message,
-        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-        { cancelable: false }
+       
       );
     } else {
       Alert.alert(
         'Failed',
         response.data.message,
-        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-        { cancelable: false }
+        
       );
     }
 
-    return response.data.data;
+    return response.data.result;
   } catch (error) {
     console.log('Error:', error);
     Alert.alert(
@@ -63,39 +63,27 @@ export const ResetPasswordEmail = createAsyncThunk('ResetPasswordEmail', async (
   console.log('🚀 ~ file: AuthSlice.js:12 ~ login ~ params:', params);
 
   try {
-    const response = await API.post('/password_reset', params.data);
+    const response = await API.post('/resend_otp', params.data);
 
     console.log(
       '🚀 ~ file: AuthSlice.js:16 ~ ResetPasswordEmail ~ response:',
       response.data,
     );
     
-    if (response.data.status) {
+    if (response.data.status == '1') {
       Alert.alert(
         'Success',
         'Otp Send Successfully',
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('OK Pressed') 
-          }
-        ],
-        { cancelable: false }
+        
       );
-      params.navigation.navigate('CheckMailOtp',{userId:response.data.user_id});
+      params.navigation.navigate(ScreenNameEnum.OTP_SCREEN,{email:params.data});
     }
     else
     {
       Alert.alert(
         'Failed',
         response.data.message,
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('OK Pressed') 
-          }
-        ],
-        { cancelable: false }
+        
       );
     }
 
@@ -118,7 +106,7 @@ export const ResetPasswordEmail = createAsyncThunk('ResetPasswordEmail', async (
   }
 });
 export const validOtp = createAsyncThunk('validOtp', async (params, thunkApi) => {
-  console.log('🚀 ~ file: AuthSlice.js:12 ~ validOtp ~ params:', params);
+  console.log('🚀 ~ file: AuthSlice.js:12 ~ validOtp ~ params:', params.data);
 
   try {
     const response = await API.post('/check_otp', params.data);
@@ -129,34 +117,23 @@ export const validOtp = createAsyncThunk('validOtp', async (params, thunkApi) =>
     );
     
     
-    if (response.data.status) {
+    if (response.data.status == '1') {
       Alert.alert(
         'Success',
         'Otp Verify Successfully',
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('OK Pressed') 
-          }
-        ],
-        { cancelable: false }
+      
       );
       
-      params.navigation.navigate('CreatePassword',{user:response.data.user_data});
+      params.navigation.navigate(ScreenNameEnum.CREATE_NEWPASS,{email:params.data.email});
     }
     else
     {
       Alert.alert(
         'Failed',
         response.data.message,
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('OK Pressed') 
-          }
-        ],
-        { cancelable: false }
+        
       );
+     // params.navigation.navigate(ScreenNameEnum.CREATE_NEWPASS,{email:params.data.email});
     }
 
     return response.data;
@@ -166,13 +143,8 @@ export const validOtp = createAsyncThunk('validOtp', async (params, thunkApi) =>
     Alert.alert(
       'Network error',
       'server not responding please try later',
-      [
-        {
-          text: 'OK',
-          onPress: () => console.log('OK Pressed'),
-        },
-      ],
-      { cancelable: false }
+    
+    
     );
     return thunkApi.rejectWithValue(error);
   }
@@ -181,7 +153,7 @@ export const CreateNewPassword = createAsyncThunk('CreateNewPassword', async (pa
   console.log('🚀 ~ file: AuthSlice.js:12 ~ CreatePassword ~ params:', params);
 
   try {
-    const response = await API.post('/create_new_password', params.data);
+    const response = await API.post('/reset_password', params.data);
 
     console.log(
       '🚀 ~ file: AuthSlice.js:16 ~ CreatePassword ~ response:',
@@ -193,29 +165,17 @@ export const CreateNewPassword = createAsyncThunk('CreateNewPassword', async (pa
       Alert.alert(
         'Success',
         'Password Reset Successfully',
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('OK Pressed') 
-          }
-        ],
-        { cancelable: false }
+       
       );
       
-      params.navigation.navigate('Login',);
+     params.navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
     }
     else
     {
       Alert.alert(
         'Failed',
         response.data.message,
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('OK Pressed') 
-          }
-        ],
-        { cancelable: false }
+        
       );
     }
 
@@ -224,13 +184,7 @@ export const CreateNewPassword = createAsyncThunk('CreateNewPassword', async (pa
     Alert.alert(
       'Network error',
       'server not responding please try later',
-      [
-        {
-          text: 'OK',
-          onPress: () => console.log('OK Pressed'),
-        },
-      ],
-      { cancelable: false }
+      
     );
     console.log('🚀 ~ file: AuthSlice.js:16 ~ CreatePassword ~ error:', error);
     return thunkApi.rejectWithValue(error);
@@ -299,7 +253,69 @@ export const logout = createAsyncThunk('logout', async (params, thunkApi) => {
     return thunkApi.rejectWithValue(error);
   }
 });
+// register
+export const register = createAsyncThunk(
+  'register',
+  async (params, thunkApi) => {
+    console.log('Register =>>>>>>>>>>', params.data);
+    try {
+      const config = {
+        headers: {
+          Accept: 'application/json',
+        },
+      };
+      const response = await API.post('/auth/signup', params.data, config);
 
+      console.log(
+        '🚀 ~ file: RegisterSlice. response ~ register ~ response:',
+        response.data,
+      );
+
+      if (response.data.success) {
+        params.navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
+        Alert.alert(
+          'Success',
+          'User Registered Successfully',
+          [
+            {
+              text: 'Please Login',
+              onPress: () => console.log('OK Pressed'),
+            },
+          ],
+          {cancelable: false},
+        );
+      } else {
+        Alert.alert(
+          'Failed',
+          response.data.message,
+          [
+            {
+              text: 'OK',
+              onPress: () => console.log('OK Pressed'),
+            },
+          ],
+          {cancelable: false},
+        );
+      }
+      return response.data;
+    } catch (error) {
+      console.log('🚀 ~ file: RegisterSlice.js:16 ~ register ~ error:', error);
+      Alert.alert(
+        'Network error',
+        'server not responding please try later',
+        [
+          {
+            text: 'OK',
+            onPress: () => console.log('OK Pressed'),
+          },
+        ],
+        {cancelable: false},
+      );
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 
 const AuthSlice = createSlice({
   name: 'authSlice',
@@ -334,6 +350,19 @@ const AuthSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.isLogin = false;
+    });
+    builder.addCase(register.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(register.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+    });
+    builder.addCase(register.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
     });
     builder.addCase(logout.pending, state => {
       state.isLoading = true;

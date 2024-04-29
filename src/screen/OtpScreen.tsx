@@ -8,31 +8,61 @@ import ScreenNameEnum from '../routes/screenName.enum';
 import { useNavigation } from '@react-navigation/native';
 import { CodeField, Cursor, useBlurOnFulfill, useClearByFocusCell } from
     'react-native-confirmation-code-field';
+    import GoBack from '../assets/svg/GoBack.svg';
+import { validOtp } from '../redux/feature/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import Loading from '../configs/Loader';
+export default function OtpScreen({route}) {
+  const {email} = route.params 
 
-export default function OtpScreen() {
     const navigation = useNavigation();
     const [value, setValue] = useState('');
   const ref = useBlurOnFulfill({value, cellCount:4});
+  const isLoading = useSelector(state => state.auth.isLoading);
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
   });
+  const dispatch = useDispatch();
+  console.log('====================================');
+  console.log(value);
+  console.log('====================================');
+  const ValidOtpcheck =()=>{
 
+    const params = {
+      data: {
+        email:email,
+        otp:value
+        
+      },
+      navigation: navigation,
+    };
+    dispatch(validOtp(params));
+  }
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
-      <View
-        style={{
-          height: hp(20),
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Image
-          source={require('../assets/Cropping/Logo_23x.png')}
-          style={{height: 180, width: 180}}
-          resizeMode="contain"
-        />
-      </View>
+         {isLoading ? <Loading /> : null}
+    <View
+          style={{
+            height: hp(20),
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+          }}>
+          <Image
+            source={require('../assets/Cropping/Logo_23x.png')}
+            style={{height: 180, width: 180}}
+            resizeMode="contain"
+          />
 
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{position: 'absolute', left: 10, top: 20}}>
+            <GoBack />
+          </TouchableOpacity>
+        </View>
       <View>
         <View
           style={{
@@ -96,7 +126,7 @@ export default function OtpScreen() {
         textContentType="oneTimeCode"
         renderCell={({index, symbol, isFocused}) => (
           <View style={{backgroundColor:'#FFF',
-          borderRadius:15,height:45,width:45}}>
+          borderRadius:15,}}>
 
 
           <Text
@@ -113,7 +143,7 @@ export default function OtpScreen() {
       <TouchableOpacity
 
 onPress={()=>{
-    navigation.navigate(ScreenNameEnum.CREATE_NEWPASS)
+  ValidOtpcheck()
 }}
           style={[
             styles.btn,
@@ -140,6 +170,27 @@ onPress={()=>{
 }
 
 const styles = StyleSheet.create({
+
+  codeFieldRoot: {marginTop: 20,},
+  cell: {
+    width: 40,
+    height: 40,
+    lineHeight: 38,
+    fontSize: 24,
+    borderWidth: 2,
+    borderColor: '#FFF',
+    textAlign: 'center',
+    fontWeight:'600',
+    color:'#000',
+    borderRadius:10,
+   // backgroundColor:'#E9E9E9',
+    
+  },
+  focusCell: {
+    borderColor: '#6D6EEC',
+    borderRadius:10,
+   
+  },
   btn: {
     height: 55,
     marginHorizontal: 20,

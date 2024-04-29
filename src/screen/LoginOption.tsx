@@ -81,7 +81,7 @@ export default function LoginOption() {
       <View style={{marginTop: hp(15)}}>
         <TouchableOpacity 
         onPress={()=>{
-          navigation.navigate(ScreenNameEnum.SIGNUP_SCREEN)
+          navigation.navigate(ScreenNameEnum.GROUP_CODE,{showCreateaccount:false})
         }}
         style={[styles.btn, {backgroundColor: '#FFFFFF'}]}>
           <Text
@@ -107,7 +107,7 @@ export default function LoginOption() {
         <TouchableOpacity
 
 onPress={()=>{
-  navigation.navigate(ScreenNameEnum.SOCIAL_LOGIN)
+  navigation.navigate(ScreenNameEnum.SIGNIN_OPTION)
 }}
           style={[
             styles.btn,
@@ -127,9 +127,9 @@ onPress={()=>{
         </TouchableOpacity>
       </View>
 
-      <View style={{justifyContent:'center',alignItems:'center',marginTop:hp(15)}}>
+      <View style={{justifyContent:'center',alignItems:'center',marginTop:hp(22)}}>
         <TouchableOpacity
-        style={{borderBottomWidth:0.5,borderColor:'#FFF'}}
+        style={{borderBottomWidth:0.8,borderColor:'#FFF',paddingVertical:5}}
         >
           <Text
        style={{
@@ -141,26 +141,46 @@ onPress={()=>{
           >Is your club not using Team Up?</Text>
         </TouchableOpacity>
       </View>
+      <View style={{flexDirection:'row',alignSelf:'center',marginTop:20,position:'absolute',bottom:hp(2),}}>
+      <TouchableOpacity
+        style={{borderBottomWidth:1,borderColor:'#b8b4bf',paddingVertical:5}}
+        >
+          <Text
+       style={{
+            fontSize: 14,
+            color: '#b8b4bf',
+            fontWeight: '600',
+            lineHeight:18,
+          }}
+          >Term of Service</Text>
+        </TouchableOpacity>
+      <TouchableOpacity
+        style={{borderBottomWidth:1,borderColor:'#b8b4bf',paddingVertical:5,marginLeft:10}}
+        >
+          <Text
+       style={{
+            fontSize: 14,
+            color: '#b8b4bf',
+            fontWeight: '600',
+            lineHeight:18,
+          }}
+          >Privacy policy</Text>
+        </TouchableOpacity>
+      <TouchableOpacity
+        style={{borderBottomWidth:1,borderColor:'#b8b4bf',paddingVertical:5,marginLeft:10}}
+        >
+          <Text
+       style={{
+            fontSize: 14,
+            color: '#b8b4bf',
+            fontWeight: '600',
+            lineHeight:18,
+          }}
+          >FAQ</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity style={{
-        flexDirection:'row',justifyContent:'space-between',
-        alignSelf:'center',position:'absolute',bottom:hp(5),
-      backgroundColor:'#FFF',paddingHorizontal:20,paddingVertical:10,borderRadius:30}}>
-        <Text
-        style={{
-          fontSize: 12,
-          color: '#874BE9',
-          fontWeight: '500',
-          lineHeight:18,
-        }}
-        >English ( US )</Text>
-        <Image  
-        source={require('../assets/Cropping/DownArrow2x.png')}
-       
-       style={{height:20,width:20,marginLeft:10}}
-       resizeMode='contain'
-       />
-      </TouchableOpacity>
+     
     </View>
   );
 }

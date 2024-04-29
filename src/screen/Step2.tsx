@@ -8,7 +8,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
+import { Dropdown } from 'react-native-element-dropdown';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -19,6 +20,8 @@ import GoBack from '../assets/svg/GoBack.svg';
 import PickPhoto from '../assets/svg/PickPhoto.svg';
 export default function Step2() {
   const navigation = useNavigation();
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -103,11 +106,25 @@ export default function Step2() {
               styles.txtInput,
               {backgroundColor: '#FFFFFF', marginTop: 20},
             ]}>
-            <TextInput
-              placeholder="Sweden"
-              placeholderTextColor={'#000'}
-              style={{fontSize: 14, color: '#000', lineHeight: 18}}
-            />
+             <Dropdown
+      
+         
+          data={data}
+          search
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder={!isFocus ? 'Select item' : '...'}
+         
+          value={value}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          onChange={item => {
+            setValue(item.value);
+            setIsFocus(false);
+          }}
+        
+        />
           </View>
 
           <View
@@ -130,6 +147,7 @@ export default function Step2() {
                 placeholder="DD"
                 placeholderTextColor={'#000'}
                 style={{fontSize: 14, color: '#000', lineHeight: 18}}
+                maxLength={2}
               />
             </View>
             <View
@@ -146,6 +164,7 @@ export default function Step2() {
                 placeholder="MM"
                 placeholderTextColor={'#000'}
                 style={{fontSize: 14, color: '#000', lineHeight: 18}}
+                maxLength={2}
               />
             </View>
             <View
@@ -171,7 +190,7 @@ export default function Step2() {
 
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate(ScreenNameEnum.SELECT_ROLE);
+          navigation.navigate(ScreenNameEnum.STEP_FOUR);
         }}
         style={[
           styles.btn,
@@ -214,3 +233,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
 });
+const data = [
+  { label: 'Item 1', value: '1' },
+  { label: 'Item 2', value: '2' },
+  { label: 'Item 3', value: '3' },
+  { label: 'Item 4', value: '4' },
+  { label: 'Item 5', value: '5' },
+  { label: 'Item 6', value: '6' },
+  { label: 'Item 7', value: '7' },
+  { label: 'Item 8', value: '8' },
+];

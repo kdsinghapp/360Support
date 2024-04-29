@@ -35,7 +35,7 @@ export default function SelectRole() {
     if(selectedRole != ''){
 
 dispatch(updateSelectedRole(selectedRole));
-navigation.navigate(ScreenNameEnum.STEP_FOUR)
+navigation.navigate(ScreenNameEnum.STEP_TWO)
     }
     else{
       Alert.alert('Please','Select Role')

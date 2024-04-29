@@ -56,6 +56,13 @@ import PlayerCalendarScreen from "../screen/player/TabScreen/PlayerCalendarScree
 import PlayerHome from "../screen/player/TabScreen/PlayerHome";
 import PlayerMore from "../screen/player/TabScreen/PlayerMore";
 import VideoScreen from "../screen/VideoScreen";
+import SignInOption from "../screen/SignInOption";
+import ChidDetails from "../screen/ChidDetails";
+import sentConnectionReq from "../screen/sentConnectionReq";
+import AskCreateALogin from "../screen/AskCreateALogin";
+import CreateChildAccount from "../screen/CreateChildAccount";
+import welcomeScreen from "../screen/welcomeScreen";
+import ChildCreateAccountLogin from "../screen/ChildCreateAccountLogin";
 
 
 const _routes = {
@@ -113,9 +120,6 @@ const _routes = {
       name: ScreenNameEnum.NOTIFICAION_SETTING,
       Component:NotificationSetting,
     },
-   
-    
-    
     {
       name: ScreenNameEnum.PRIVACY_POLICY,
       Component:Privacy_Policy,
@@ -132,7 +136,6 @@ const _routes = {
       name: ScreenNameEnum.STEP_TWO,
       Component:Step2,
     },
-    
     {
       name: ScreenNameEnum.SELECT_ROLE,
       Component:SelectRole,
@@ -174,9 +177,38 @@ const _routes = {
       name: ScreenNameEnum.VIDEO_SCREEN,
       Component:VideoScreen,
     },
+    {
+      name: ScreenNameEnum.SIGNIN_OPTION,
+      Component:SignInOption,
+    },
+    {
+      name: ScreenNameEnum.CHILD_DETAILS,
+      Component:ChidDetails,
+    },
+    {
+      name: ScreenNameEnum.SENT_CONNECTIONREQ,
+      Component:sentConnectionReq,
+    },
+    {
+      name: ScreenNameEnum.ASKCREATEALOGIN,
+      Component:AskCreateALogin,
+    },
+    {
+      name: ScreenNameEnum.CREATECHILDACCOUNT,
+      Component:CreateChildAccount,
+    },
+    {
+      name: ScreenNameEnum.WELCOME_SCREEN,
+      Component:welcomeScreen,
+    },
+    {
+      name: ScreenNameEnum.CHILDCREATEACCOUNTLOGIN,
+      Component:ChildCreateAccountLogin,
+    },
     
     
   ],
+
   HOME_ROUTE: [
     {
       name: ScreenNameEnum.HOME_SCREEN,

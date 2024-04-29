@@ -74,7 +74,7 @@ export default function SocialLogin() {
       <View style={{marginTop: hp(5)}}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
+            navigation.navigate(ScreenNameEnum.SIGNUP_SCREEN);
           }}
           style={[
             styles.btn,

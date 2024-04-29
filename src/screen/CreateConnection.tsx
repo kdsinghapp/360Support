@@ -7,7 +7,7 @@ import {
     TextInput,
     FlatList,
   } from 'react-native';
-  import React from 'react';
+  import React, { useState } from 'react';
   import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -19,6 +19,24 @@ import {
 
   export default function CreateConnection() {
     const navigation = useNavigation();
+    const [selectedAccount, setselectedAccount] = useState('');
+    const [SelectedIndex, setSelectedIndex] = useState(null);
+  
+  
+  
+    
+
+    const setRole =(role)=>{
+      setselectedAccount(role)
+
+      if(role !== 'exitAccount')
+      {
+      navigation.navigate(ScreenNameEnum.CHILD_DETAILS)
+      }
+      else{
+        navigation.navigate(ScreenNameEnum.SENT_CONNECTIONREQ,{showCreateaccount:false})
+      }
+    }
     return (
       <View style={{flex: 1, backgroundColor: '#874be9'}}>
         <View
@@ -68,11 +86,19 @@ import {
         <View style={{marginTop:20}}>
           <FlatList
             data={SelectData}
-            renderItem={({item}) => (
-              <View
+            renderItem={({item,index}) => (
+              <TouchableOpacity
+
+              onPress={()=>{
+                setRole(item.type)
+                setSelectedIndex(index)
+              }}
                 style={[
                   styles.txtInput,
-                  {backgroundColor: '#FFFFFF', marginTop: 20},
+                  {backgroundColor: '#FFFFFF', marginTop: 20,
+                  borderWidth:SelectedIndex == index?3:0,
+                borderColor:'green'},
+                
                 ]}>
                 <View style={{padding: 5, marginHorizontal: 10}}>
                   <Image
@@ -101,31 +127,11 @@ import {
                     {item.describe}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
           />
         </View>
-        <TouchableOpacity
-         onPress={() => {
-            navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
-          }}
-          style={[
-            styles.btn,
-            {
-              backgroundColor: '#294247',
-              marginTop: 20,
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: 17,
-              color: '#FFFFFF',
-              fontWeight: '600',
-              lineHeight: 25,
-            }}>
-            Continue
-          </Text>
-        </TouchableOpacity>
+        
         <TouchableOpacity
           style={{
             justifyContent: 'center',
@@ -156,11 +162,13 @@ import {
       titile: "Create a new player account",
       describe: "If your child doesn't already have an account in 360Player",
       logo: require('../assets/Cropping/Logo3.png'),
+      type:'CreateAccount'
     },
     {
       titile: "Connect to an existing player account",
       describe: 'If your child already has a 360Player account.',
       logo: require('../assets/Cropping/Logo1.png'),
+      type:'exitAccount'
     },
    
   ];

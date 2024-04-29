@@ -1,3 +1,5 @@
+
+
 import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput} from 'react-native';
 import React from 'react';
 import {
@@ -7,7 +9,8 @@ import {
 import ScreenNameEnum from '../routes/screenName.enum';
 import { useNavigation } from '@react-navigation/native';
 import GoBack from '../assets/svg/GoBack.svg';
-export default function SignUp() {
+
+export default function CreateChildAccount() {
 
   const navigation = useNavigation()
   return (
@@ -27,11 +30,10 @@ export default function SignUp() {
           <GoBack />
         </TouchableOpacity>
       </View>
-      <View style={{marginTop:hp(5)}}>
+      <View style={{marginTop:hp(5),marginHorizontal:15}}>
         <View
           style={{
-            alignSelf: 'center',
-            alignItems: 'center',
+          
             justifyContent: 'center',
           }}>
           <Text
@@ -41,17 +43,9 @@ export default function SignUp() {
               color: '#FFF',
               lineHeight: 36,
             }}>
-          Please provide your account 
+         Create account 
           </Text>
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '700',
-              color: '#FFF',
-              lineHeight: 36,
-            }}>
-        details
-          </Text>
+         
          
         </View>
      
@@ -65,7 +59,7 @@ export default function SignUp() {
       <View style={{}}>
       <View style={[styles.txtInput, {backgroundColor: '#FFFFFF',marginTop:20}]}>
           <TextInput 
-          placeholder='Enter your email'
+          placeholder="Your child's email"
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
           />
@@ -79,7 +73,7 @@ export default function SignUp() {
         </View>
         <View style={[styles.txtInput, {backgroundColor: '#FFFFFF',marginTop:20}]}>
           <TextInput 
-          placeholder='Enter a password'
+          placeholder="Your child's password"
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
           />
@@ -112,15 +106,30 @@ export default function SignUp() {
               fontWeight: '600',
               lineHeight: 25,
             }}>
-         Create account
+         Create child account
           </Text>
         </TouchableOpacity>
 
        
         <View
         style={{flexDirection:'row',
-        position: 'absolute',
-        bottom: hp(13),alignSelf:'center',
+       
+        marginTop: hp(3),alignSelf:'center',
+        height:60,alignItems:'center',justifyContent:'center'}}
+        >
+          <Text
+       style={{
+            fontSize: 14,
+            color: '#FFFFFF',
+            fontWeight: '500',
+            lineHeight:18,
+          }}
+          >By creating your chils's account you agree to our </Text>
+          
+        </View>
+        <TouchableOpacity
+        style={{flexDirection:'row',
+      
         height:60,alignItems:'center',justifyContent:'center'}}
         >
           <Text
@@ -129,10 +138,13 @@ export default function SignUp() {
             color: '#FFFFFF',
             fontWeight: '600',
             lineHeight:18,
+        borderBottomWidth:1,
+        borderColor:'#FFF',
+        paddingVertical:5
           }}
-          >By signing up you agree to our terms and conditions </Text>
+          >Term and conditions</Text>
           
-        </View>
+        </TouchableOpacity>
       <TouchableOpacity
         style={{
           justifyContent: 'center',

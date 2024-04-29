@@ -1,28 +1,86 @@
-import {View, Text, Image, TouchableOpacity, StyleSheet, TextInput} from 'react-native';
-import React from 'react';
+import {View, Text, Image, TouchableOpacity, StyleSheet, TextInput, Alert} from 'react-native';
+import React, { useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import ScreenNameEnum from '../routes/screenName.enum';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import GoBack from '../assets/svg/GoBack.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import Loading from '../configs/Loader';
+import { login } from '../redux/feature/authSlice';
 
 export default function Login() {
     const navigation = useNavigation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const dispatch = useDispatch();
+    const isLoading = useSelector(state => state.auth.isLoading);
+
+    const [isValidEmail, setIsValidEmail] = useState(true);
+
+    const isFocus = useIsFocused();
+    const validateEmail = () => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setIsValidEmail(emailRegex.test(email));
+    };
+    const Login = () => {
+      if (password != '' && email != '') {
+        validateEmail();
+  
+        if (isValidEmail) {
+          const passwordWithoutSpaces = password.replace(/\s/g, '');
+          const params = {
+            data: {
+              email: email,
+              password: passwordWithoutSpaces,
+            },
+            navigation: navigation,
+          };
+          dispatch(login(params));
+        } else {
+          Alert.alert(
+            'Failed',
+            'Invalid email or password',
+           
+          );
+        }
+      } else {
+        Alert.alert(
+          'Require',
+          'email or password field empty',
+          
+        );
+      }
+    };
+  
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
-      <View
-        style={{
-          height: hp(20),
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Image
-          source={require('../assets/Cropping/Logo_23x.png')}
-          style={{height: 180, width: 180}}
-          resizeMode="contain"
-        />
-      </View>
+       {isLoading ? <Loading /> : null}
+         <View
+          style={{
+            height: hp(20),
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+          }}>
+          <Image
+            source={require('../assets/Cropping/Logo_23x.png')}
+            style={{height: 180, width: 180}}
+            resizeMode="contain"
+          />
+  
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{position: 'absolute', left: 10, top: 20}}>
+            <GoBack />
+          </TouchableOpacity>
+        </View>
+      
 
       <View>
         <View
@@ -50,15 +108,19 @@ export default function Login() {
           placeholder='Your email'
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
+          onChangeText={(txt)=>setEmail(txt)}
+          value={email}
           />
         </View>
         <View style={[styles.txtInput, {
             marginTop:30,
             backgroundColor: '#FFFFFF'}]}>
           <TextInput 
-          placeholder='Your email'
+          placeholder='Your password'
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
+          onChangeText={(txt)=>setPassword(txt)}
+          value={password}
           />
         </View>
         </View>
@@ -68,7 +130,7 @@ export default function Login() {
         <TouchableOpacity
 
 onPress={()=>{
-    navigation.navigate(ScreenNameEnum.GROUP_CODE)
+  Login()
 }}
           style={[
             styles.btn,
@@ -83,7 +145,7 @@ onPress={()=>{
               fontWeight: '600',
               lineHeight: 25,
             }}>
-         LOGIN
+        Sign in
           </Text>
         </TouchableOpacity>
       </View>
