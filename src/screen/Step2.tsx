@@ -8,8 +8,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
-import React, { useState } from 'react';
-import { Dropdown } from 'react-native-element-dropdown';
+import React, {useState} from 'react';
+import {Dropdown} from 'react-native-element-dropdown';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,10 +18,51 @@ import ScreenNameEnum from '../routes/screenName.enum';
 import {useNavigation} from '@react-navigation/native';
 import GoBack from '../assets/svg/GoBack.svg';
 import PickPhoto from '../assets/svg/PickPhoto.svg';
+import {useSelector} from 'react-redux';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
 export default function Step2() {
   const navigation = useNavigation();
+  const selected = useSelector(state => state.auth.selectedRole);
+  const Country_List = useSelector(state => state.auth.Country_List);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
+  const [profile,setProfile] = useState('')
+  const [Dd, setDd] = useState('');
+  const [Mm, setMm] = useState('');
+  const [YYYY, setYYY] = useState('');
+
+
+  console.log(profile);
+  
+  const openImageLibrary = () => {
+    
+    const options = {
+      mediaType: 'photo', 
+      quality: 0.5, 
+    };
+  
+
+    launchImageLibrary(options, (response) => {
+      console.log(response);
+      
+  
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorCode);
+      } else {
+        setProfile({
+          uri: response.assets[0].uri,
+          name: response.assets[0].fileName,
+          type: response.assets[0].type,
+        })
+        
+        console.log('Image URI: ', response.assets[0].uri);
+      }
+    });
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -55,7 +96,7 @@ export default function Step2() {
                 color: '#FFF',
                 lineHeight: 24,
               }}>
-              Sign up as a parent in NFC U16
+              Sign up as a {selected} in NFC U16
             </Text>
             <Text
               style={{
@@ -70,12 +111,15 @@ export default function Step2() {
           </View>
         </View>
         <TouchableOpacity
+        onPress={()=>{
+          openImageLibrary()
+        }}
           style={{
             marginTop: 30,
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <PickPhoto />
+          {profile == null?<PickPhoto />:<Image  source={{uri:profile.uri}}  style={{height:90,width:90,borderRadius:45}}/>}
         </TouchableOpacity>
 
         <View style={{}}>
@@ -106,25 +150,25 @@ export default function Step2() {
               styles.txtInput,
               {backgroundColor: '#FFFFFF', marginTop: 20},
             ]}>
-             <Dropdown
-      
-         
-          data={data}
-          search
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Select item' : '...'}
-         
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
-            setValue(item.value);
-            setIsFocus(false);
-          }}
-        
-        />
+            <Dropdown
+              data={Country_List}
+              maxHeight={200}
+              labelField="name"
+              valueField="name"
+              placeholder={!isFocus ? 'Select Country' : '...'}
+              containerStyle={{
+                marginTop: hp(3.5),
+                padding: 5,
+                borderRadius: 10,
+              }}
+              value={value}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={item => {
+                setValue(item.name);
+                setIsFocus(false);
+              }}
+            />
           </View>
 
           <View
@@ -148,6 +192,8 @@ export default function Step2() {
                 placeholderTextColor={'#000'}
                 style={{fontSize: 14, color: '#000', lineHeight: 18}}
                 maxLength={2}
+                onChangeText={txt => setDd(txt)}
+                value={Dd}
               />
             </View>
             <View
@@ -165,6 +211,8 @@ export default function Step2() {
                 placeholderTextColor={'#000'}
                 style={{fontSize: 14, color: '#000', lineHeight: 18}}
                 maxLength={2}
+                onChangeText={txt => setMm(txt)}
+                value={Mm}
               />
             </View>
             <View
@@ -181,37 +229,38 @@ export default function Step2() {
                 placeholder="YYYY"
                 placeholderTextColor={'#000'}
                 style={{fontSize: 14, color: '#000', lineHeight: 18}}
+                onChangeText={txt => setYYY(txt)}
+                value={YYYY}
               />
             </View>
           </View>
         </View>
-        <View  style={{height:hp(15),}}/>
-     
+        <View style={{height: hp(15)}} />
 
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate(ScreenNameEnum.STEP_FOUR);
-        }}
-        style={[
-          styles.btn,
-          {
-            backgroundColor: '#294247',
-            marginTop: 20,
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ScreenNameEnum.STEP_FOUR);
+          }}
+          style={[
+            styles.btn,
+            {
+              backgroundColor: '#294247',
+              marginTop: 20,
 
-            bottom: 20,
-            width: '90%',
-          },
-        ]}>
-        <Text
-          style={{
-            fontSize: 17,
-            color: '#FFFFFF',
-            fontWeight: '600',
-            lineHeight: 25,
-          }}>
-          Continue
-        </Text>
-      </TouchableOpacity>
+              bottom: 20,
+              width: '90%',
+            },
+          ]}>
+          <Text
+            style={{
+              fontSize: 17,
+              color: '#FFFFFF',
+              fontWeight: '600',
+              lineHeight: 25,
+            }}>
+            Continue
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -234,12 +283,12 @@ const styles = StyleSheet.create({
   },
 });
 const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
+  {label: 'Item 1', value: '1'},
+  {label: 'Item 2', value: '2'},
+  {label: 'Item 3', value: '3'},
+  {label: 'Item 4', value: '4'},
+  {label: 'Item 5', value: '5'},
+  {label: 'Item 6', value: '6'},
+  {label: 'Item 7', value: '7'},
+  {label: 'Item 8', value: '8'},
 ];

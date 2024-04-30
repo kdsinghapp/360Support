@@ -1,5 +1,5 @@
-import {View, Text, Image, TouchableOpacity, StyleSheet, TextInput} from 'react-native';
-import React from 'react';
+import {View, Text, Image, TouchableOpacity, StyleSheet, TextInput, Alert} from 'react-native';
+import React, { useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -7,22 +7,45 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 import GoBack from '../assets/svg/GoBack.svg';
+import Loading from '../configs/Loader';
+import { useDispatch, useSelector } from 'react-redux';
+import { Get_Group } from '../redux/feature/authSlice';
 export default function GroupCode({route}) {
   const navigation = useNavigation();
+
+
 const {showCreateaccount }= route.params
-console.log(showCreateaccount);
-
-
+const dispatch = useDispatch()
+const [groupCode ,setgroupCode] =  useState('')
+const isLoading = useSelector(state => state.auth.isLoading);
 const checkScreenGroupCode =()=>{
-  if(showCreateaccount){
-    navigation.navigate(ScreenNameEnum.CHILDCREATEACCOUNTLOGIN)
-  }
-  else{
-    navigation.navigate(ScreenNameEnum.STEP_ONE)
-  }
+  getGroupDetails()
+  // if(showCreateaccount){
+  //   navigation.navigate(ScreenNameEnum.CHILDCREATEACCOUNTLOGIN)
+  // }
+  // else{
+  //   navigation.navigate(ScreenNameEnum.STEP_ONE)
+  // }
 }
+
+const getGroupDetails =()=>{
+
+  if (groupCode == '') return Alert.alert('Empty',"Please enter group code")
+  const params = {
+
+      group_code: groupCode,
+ 
+    navigation:navigation 
+  };
+
+
+  dispatch(Get_Group(params));
+}
+
+
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
+       {isLoading ? <Loading /> : null}
       <View
           style={{
             height: hp(20),
@@ -82,7 +105,9 @@ const checkScreenGroupCode =()=>{
           <TextInput 
           placeholder='Enter Group Code'
           placeholderTextColor={'#000'}
-          style={{fontSize:14,color:'#000',lineHeight:18}}
+          style={{fontSize:18,color:'#000',lineHeight:18,fontWeight:'700',}}
+value={groupCode}
+          onChangeText={(txt)=>setgroupCode(txt)}
           />
         </View>
         </View>
@@ -176,7 +201,7 @@ const styles = StyleSheet.create({
   btn: {
     height: 55,
     marginHorizontal: 20,
-    borderRadius: 15,
+    borderRadius: 10,
    justifyContent:'center',
    alignItems:'center'
  
@@ -184,9 +209,11 @@ const styles = StyleSheet.create({
   txtInput: {
     height: 55,
     marginHorizontal: 20,
-    borderRadius: 15,
+    borderRadius: 10,
    justifyContent:'center',
- paddingHorizontal:15
+   paddingHorizontal:10,
+  
+
  
   },
 });

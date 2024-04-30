@@ -63,6 +63,11 @@ import AskCreateALogin from "../screen/AskCreateALogin";
 import CreateChildAccount from "../screen/CreateChildAccount";
 import welcomeScreen from "../screen/welcomeScreen";
 import ChildCreateAccountLogin from "../screen/ChildCreateAccountLogin";
+import coachStep1 from "../screen/coachStep1";
+import PlayerStep1 from "../screen/PlayerStep1";
+import NoWithoutLoginScreen from "../screen/NoWithoutLoginScreen";
+import Step2Requestsent from "../screen/Step2Requestsent";
+import firstTimechildadded from "../screen/firstTimechildadded";
 
 
 const _routes = {
@@ -204,6 +209,26 @@ const _routes = {
     {
       name: ScreenNameEnum.CHILDCREATEACCOUNTLOGIN,
       Component:ChildCreateAccountLogin,
+    },
+    {
+      name: ScreenNameEnum.COACH_STEP1,
+      Component:coachStep1,
+    },
+    {
+      name: ScreenNameEnum.PLAYER_STEP1,
+      Component:PlayerStep1,
+    },
+    {
+      name: ScreenNameEnum.NOWITHOUTSCREEN,
+      Component:NoWithoutLoginScreen,
+    },
+    {
+      name: ScreenNameEnum.REQUESTSENTSETP2,
+      Component:Step2Requestsent,
+    },
+    {
+      name: ScreenNameEnum.FIRST_TIMECHILD,
+      Component:firstTimechildadded,
     },
     
     

@@ -128,7 +128,7 @@ else{
           <TextInput 
           placeholder='New Password'
           placeholderTextColor={'#000'}
-          style={{fontSize:14,color:'#000',lineHeight:18}}
+          style={{fontSize:14,color:'#000',lineHeight:18,fontWeight:'600',}}
           onChangeText={(txt)=>setPassword(txt)}
           value={password}
           />
@@ -139,7 +139,7 @@ else{
           <TextInput 
           placeholder='Confirm New Password'
           placeholderTextColor={'#000'}
-          style={{fontSize:14,color:'#000',lineHeight:18}}
+          style={{fontSize:14,color:'#000',lineHeight:18,fontWeight:'600'}}
 
           onChangeText={(txt)=>setConfirmPassword(txt)}
           value={ConfirmPassword}

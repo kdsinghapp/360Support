@@ -8,30 +8,32 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import ScreenNameEnum from '../routes/screenName.enum';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import GoBack from '../assets/svg/GoBack.svg';
 import PickPhoto from '../assets/svg/PickPhoto.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import {  updateSelectedRole } from '../redux/feature/authSlice';
+import {  Get_Country, updateSelectedRole } from '../redux/feature/authSlice';
 export default function SelectRole() {
   const navigation = useNavigation();
 
 
   const [selectedRole, setselectedRole] = useState('');
   const [SelectedIndex, setSelectedIndex] = useState(null);
-
+const isFocus = useIsFocused()
 
 
   
   const dispatch =useDispatch()
   const setRole =()=>{
     
+
+    dispatch(Get_Country());
     if(selectedRole != ''){
 
 dispatch(updateSelectedRole(selectedRole));

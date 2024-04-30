@@ -183,7 +183,7 @@
       
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate(ScreenNameEnum.ASKCREATEALOGIN);
+                navigation.navigate(ScreenNameEnum.FIRST_TIMECHILD);
               }}
               style={[
                 styles.btn,

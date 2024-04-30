@@ -1,5 +1,4 @@
 
-
     import {View, Text, Image, TouchableOpacity, StyleSheet, TextInput} from 'react-native';
     import React from 'react';
     import {
@@ -11,33 +10,29 @@
     import Logo from '../assets/svg/Step1.svg';
     import GoBack from '../assets/svg/GoBack.svg'
 
-    export default function AskCreateALogin() {
+    export default function PlayerStep1() {
       const navigation = useNavigation();
     
       return (
         <View style={{flex: 1, backgroundColor: '#874be9'}}>
           <View
             style={{
-              height: hp(20),
+              height: hp(10),
               alignItems: 'center',
               justifyContent: 'center',
               width:'100%',
              
             }}>
-            <Image
-              source={require('../assets/Cropping/Logo_23x.png')}
-              style={{height: 180, width: 180}}
-              resizeMode="contain"
-            />
-    
-            <TouchableOpacity
+            
+  
+            {/* <TouchableOpacity
             onPress={()=>{
               navigation.goBack()
             }}
             style={{position:'absolute',left:10,top:20}}
             >
               <GoBack />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
     
           <View>
@@ -47,113 +42,89 @@
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text
-                style={{
-                  fontSize: 24,
-                  fontWeight: '700',
-                  color: '#FFF',
-                  lineHeight: 36,
-                }}>
-             Are you, Shubham Techno a 
-              </Text>
-              <Text
-                style={{
-                  fontSize: 24,
-                  fontWeight: '700',
-                  color: '#FFF',
-                  lineHeight: 36,
-                }}>
-            parent to a player in Farham
-              </Text>
-              <Text
-                style={{
-                  fontSize: 24,
-                  fontWeight: '700',
-                  color: '#FFF',
-                  lineHeight: 36,
-                }}>
-            FC U17?
-              </Text>
+              
               
               
             </View>
-           
-           
+            <View style={{height:hp(15),marginHorizontal:15,
+                alignItems:'center',marginTop:10,flexDirection:'row'}}>
+              <View style={{height:60,width:60,alignItems:'center',justifyContent:'center'}}>
+  
+              <Logo />
+              </View>
+              <View style={{}}>
+            <Text
+                style={{
+                  fontSize:18,
+                  fontWeight: '400',
+                  color: '#FFF',
+                  lineHeight: 24,
+            
+                }}>
+              Farham FC
+              </Text>
+            <Text
+                style={{
+                  fontSize:18,
+                  fontWeight: '600',
+                  color: '#FFF',
+                  lineHeight: 24,
+            
+                }}>
+               NFC U16
+              </Text>
+              </View>
+            </View>
           
           </View>
-          
+          <View style={{paddingHorizontal:20,}}>
+          <Text
+                style={{
+                  fontSize: 24,
+                  fontWeight: '700',
+                  color: '#FFF',
+                  lineHeight: 36,
+                }}>
+           Welcome!
+              </Text>
+          <Text
+                style={{
+                  fontSize:14,
+                  fontWeight: '400',
+                  color: '#FFF',
+                  lineHeight:18,
+                }}>
+           You have now created your account, and will now be taken to your team's dashboard. We hope you'll enjoy working with 360Player!
+              </Text>
+          </View>
           <View style={{marginTop: hp(5)}}>
          
             
             <TouchableOpacity
     
             onPress={()=>{
-              navigation.navigate(ScreenNameEnum.CREATECHILDACCOUNT)
+              navigation.navigate(ScreenNameEnum.BOTTOM_TAB)
             }}
               style={[
                 styles.btn,
                 {
-                  backgroundColor: '#FFF',
+                  backgroundColor: '#294247',
                 },
               ]}>
               <Text
                 style={{
                   fontSize: 17,
-                  color: '#000',
+                  color: '#FFFFFF',
                   fontWeight: '600',
                   lineHeight: 25,
                 }}>
-              Yes, create a login
+           Take me to my team!
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-    
-    onPress={()=>{
-      navigation.navigate(ScreenNameEnum.NOWITHOUTSCREEN)
-    }}
-              style={[
-                styles.btn,
-                {
-               backgroundColor:'#FFF',
-                  
-                  marginTop:20
-                },
-              ]}>
-              <Text
-                style={{
-                  fontSize: 17,
-                  color: '#000',
-                  fontWeight: '600',
-                  lineHeight: 25,
-                }}>
-              No, continue without
-              </Text>
-            </TouchableOpacity>
+          
           </View>
     
-          <TouchableOpacity
-            style={{
-              justifyContent: 'center',
-              alignSelf: 'center',
-          
-              marginTop: hp(10),
-              backgroundColor: '#6f5694',
-              paddingHorizontal:30,
-            
-              borderRadius: 30,
-              height:30
-            }}>
-            <Text
-              style={{
-                fontSize: 12,
-                color: '#FFF',
-                fontWeight: '600',
-                lineHeight: 18,
-              }}>
-           Log out
-            </Text>
-          </TouchableOpacity>
-    
+ 
       
         </View>
       );
@@ -163,7 +134,7 @@
       btn: {
         height: 55,
         marginHorizontal: 20,
-        borderRadius: 15,
+        borderRadius: 10,
        justifyContent:'center',
        alignItems:'center'
      

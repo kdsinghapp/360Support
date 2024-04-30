@@ -1,6 +1,6 @@
 
 
-import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput} from 'react-native';
+import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput, ScrollView} from 'react-native';
 import React from 'react';
 import {
   widthPercentageToDP as wp,
@@ -15,7 +15,7 @@ export default function CreateChildAccount() {
   const navigation = useNavigation()
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
-    
+     <ScrollView showsVerticalScrollIndicator={false}>
     <View
         style={{
           height: hp(5),
@@ -33,7 +33,7 @@ export default function CreateChildAccount() {
       <View style={{marginTop:hp(5),marginHorizontal:15}}>
         <View
           style={{
-          
+          width:'80%',
             justifyContent: 'center',
           }}>
           <Text
@@ -43,7 +43,7 @@ export default function CreateChildAccount() {
               color: '#FFF',
               lineHeight: 36,
             }}>
-         Create account 
+           Please provide your child's account details
           </Text>
          
          
@@ -88,7 +88,7 @@ export default function CreateChildAccount() {
 </View>
       <TouchableOpacity
        onPress={() => {
-        navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
+        navigation.navigate(ScreenNameEnum.NOWITHOUTSCREEN);
       }}
           style={[
             styles.btn,
@@ -149,8 +149,8 @@ export default function CreateChildAccount() {
         style={{
           justifyContent: 'center',
           alignSelf: 'center',
-          position: 'absolute',
-          bottom: hp(5),
+        
+          marginTop: hp(5),
           backgroundColor: '#FFF',
           paddingHorizontal: 20,
           paddingVertical: 10,
@@ -166,6 +166,8 @@ export default function CreateChildAccount() {
           Cancel
         </Text>
       </TouchableOpacity>
+
+     </ScrollView>
     </View>
   );
 }

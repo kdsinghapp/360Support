@@ -31,13 +31,14 @@ export default function OtpScreen({route}) {
 
     const params = {
       data: {
-        email:email,
+        email:email.email,
         otp:value
         
       },
       navigation: navigation,
     };
     dispatch(validOtp(params));
+
   }
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>

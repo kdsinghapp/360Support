@@ -7,9 +7,25 @@ import {
 import ScreenNameEnum from '../routes/screenName.enum';
 import { useNavigation } from '@react-navigation/native';
 import GoBack from '../assets/svg/GoBack.svg';
+import { useSelector } from 'react-redux';
 export default function SignUp() {
-
+  const selected = useSelector(state => state.auth.selectedRole);
+console.log('====================================');
+console.log(selected);
+console.log('====================================');
   const navigation = useNavigation()
+
+  const checkScreenGroupCode =()=>{
+    if(selected === 'Coach'){
+      navigation.navigate(ScreenNameEnum.COACH_STEP1)
+    }
+    else if(selected === 'Player'){
+      navigation.navigate(ScreenNameEnum.PLAYER_STEP1)
+    }
+    else if(selected === 'Parent'){
+      navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
+    }
+  }
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
     
@@ -94,7 +110,8 @@ export default function SignUp() {
 </View>
       <TouchableOpacity
        onPress={() => {
-        navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
+        checkScreenGroupCode()
+      
       }}
           style={[
             styles.btn,

@@ -75,7 +75,7 @@
     </View>
           <TouchableOpacity
            onPress={() => {
-            navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
+            navigation.navigate(ScreenNameEnum.REQUESTSENTSETP2);
           }}
               style={[
                 styles.btn,

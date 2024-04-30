@@ -21,11 +21,13 @@ import GoBack from '../assets/svg/GoBack.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import {ResetPasswordEmail} from '../redux/feature/authSlice';
 import Loading from '../configs/Loader';
-export default function welcomeScreen() {
+import SettingModal from './Modal/SettignModal';
+export default function NoWithoutLoginScreen() {
   const navigation = useNavigation();
   const isLoading = useSelector(state => state.auth.isLoading);
 
   const [Email, setEmail] = useState('');
+  const [ModalVisible,setModalVisible] = useState(false)
   const dispatch = useDispatch();
   const validateEmail = email => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,7 +67,7 @@ export default function welcomeScreen() {
 
           <TouchableOpacity
             onPress={() => {
-              navigation.goBack();
+                setModalVisible(true)
             }}
             style={{position: 'absolute', right: 10, top: 20}}>
             <Image
@@ -88,7 +90,7 @@ export default function welcomeScreen() {
                 color: '#FFF',
                 lineHeight: 36,
               }}>
-              Welcome back, Parent Test!
+              Success!
             </Text>
           </View>
           <View
@@ -100,121 +102,152 @@ export default function welcomeScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontWeight: '400',
+                fontWeight: '600',
                 color: '#FFF',
                 lineHeight: 24,
               }}>
-              You are not a part of any team or group,
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: '400',
-                color: '#FFF',
-                lineHeight: 24,
-              }}>
-              Connect to a child or join a new group using a group code to
-              continue.
+              You are now connected to:
             </Text>
           </View>
         </View>
-<View style={{marginHorizontal:15,marginTop:20}}>  
-<Text
+        <View style={{marginHorizontal: 15, marginTop: 20}}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '700',
+              color: '#FFF',
+              lineHeight: 24,
+            }}>
+            Your account
+          </Text>
+        </View>
+        <View
+         
+          style={[styles.tab, {marginTop: 20}]}>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+              backgroundColor: 'grey',
+            }}>
+            <Text
               style={{
-                fontSize: 18,
+                fontSize: 16,
+                lineHeight: 19.09,
                 fontWeight: '700',
                 color: '#FFF',
-                lineHeight: 24,
               }}>
-             Child connection
+              PA
             </Text>
-</View>
-        <TouchableOpacity 
-        onPress={()=>{
-          //  navigation.navigate(ScreenNameEnum.SENT_CONNECTIONREQ,{showCreateaccount:true})
-        }}
+          </View>
+
+          <View style={{width: '65%', marginLeft: 10}}>
+            <Text
+              style={{
+                fontSize: 16,
+                lineHeight: 19.09,
+                fontWeight: '700',
+                color: '#000',
+              }}>
+              Parent Account
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                lineHeight: 19.09,
+                fontWeight: '400',
+                color: 'grey',
+              }}>
+              parent@gmail.com
+            </Text>
+          </View>
+        </View>
+
+        <View style={{marginHorizontal: 15, marginTop: 20}}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '700',
+              color: '#FFF',
+              lineHeight: 24,
+            }}>
+            child account
+          </Text>
+        </View>
+        <View
+          
+          style={[styles.tab, {marginTop: 20}]}>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+              backgroundColor: 'grey',
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                lineHeight: 19.09,
+                fontWeight: '700',
+                color: '#FFF',
+              }}>
+              CA
+            </Text>
+          </View>
+
+          <View style={{width: '65%', marginLeft: 10}}>
+            <Text
+              style={{
+                fontSize: 16,
+                lineHeight: 19.09,
+                fontWeight: '700',
+                color: '#000',
+              }}>
+              child Account
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                lineHeight: 19.09,
+                fontWeight: '400',
+                color: 'grey',
+              }}>
+              child@gmail.com
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+          }}
+          style={[
+            styles.btn,
+            {
+              backgroundColor: '#294247',
+              marginTop: hp(5),
+            },
+          ]}>
+          <Text
+            style={{
+              fontSize: 17,
+              color: '#FFFFFF',
+              fontWeight: '600',
+              lineHeight: 25,
+            }}>
+            Take me to the team!
+          </Text>
+        </TouchableOpacity>
+        <SettingModal visible={ModalVisible}
         
-        style={[styles.tab, {marginTop: 20}]}>
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Image
-              resizeMode="contain"
-              source={require('../assets/Cropping/Add3x.png')}
-              style={{height: 70, width: 70}}
-            />
-          </View>
-
-          <View style={{width: '65%'}}>
-            <Text
-              style={{
-                fontSize: 16,
-                lineHeight: 19.09,
-                fontWeight: '700',
-                color: '#000',
-              }}>
-              New child connection
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                lineHeight: 19.09,
-                fontWeight: '400',
-                color: 'grey',
-              }}>
-              if you are a coach or a player in a group you can join here
-            </Text>
-          </View>
-        </TouchableOpacity>
-    
-<View style={{marginHorizontal:15,marginTop:20}}>  
-<Text
-              style={{
-                fontSize: 18,
-                fontWeight: '700',
-                color: '#FFF',
-                lineHeight: 24,
-              }}>
-            Groups
-            </Text>
-</View>
-        <TouchableOpacity style={[styles.tab, {marginTop: 20}]}>
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Image
-              resizeMode="contain"
-              source={require('../assets/Cropping/Add3x.png')}
-              style={{height: 70, width: 70}}
-            />
-          </View>
-
-          <View style={{width: '65%'}}>
-            <Text
-              style={{
-                fontSize: 16,
-                lineHeight: 19.09,
-                fontWeight: '700',
-                color: '#000',
-              }}>
-            Join as a coch or player
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                lineHeight: 19.09,
-                fontWeight: '400',
-                color: 'grey',
-              }}>
-              if you are a coach or a player in a group you can join here
-            </Text>
-          </View>
-        </TouchableOpacity>
-    
+        onClose={() => setModalVisible(false)} 
+        
+        
+        />
       </ScrollView>
     </View>
   );
@@ -222,7 +255,7 @@ export default function welcomeScreen() {
 
 const styles = StyleSheet.create({
   tab: {
-    marginHorizontal:15,
+    marginHorizontal: 15,
     backgroundColor: '#FFF',
     marginTop: hp(5),
     height: hp(10),
