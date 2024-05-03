@@ -7,6 +7,8 @@ import {
   TextInput,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
+  Platform,
 } from 'react-native';
 import React, {useState} from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
@@ -18,53 +20,80 @@ import ScreenNameEnum from '../routes/screenName.enum';
 import {useNavigation} from '@react-navigation/native';
 import GoBack from '../assets/svg/GoBack.svg';
 import PickPhoto from '../assets/svg/PickPhoto.svg';
-import {useSelector} from 'react-redux';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import {useDispatch, useSelector} from 'react-redux';
+import ImagePicker from 'react-native-image-crop-picker'
+import { Add_UserInfo } from '../redux/feature/authSlice';
+import Loading from '../configs/Loader';
 
 export default function Step2() {
   const navigation = useNavigation();
   const selected = useSelector(state => state.auth.selectedRole);
   const Country_List = useSelector(state => state.auth.Country_List);
+  const GroupDetails = useSelector(state => state.auth.Group_Details);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-  const [profile,setProfile] = useState('')
+  const [profile,setProfile] = useState(null)
   const [Dd, setDd] = useState('');
   const [Mm, setMm] = useState('');
   const [YYYY, setYYY] = useState('');
-
-
-  console.log(profile);
+  const [firstName,setfirstName] = useState('')
+  const [lastName,setlastName] = useState('')
+  const isLoading = useSelector(state => state.auth.isLoading);
+const dispatch =useDispatch()
   
   const openImageLibrary = () => {
     
-    const options = {
-      mediaType: 'photo', 
-      quality: 0.5, 
-    };
-  
 
-    launchImageLibrary(options, (response) => {
-      console.log(response);
-      
-  
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode) {
-        console.log('ImagePicker Error: ', response.errorCode);
-      } else {
-        setProfile({
-          uri: response.assets[0].uri,
-          name: response.assets[0].fileName,
-          type: response.assets[0].type,
-        })
+      ImagePicker.openPicker({
+          width: 300,
+          height: 400,
+          cropping: true
+      }).then(image => {
+       
         
-        console.log('Image URI: ', response.assets[0].uri);
+          setProfile(image)
+      }).catch((err) => {
+        
+         console.log(err);
+    
+      })
+  
+  }
+
+
+
+  const createUser =()=>{
+    if(firstName == '' || lastName == '' ) return Alert.alert('Please enter ','First Name or Last Name')
+    if(firstName == '' || lastName == '' ) return Alert.alert('Please enter ','date of birth')
+    if(Dd == '' || Mm == '' || YYYY == '') return Alert.alert('Please enter ','date of birth')
+    if(profile == null) return Alert.alert('Please Pick ','Profile image')
+    if(value == ''  ) return Alert.alert('Please selecte ','Country')
+
+   
+    
+    const params = {
+      data: {
+        first_name:firstName,
+        last_name:lastName,
+        dob:`${Dd}-${Mm}-${YYYY}`,
+        country:value,
+        type:selected,
+        image:{
+          uri: Platform.OS == "android" ? profile.path : profile?.path?.replace("file://", ""),
+          type: profile.mime,
+          name: "image.png"
       }
-    });
-  };
+      },
+      navigation: navigation,
+    };
+    dispatch(Add_UserInfo(params));
+
+
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
+        {isLoading ? <Loading /> : null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -96,7 +125,7 @@ export default function Step2() {
                 color: '#FFF',
                 lineHeight: 24,
               }}>
-              Sign up as a {selected} in NFC U16
+              Sign up as a {selected} in {GroupDetails.group_name}
             </Text>
             <Text
               style={{
@@ -106,7 +135,7 @@ export default function Step2() {
                 lineHeight: 18,
                 marginTop: 10,
               }}>
-              First, lets create your (parent) account
+              First, lets create your ({selected}) account
             </Text>
           </View>
         </View>
@@ -119,7 +148,7 @@ export default function Step2() {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          {profile == null?<PickPhoto />:<Image  source={{uri:profile.uri}}  style={{height:90,width:90,borderRadius:45}}/>}
+          {profile == null?<PickPhoto />:<Image  source={{uri:profile.path}}  style={{height:90,width:90,borderRadius:45}}/>}
         </TouchableOpacity>
 
         <View style={{}}>
@@ -132,6 +161,9 @@ export default function Step2() {
               placeholder="Your First Name"
               placeholderTextColor={'#000'}
               style={{fontSize: 14, color: '#000', lineHeight: 18}}
+
+              onChangeText={(txt)=>setfirstName(txt)}
+              value={firstName}
             />
           </View>
           <View
@@ -143,6 +175,9 @@ export default function Step2() {
               placeholder="Your Last Name"
               placeholderTextColor={'#000'}
               style={{fontSize: 14, color: '#000', lineHeight: 18}}
+              
+              onChangeText={(txt)=>setlastName(txt)}
+              value={lastName}
             />
           </View>
           <View
@@ -150,7 +185,7 @@ export default function Step2() {
               styles.txtInput,
               {backgroundColor: '#FFFFFF', marginTop: 20},
             ]}>
-            <Dropdown
+        {Country_List &&   <Dropdown
               data={Country_List}
               maxHeight={200}
               labelField="name"
@@ -169,6 +204,7 @@ export default function Step2() {
                 setIsFocus(false);
               }}
             />
+            }
           </View>
 
           <View
@@ -213,6 +249,7 @@ export default function Step2() {
                 maxLength={2}
                 onChangeText={txt => setMm(txt)}
                 value={Mm}
+                
               />
             </View>
             <View
@@ -230,6 +267,7 @@ export default function Step2() {
                 placeholderTextColor={'#000'}
                 style={{fontSize: 14, color: '#000', lineHeight: 18}}
                 onChangeText={txt => setYYY(txt)}
+                maxLength={4}
                 value={YYYY}
               />
             </View>
@@ -239,7 +277,8 @@ export default function Step2() {
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(ScreenNameEnum.STEP_FOUR);
+       
+            createUser()
           }}
           style={[
             styles.btn,

@@ -10,9 +10,9 @@ const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
   const selected = useSelector(state => state.auth.selectedRole);
-console.log('=>>>>>>>>>>>>>>>>>>> role',selected);
+  const UserInformation = useSelector(state => state.auth.UserInformation);
   const renderTabScreens = () => {
-    if (selected === 'Parent') {
+    if (UserInformation.type === 'Parent' || UserInformation.type === 'Child') {
       return _routes.BOTTOMTAB_ROUTE.map(screen => (
         <Tab.Screen
           key={screen.name}
@@ -40,7 +40,7 @@ console.log('=>>>>>>>>>>>>>>>>>>> role',selected);
       ));
     } 
     
-    else  if (selected === 'Coach') {
+    else  if (UserInformation.type === 'Coach') {
       return _routes.BOTTOMTAB_COACH.map(screen => (
         <Tab.Screen
           key={screen.name}
@@ -68,7 +68,7 @@ console.log('=>>>>>>>>>>>>>>>>>>> role',selected);
       ));
      
     }
-    else  if (selected === 'Player') {
+    else  if (UserInformation.type === 'Player') {
       return _routes.BOTTOMTAB_PLAYER.map(screen => (
         <Tab.Screen
           key={screen.name}

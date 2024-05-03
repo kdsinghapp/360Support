@@ -1,20 +1,89 @@
 
 
-import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput, ScrollView} from 'react-native';
-import React from 'react';
+import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput, ScrollView, Alert} from 'react-native';
+import React, { useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import ScreenNameEnum from '../routes/screenName.enum';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import GoBack from '../assets/svg/GoBack.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { Updated_ChildInfo } from '../redux/feature/authSlice';
+import Loading from '../configs/Loader';
 
 export default function CreateChildAccount() {
 
-  const navigation = useNavigation()
+  const selected = useSelector(state => state.auth.selectedRole);
+  const UserInformation = useSelector(state => state.auth.UserInformation);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [Cemail, setCEmail] = useState('');
+  const [Cpassword, setCPassword] = useState('');
+
+  const dispatch = useDispatch();
+  const isLoading = useSelector(state => state.auth.isLoading);
+
+  const [isValidEmail, setIsValidEmail] = useState(true);
+  const navigation = useNavigation();
+  const isFocus = useIsFocused();
+
+  const validateEmail = email => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  const validatePassword = password => {
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    return passwordRegex.test(password);
+  };
+  const UpdatedChild = () => {
+    if (password != '' && email != '') {
+
+
+      if (!validateEmail(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        alert(
+          'Password must contain at least 8 characters, including  letters ,least one special character,  and numbers.',
+        );
+        return;
+      }
+
+      if (isValidEmail) {
+        const passwordWithoutSpaces = password.replace(/\s/g, '');
+
+        if (email !== Cemail)
+          return Alert.alert('Email', 'Email or Confirm Email not Match');
+        if (password !== Cpassword)
+          return Alert.alert(
+            'Password',
+            'Password or Confirm Password not Match',
+          );
+        const params = {
+          data: {
+            email: email,
+            password: passwordWithoutSpaces,
+            user_id: '30',
+          },
+          navigation: navigation,
+        };
+        dispatch(Updated_ChildInfo(params));
+      } else {
+        Alert.alert('Failed', 'Invalid email or password');
+      }
+    } else {
+      Alert.alert('Require', 'email or password field empty');
+    }
+  };
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
+       {isLoading ? <Loading /> : null}
      <ScrollView showsVerticalScrollIndicator={false}>
     <View
         style={{
@@ -62,6 +131,8 @@ export default function CreateChildAccount() {
           placeholder="Your child's email"
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
+          value={email}
+          onChangeText={(txt)=>setEmail(txt)}
           />
         </View>
         <View style={[styles.txtInput, {backgroundColor: '#FFFFFF',marginTop:20}]}>
@@ -69,6 +140,9 @@ export default function CreateChildAccount() {
           placeholder='Confirm email'
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
+          value={Cemail}
+          onChangeText={(txt)=>setCEmail(txt)}
+
           />
         </View>
         <View style={[styles.txtInput, {backgroundColor: '#FFFFFF',marginTop:20}]}>
@@ -76,6 +150,8 @@ export default function CreateChildAccount() {
           placeholder="Your child's password"
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
+          value={password}
+          onChangeText={(txt)=>setPassword(txt)}
           />
         </View>
         <View style={[styles.txtInput, {backgroundColor: '#FFFFFF',marginTop:20}]}>
@@ -83,12 +159,14 @@ export default function CreateChildAccount() {
           placeholder='Confirm password'
           placeholderTextColor={'#000'}
           style={{fontSize:14,color:'#000',lineHeight:18}}
+          value={Cpassword}
+          onChangeText={(txt)=>setCPassword(txt)}
           />
         </View>
 </View>
       <TouchableOpacity
        onPress={() => {
-        navigation.navigate(ScreenNameEnum.NOWITHOUTSCREEN);
+        UpdatedChild()
       }}
           style={[
             styles.btn,

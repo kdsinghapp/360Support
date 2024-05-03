@@ -8,7 +8,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -19,39 +19,42 @@ import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 import GoBack from '../assets/svg/GoBack.svg';
 import {useDispatch, useSelector} from 'react-redux';
-import {ResetPasswordEmail} from '../redux/feature/authSlice';
+import {ResetPasswordEmail, get_profile} from '../redux/feature/authSlice';
 import Loading from '../configs/Loader';
 import SettingModal from './Modal/SettignModal';
 export default function NoWithoutLoginScreen() {
   const navigation = useNavigation();
   const isLoading = useSelector(state => state.auth.isLoading);
-
+  const UserInformation = useSelector(state => state.auth.UserInformation);
+  const GetUserProfile = useSelector(state => state.auth.GetUserProfile);
+  // const UserInformation = useSelector(state => state.auth.UserInformation);
   const [Email, setEmail] = useState('');
-  const [ModalVisible,setModalVisible] = useState(false)
+  const [ModalVisible, setModalVisible] = useState(false);
+
+
+
   const dispatch = useDispatch();
-  const validateEmail = email => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  const getGroupDetails = () => {
+    if (!UserInformation == null) return;
+    const params = {
+      user_id: UserInformation.id,
+
+      navigation: navigation,
+    };
+
+    dispatch(get_profile(params));
   };
-  const sentOtp = () => {
-    if (Email === '') return Alert.alert('Email', 'Please Enter  Email ');
-    if (validateEmail(Email)) {
-      const params = {
-        data: {
-          email: Email,
-        },
-        navigation: navigation,
-      };
-      dispatch(ResetPasswordEmail(params));
-    } else {
-      Alert.alert('Email', 'Please Enter Valid Email ');
-    }
-  };
+
+  useEffect(() => {
+    getGroupDetails();
+  }, [UserInformation]);
 
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {isLoading ? <Loading /> : null}
+
+        
         <View
           style={{
             height: hp(20),
@@ -67,7 +70,7 @@ export default function NoWithoutLoginScreen() {
 
           <TouchableOpacity
             onPress={() => {
-                setModalVisible(true)
+              setModalVisible(true);
             }}
             style={{position: 'absolute', right: 10, top: 20}}>
             <Image
@@ -121,9 +124,7 @@ export default function NoWithoutLoginScreen() {
             Your account
           </Text>
         </View>
-        <View
-         
-          style={[styles.tab, {marginTop: 20}]}>
+        {GetUserProfile != null &&       <View style={[styles.tab, {marginTop: 20}]}>
           <View
             style={{
               alignItems: 'center',
@@ -140,11 +141,12 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#FFF',
               }}>
-              PA
+             {GetUserProfile?.first_name[0]}{GetUserProfile?.last_name[0]} 
             </Text>
           </View>
 
-          <View style={{width: '65%', marginLeft: 10}}>
+      
+         <View style={{width: '65%', marginLeft: 10}}>
             <Text
               style={{
                 fontSize: 16,
@@ -152,7 +154,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#000',
               }}>
-              Parent Account
+              {GetUserProfile?.first_name} {GetUserProfile?.last_name} 
             </Text>
             <Text
               style={{
@@ -161,10 +163,11 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '400',
                 color: 'grey',
               }}>
-              parent@gmail.com
+             {GetUserProfile?.email}
             </Text>
           </View>
         </View>
+          }
 
         <View style={{marginHorizontal: 15, marginTop: 20}}>
           <Text
@@ -177,10 +180,9 @@ export default function NoWithoutLoginScreen() {
             child account
           </Text>
         </View>
-        <View
-          
-          style={[styles.tab, {marginTop: 20}]}>
-          <View
+        <View style={[styles.tab, {marginTop: 20}]}>
+    {GetUserProfile  != null && 
+         <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -196,9 +198,10 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#FFF',
               }}>
-              CA
+             {GetUserProfile?.child_details[0].first_name[0]}{GetUserProfile?.child_details[0].last_name[0]}
             </Text>
           </View>
+}
 
           <View style={{width: '65%', marginLeft: 10}}>
             <Text
@@ -208,7 +211,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#000',
               }}>
-              child Account
+            {GetUserProfile?.child_details[0].first_name} {GetUserProfile?.child_details[0].last_name}
             </Text>
             <Text
               style={{
@@ -217,7 +220,8 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '400',
                 color: 'grey',
               }}>
-              child@gmail.com
+                 {GetUserProfile?.child_details[0].email} 
+             
             </Text>
           </View>
         </View>
@@ -242,11 +246,41 @@ export default function NoWithoutLoginScreen() {
             Take me to the team!
           </Text>
         </TouchableOpacity>
-        <SettingModal visible={ModalVisible}
-        
-        onClose={() => setModalVisible(false)} 
-        
-        
+        <Text
+          style={{
+            fontSize: 17,
+            color: '#FFFFFF',
+            fontWeight: '600',
+            lineHeight: 25,
+            alignSelf: 'center',
+          }}>
+          Or
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+          }}
+          style={[
+            styles.btn,
+            {
+              borderWidth: 1,
+              borderColor: '#FFF',
+              marginTop: hp(5),
+            },
+          ]}>
+          <Text
+            style={{
+              fontSize: 17,
+              color: '#FFFFFF',
+              fontWeight: '600',
+              lineHeight: 25,
+            }}>
+            Invite another parent
+          </Text>
+        </TouchableOpacity>
+        <SettingModal
+          visible={ModalVisible}
+          onClose={() => setModalVisible(false)}
         />
       </ScrollView>
     </View>

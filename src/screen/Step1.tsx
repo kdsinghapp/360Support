@@ -84,10 +84,11 @@ export default function Step1() {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Image
+           {GroupDetails && <Image
               source={{uri: GroupDetails.image}}
               style={{height: 60, width: 60, borderRadius: 30}}
             />
+           }
           </View>
           <Text
             style={{
@@ -97,7 +98,7 @@ export default function Step1() {
               lineHeight: 24,
               marginTop: 15,
             }}>
-            {GroupDetails.group_name}
+            {GroupDetails?.group_name}
           </Text>
           <Text
             style={{
@@ -107,7 +108,7 @@ export default function Step1() {
               lineHeight: 18,
               marginTop: 10,
             }}>
-            {GroupDetails.details}
+            {GroupDetails?.details}
           </Text>
         </View>
       </View>

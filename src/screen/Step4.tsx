@@ -9,9 +9,11 @@ import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 import Logo from '../assets/svg/Step1.svg';
 import GoBack from '../assets/svg/GoBack.svg'
+import { useSelector } from 'react-redux';
 export default function Step4() {
   const navigation = useNavigation();
-
+  const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const UserInformation = useSelector(state => state.auth.UserInformation);
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
       <View
@@ -52,7 +54,7 @@ export default function Step4() {
               color: '#FFF',
               lineHeight: 36,
             }}>
-         Are you, Shubham Techno a 
+         Are you, {UserInformation?.first_name} {UserInformation?.last_name}  a 
           </Text>
           <Text
             style={{
@@ -61,7 +63,7 @@ export default function Step4() {
               color: '#FFF',
               lineHeight: 36,
             }}>
-        parent to a player in Farham
+        parent to a player 
           </Text>
           <Text
             style={{
@@ -70,7 +72,7 @@ export default function Step4() {
               color: '#FFF',
               lineHeight: 36,
             }}>
-        FC U17?
+     {GroupDetails.group_name}
           </Text>
           
           
