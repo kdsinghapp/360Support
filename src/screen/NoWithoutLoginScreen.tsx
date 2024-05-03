@@ -26,13 +26,13 @@ export default function NoWithoutLoginScreen() {
   const navigation = useNavigation();
   const isLoading = useSelector(state => state.auth.isLoading);
   const UserInformation = useSelector(state => state.auth.UserInformation);
-  const GetUserProfile = useSelector(state => state.auth.GetUserProfile);
-  // const UserInformation = useSelector(state => state.auth.UserInformation);
   const [Email, setEmail] = useState('');
   const [ModalVisible, setModalVisible] = useState(false);
 
 
-
+  console.log('====================================');
+  console.log(UserInformation.id);
+  console.log('====================================');
   const dispatch = useDispatch();
   const getGroupDetails = () => {
     if (!UserInformation == null) return;
@@ -53,8 +53,6 @@ export default function NoWithoutLoginScreen() {
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {isLoading ? <Loading /> : null}
-
-        
         <View
           style={{
             height: hp(20),
@@ -124,7 +122,7 @@ export default function NoWithoutLoginScreen() {
             Your account
           </Text>
         </View>
-        {GetUserProfile != null &&       <View style={[styles.tab, {marginTop: 20}]}>
+        <View style={[styles.tab, {marginTop: 20}]}>
           <View
             style={{
               alignItems: 'center',
@@ -141,12 +139,11 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#FFF',
               }}>
-             {GetUserProfile?.first_name[0]}{GetUserProfile?.last_name[0]} 
+              PA
             </Text>
           </View>
 
-      
-         <View style={{width: '65%', marginLeft: 10}}>
+          <View style={{width: '65%', marginLeft: 10}}>
             <Text
               style={{
                 fontSize: 16,
@@ -154,7 +151,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#000',
               }}>
-              {GetUserProfile?.first_name} {GetUserProfile?.last_name} 
+              Parent Account
             </Text>
             <Text
               style={{
@@ -163,11 +160,10 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '400',
                 color: 'grey',
               }}>
-             {GetUserProfile?.email}
+              parent@gmail.com
             </Text>
           </View>
         </View>
-          }
 
         <View style={{marginHorizontal: 15, marginTop: 20}}>
           <Text
@@ -181,8 +177,7 @@ export default function NoWithoutLoginScreen() {
           </Text>
         </View>
         <View style={[styles.tab, {marginTop: 20}]}>
-    {GetUserProfile  != null && 
-         <View
+          <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -198,10 +193,9 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#FFF',
               }}>
-             {GetUserProfile?.child_details[0].first_name[0]}{GetUserProfile?.child_details[0].last_name[0]}
+              CA
             </Text>
           </View>
-}
 
           <View style={{width: '65%', marginLeft: 10}}>
             <Text
@@ -211,7 +205,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#000',
               }}>
-            {GetUserProfile?.child_details[0].first_name} {GetUserProfile?.child_details[0].last_name}
+              child Account
             </Text>
             <Text
               style={{
@@ -220,8 +214,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '400',
                 color: 'grey',
               }}>
-                 {GetUserProfile?.child_details[0].email} 
-             
+              child@gmail.com
             </Text>
           </View>
         </View>
