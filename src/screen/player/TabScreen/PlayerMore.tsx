@@ -158,7 +158,7 @@
                   </View>
                   <TouchableOpacity
                     onPress={() => {
-                     navigation.navigate(ScreenNameEnum.LOGIN_SCREEN,)
+                     navigation.navigate(ScreenNameEnum.LOGIN_OPTION,)
                      setIsVisible(false)
                     }}
                     style={{

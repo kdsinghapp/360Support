@@ -15,29 +15,29 @@ import {
 } from 'react-native-responsive-screen';
 import Msg from '../assets/svg/Message.svg';
 import Mail from '../assets/svg/Mail.svg';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 import GoBack from '../assets/svg/GoBack.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import {ResetPasswordEmail, get_profile} from '../redux/feature/authSlice';
 import Loading from '../configs/Loader';
 import SettingModal from './Modal/SettignModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function NoWithoutLoginScreen() {
   const navigation = useNavigation();
   const isLoading = useSelector(state => state.auth.isLoading);
-  const UserInformation = useSelector(state => state.auth.UserInformation);
-  const [Email, setEmail] = useState('');
+  const Get_profile = useSelector(state => state.auth.GetUserProfile);
+
   const [ModalVisible, setModalVisible] = useState(false);
 
+  const idFousce = useIsFocused();
 
-  console.log('====================================');
-  console.log(UserInformation.id);
-  console.log('====================================');
   const dispatch = useDispatch();
-  const getGroupDetails = () => {
-    if (!UserInformation == null) return;
+  const getGroupDetails = async () => {
+    const id = await AsyncStorage.getItem('user_id');
+    if (!id == null) return;
     const params = {
-      user_id: UserInformation.id,
+      user_id: id,
 
       navigation: navigation,
     };
@@ -47,7 +47,7 @@ export default function NoWithoutLoginScreen() {
 
   useEffect(() => {
     getGroupDetails();
-  }, [UserInformation]);
+  }, [idFousce]);
 
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
@@ -139,7 +139,8 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#FFF',
               }}>
-              PA
+              {Get_profile?.first_name[0].toUpperCase()}
+              {Get_profile?.last_name[0].toUpperCase()}
             </Text>
           </View>
 
@@ -151,7 +152,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '700',
                 color: '#000',
               }}>
-              Parent Account
+              {Get_profile?.first_name} {Get_profile?.last_name}
             </Text>
             <Text
               style={{
@@ -160,7 +161,7 @@ export default function NoWithoutLoginScreen() {
                 fontWeight: '400',
                 color: 'grey',
               }}>
-              parent@gmail.com
+              {Get_profile?.email}
             </Text>
           </View>
         </View>
@@ -176,48 +177,51 @@ export default function NoWithoutLoginScreen() {
             child account
           </Text>
         </View>
-        <View style={[styles.tab, {marginTop: 20}]}>
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 50,
-              width: 50,
-              borderRadius: 25,
-              backgroundColor: 'grey',
-            }}>
-            <Text
+        {Get_profile?.child_details.length > 0 && (
+          <View style={[styles.tab, {marginTop: 20}]}>
+            <View
               style={{
-                fontSize: 16,
-                lineHeight: 19.09,
-                fontWeight: '700',
-                color: '#FFF',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 50,
+                width: 50,
+                borderRadius: 25,
+                backgroundColor: 'grey',
               }}>
-              CA
-            </Text>
-          </View>
+              <Text
+                style={{
+                  fontSize: 16,
+                  lineHeight: 19.09,
+                  fontWeight: '700',
+                  color: '#FFF',
+                }}>
+                {childDetails?.first_name[0].toUpperCase()}
+                {childDetails?.last_name[0].toUpperCase()}
+              </Text>
+            </View>
 
-          <View style={{width: '65%', marginLeft: 10}}>
-            <Text
-              style={{
-                fontSize: 16,
-                lineHeight: 19.09,
-                fontWeight: '700',
-                color: '#000',
-              }}>
-              child Account
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                lineHeight: 19.09,
-                fontWeight: '400',
-                color: 'grey',
-              }}>
-              child@gmail.com
-            </Text>
+            <View style={{width: '65%', marginLeft: 10}}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  lineHeight: 19.09,
+                  fontWeight: '700',
+                  color: '#000',
+                }}>
+                {childDetails?.first_name} {childDetails?.last_name}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  lineHeight: 19.09,
+                  fontWeight: '400',
+                  color: 'grey',
+                }}>
+                {childDetails?.email}
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
         <TouchableOpacity
           onPress={() => {
             navigation.navigate(ScreenNameEnum.BOTTOM_TAB);

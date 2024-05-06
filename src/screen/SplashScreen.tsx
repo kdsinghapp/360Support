@@ -8,7 +8,7 @@ export default function SplashScreen() {
   const navigation = useNavigation();
 useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+      navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
     }, 3000);
 
     return () => clearTimeout(timer);

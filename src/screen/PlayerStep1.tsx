@@ -9,10 +9,11 @@
     import ScreenNameEnum from '../routes/screenName.enum';
     import Logo from '../assets/svg/Step1.svg';
     import GoBack from '../assets/svg/GoBack.svg'
+import { useSelector } from 'react-redux';
 
     export default function PlayerStep1() {
       const navigation = useNavigation();
-    
+      const GroupDetails = useSelector(state => state.auth.Group_Details);
       return (
         <View style={{flex: 1, backgroundColor: '#874be9'}}>
           <View
@@ -50,7 +51,11 @@
                 alignItems:'center',marginTop:10,flexDirection:'row'}}>
               <View style={{height:60,width:60,alignItems:'center',justifyContent:'center'}}>
   
-              <Logo />
+              {GroupDetails && <Image
+              source={{uri: GroupDetails.image}}
+              style={{height: 60, width: 60, borderRadius: 30}}
+            />
+           }
               </View>
               <View style={{}}>
             <Text
@@ -61,7 +66,7 @@
                   lineHeight: 24,
             
                 }}>
-              Farham FC
+          {GroupDetails?.group_name}
               </Text>
             <Text
                 style={{
@@ -71,7 +76,7 @@
                   lineHeight: 24,
             
                 }}>
-               NFC U16
+              {GroupDetails?.details}
               </Text>
               </View>
             </View>

@@ -340,7 +340,18 @@ export const Updated_UserInfo = createAsyncThunk(
       console.log('=============update_signup api=======================');
 
       if (response.data.status == '1') {
-        params.navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
+        
+
+        if (params.selected === 'Coach') {
+          params.navigation.navigate(ScreenNameEnum.COACH_STEP1)
+         
+        } else if (params.selected === 'Player') {
+    
+          params.navigation.navigate(ScreenNameEnum.PLAYER_STEP1);
+        } else if (params.selected === 'Parent') {
+          params.navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
+         
+        }
       } else {
         Alert.alert('Failed', response.data.message);
       }

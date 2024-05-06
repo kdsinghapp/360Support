@@ -19,6 +19,7 @@ import GoBack from '../assets/svg/GoBack.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../configs/Loader';
 import {Updated_UserInfo} from '../redux/feature/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SignUp() {
   const selected = useSelector(state => state.auth.selectedRole);
   const UserInformation = useSelector(state => state.auth.UserInformation);
@@ -43,7 +44,9 @@ export default function SignUp() {
 
     return passwordRegex.test(password);
   };
-  const UpdatedUser = () => {
+  const UpdatedUser = async() => {
+
+    await AsyncStorage.setItem("user_id",UserInformation.id)
     if (password != '' && email != '') {
 
 
@@ -76,6 +79,7 @@ export default function SignUp() {
             user_id: UserInformation.id,
           },
           navigation: navigation,
+          selected:selected
         };
         dispatch(Updated_UserInfo(params));
       } else {
@@ -87,15 +91,8 @@ export default function SignUp() {
   };
 
   const checkScreenGroupCode = () => {
-    if (selected === 'Coach') {
-      // navigation.navigate(ScreenNameEnum.COACH_STEP1)
-      UpdatedUser();
-    } else if (selected === 'Player') {
-      navigation.navigate(ScreenNameEnum.PLAYER_STEP1);
-    } else if (selected === 'Parent') {
-      // navigation.navigate(ScreenNameEnum.CREATE_CONNECTION);
-      UpdatedUser();
-    }
+    UpdatedUser();
+   
   };
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
