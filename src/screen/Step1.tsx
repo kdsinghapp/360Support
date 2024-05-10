@@ -18,6 +18,7 @@ import GoBack from '../assets/svg/GoBack.svg';
 import {useSelector} from 'react-redux';
 export default function Step1() {
   const GroupDetails = useSelector(state => state.auth.Group_Details);
+
   const navigation = useNavigation();
 
   return (

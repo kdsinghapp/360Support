@@ -10,6 +10,7 @@ import GoBack from '../assets/svg/GoBack.svg';
 import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../configs/Loader';
 import { login } from '../redux/feature/authSlice';
+import { errorToast } from '../configs/customToast';
 
 export default function Login() {
     const navigation = useNavigation();
@@ -41,18 +42,12 @@ export default function Login() {
           };
           dispatch(login(params));
         } else {
-          Alert.alert(
-            'Failed',
-            'Invalid email or password',
-           
-          );
+          errorToast(`Invalid email or password`)
         }
       } else {
-        Alert.alert(
-          'Require',
-          'email or password field empty',
-          
-        );
+       
+      
+        errorToast(`email or password field empty`)
       }
     };
   

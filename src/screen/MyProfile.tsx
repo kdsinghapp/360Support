@@ -8,21 +8,131 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-
+import GoBack from '../assets/svg/GoBack.svg';
 import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 import BackBtn from '../assets/svg/BackBtn.svg';
-import Logo from '../assets/svg/Step1.svg';
+import PickPhoto from '../assets/svg/PickPhoto.svg';
 import Youtube from '../assets/svg/Youtube.svg';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  Get_Group,
+  get_profile,
+  update_parent_profile,
+} from '../redux/feature/authSlice';
+import {withDecay} from 'react-native-reanimated';
+import ImagePicker from 'react-native-image-crop-picker';
 export default function MyProfile() {
-  const [Selected, setSelected] = useState('Overview');
+  const [Selected, setSelected] = useState('Info & Contact');
+  const My_Profile = useSelector(state => state.auth.GetUserProfile);
+  const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const user_data = useSelector(state => state.auth.userData);
   const navigation = useNavigation();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({});
+  const [profile, setProfile] = useState(null);
 
+  const [userProfile, setUserProfile] = useState({
+    Name: `${My_Profile?.first_name} ${My_Profile?.last_name}`,
+    'Birth date': `${My_Profile?.dob}`,
+    Gender: `${My_Profile?.gender}`,
+    Age: `${My_Profile?.age}`,
+   
+  });
+  const [contactInfo, setContactInfo] = useState({
+    Email: `${My_Profile?.email}`,
+    'Cellphone number': `${My_Profile?.mobile}`,
+    'Street address': `${My_Profile?.street_address}`,
+    'ZIP code': `${My_Profile?.zip_code}`,
+    'State or region': `${My_Profile?.state}`,
+    Country: `${My_Profile?.country}`,
+    City: `${My_Profile?.city}`,
+  });
+
+  const dispatch = useDispatch();
+  // Function to toggle editing mode
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+  };
+  const userInfo = Object.entries(userProfile).map(([title, value]) => ({
+    title,
+    value,
+  }));
+  // Sample contact information data
+  const contactData = Object.entries(contactInfo).map(([title, value]) => ({
+    title,
+    value,
+  }));
+  const openImageLibrary = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    })
+      .then(image => {
+        setProfile(image);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  
+
+  // Function to handle input changes
+  const handleInputChange = (key, value) => {
+    if (value == '') return setEditedProfile({...editedProfile, [key]: ' '});
+    setEditedProfile({...editedProfile, [key]: value});
+
+
+ 
+  
+  };
+
+  // Function to save edited profile
+
+
+  const saveProfile = async () => {
+
+    setUserProfile({...userProfile, ...editedProfile});
+    setContactInfo({...contactInfo, ...editedProfile});
+    setIsEditing(false);
+
+    setEditedProfile({});
+    Updated_profile();
+  };
+
+  const Updated_profile =async()=>{
+    const params = {
+      data: {
+        user_id: user_data?.id,
+        first_name: userProfile?.Name || "",
+        last_name: userProfile?.Name || "",
+        dob: userProfile["Birth date"] || "",
+        gender: userProfile["Gender"] || "",
+        age: userProfile["Age"] || "",
+  
+        mobile: contactInfo["Cellphone number"] || "",
+        street_address: contactInfo["Street address"] || "",
+        zip_code: contactInfo["ZIP code"] || "",
+        state: contactInfo["State or region"] || "",
+        country: contactInfo["Country"] || "",
+        city: contactInfo["City"] || "",
+      },
+
+     
+    };
+    console.log('====================================');
+    console.log(params.data);
+    console.log('====================================');
+     // dispatch(update_parent_profile(params));
+  
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
@@ -64,32 +174,35 @@ export default function MyProfile() {
               style={{
                 height: 80,
                 width: 80,
-                backgroundColor: '#4800BE',
+
                 borderRadius: 40,
 
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Text
+              <TouchableOpacity
+                onPress={() => {
+                  openImageLibrary();
+                }}
                 style={{
-                  fontWeight: '700',
-                  fontSize: 22,
-                  lineHeight: 32,
-                  color: '#FFF',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}>
-                AR
-              </Text>
-            </View>
-            <View>
-              <Text
-                style={{
-                  fontWeight: '700',
-                  fontSize: 22,
-                  lineHeight: 32,
-                  color: '#FFF',
-                }}>
-                Abram Rosser
-              </Text>
+                {My_Profile?.image == null ? (
+                  <PickPhoto />
+                ) : (
+                  <>
+                    <Image
+                      source={{uri: My_Profile?.image}}
+                      style={{height: 80, width: 80, borderRadius: 40}}
+                    />
+                    <Text
+                      style={{fontSize: 12, color: '#fff', fontWeight: '700'}}>
+                      Edit Profile
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -100,16 +213,30 @@ export default function MyProfile() {
               alignItems: 'center',
               alignSelf: 'center',
             }}>
-            <Logo />
-            <Text
-              style={{
-                marginLeft: 10,
-                fontSize: 14,
-                fontWeight: '500',
-                color: '#FFF',
-              }}>
-              Farham FC
-            </Text>
+            <Image
+              source={{uri: GroupDetails?.image}}
+              style={{height: 35, width: 35, borderRadius: 17.5}}
+            />
+            <View style={{}}>
+              <Text
+                style={{
+                  marginLeft: 10,
+                  fontSize: 14,
+                  fontWeight: '500',
+                  color: '#FFF',
+                }}>
+                {GroupDetails?.group_name}
+              </Text>
+              <Text
+                style={{
+                  marginLeft: 10,
+                  fontSize: 14,
+                  fontWeight: '500',
+                  color: '#FFF',
+                }}>
+                {GroupDetails?.details}
+              </Text>
+            </View>
           </View>
           <View
             style={{
@@ -136,7 +263,7 @@ export default function MyProfile() {
                       borderRadius: 30,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      paddingHorizontal: 5,
+                      paddingHorizontal: 24,
                     },
                     Selected === item.name && styles.shdow,
                   ]}>
@@ -576,193 +703,259 @@ export default function MyProfile() {
         )}
 
         {Selected == 'Info & Contact' && (
-          <View style={{flex: 1, marginHorizontal: 15, marginTop: 20,backgroundColor:'#FFFDF5'}}>
-            <TouchableOpacity
-              style={{
-                height: 55,
-               borderColor:'#EBEBEB',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#FFF',
-                borderWidth:2,
-                borderRadius: 15,
-              }}>
+          <View
+            style={{
+              flex: 1,
+              marginHorizontal: 15,
+              marginTop: 20,
+              backgroundColor: '#FFFDF5',
+            }}>
+            {!isEditing && (
+              <TouchableOpacity
+                onPress={toggleEditing}
+                style={{
+                  height: 55,
+                  borderColor: '#EBEBEB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#FFF',
+                  borderWidth: 2,
+                  borderRadius: 15,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: '700',
+                    color: '#874BE9',
+                  }}>
+                  Edit Profile
+                </Text>
+              </TouchableOpacity>
+            )}
+            {isEditing && (
+              <TouchableOpacity
+                onPress={()=>{
+                  saveProfile()
+                 
+                
+                }
+                }
+                style={{
+                  height: 55,
+                  borderColor: '#EBEBEB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#FFF',
+                  borderWidth: 2,
+                  borderRadius: 15,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: '700',
+                    color: '#874BE9',
+                  }}>
+                  Update Profile
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {/* <View style={{marginTop: 20}}>
               <Text
                 style={{
                   fontSize: 17,
                   fontWeight: '700',
-                  color: '#874BE9',
-                }}>
-                Edit Profile
-              </Text>
-            </TouchableOpacity>
-
-            <View style={{marginTop:20}}>
-              <Text   style={{
-                  fontSize: 17,
-                  fontWeight: '700',
                   color: '#000',
                 }}>
-                
-                Parents</Text>
+                Parents
+              </Text>
             </View>
-            <View style={[styles.shdow,{
-              backgroundColor:'#FFF',
-              height:60,
-             borderRadius:5,
-              marginTop:15,
-              marginVertical:10,
-              flexDirection:'row',
-              alignItems:'center',
-              paddingHorizontal:10
-            }]}>
+            <View
+              style={[
+                styles.shdow,
+                {
+                  backgroundColor: '#FFF',
+                  height: 60,
+                  borderRadius: 5,
+                  marginTop: 15,
+                  marginVertical: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 10,
+                },
+              ]}>
               <View
-              style={{
-                height:45,
-                width: 45,
-                backgroundColor: '#4800BE',
-                borderRadius:22.5,
+                style={{
+                  height: 45,
+                  width: 45,
+                  backgroundColor: '#4800BE',
+                  borderRadius: 22.5,
 
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                {My_Profile?.image != '' ? (
+                  <Image
+                    style={{height: 45, width: 45, borderRadius: 22.5}}
+                    source={{uri: My_Profile?.image}}
+                  />
+                ) : (
+                  <Text
+                    style={{
+                      fontWeight: '700',
+                      fontSize: 12,
+                      lineHeight: 32,
+                      color: '#FFF',
+                    }}>
+                    {My_Profile?.first_name[0]}
+                    {My_Profile?.last_name[0]}
+                  </Text>
+                )}
+              </View>
+              <View style={{marginLeft: 15}}>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: '700',
+                    color: '#000',
+                  }}>
+                  {My_Profile?.first_name} {My_Profile?.last_name}
+                </Text>
+              </View>
+            </View> */}
+            <View style={{marginTop: 20}}>
               <Text
                 style={{
+                  fontSize: 17,
                   fontWeight: '700',
-                  fontSize: 12,
-                  lineHeight: 32,
-                  color: '#FFF',
+                  color: '#000',
                 }}>
-                AR
+                Base information
               </Text>
             </View>
-            <View style={{marginLeft:15}}>
-              <Text style={{
-                  fontSize: 17,
-                  fontWeight: '700',
-                  color: '#000',
-                }}>Jenny Wilson</Text>
-            </View>
 
-            
+            <View>
+              <FlatList
+                data={userInfo}
+                renderItem={({item}) => (
+                  <View
+                    style={{
+                      backgroundColor: '#FFF',
+                      height: 60,
+                      borderRadius: 5,
+                      marginTop: 15,
+                      marginVertical: 10,
+                      paddingHorizontal: 10,
+                    }}>
+                    <View style={{marginLeft: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: '700',
+                          color: '#000',
+                        }}>
+                        {item.title}
+                      </Text>
+                      {isEditing ? (
+                        <TextInput
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '400',
+                            height: 35,
+                            color: '#000',
+                            backgroundColor: '#f0f0f0',
+                          }}
+                          placeholder={editedProfile[item.title]}
+                          value={editedProfile[item.title] || item.value}
+                          onChangeText={text =>
+                            handleInputChange(item.title, text)
+                          }
+                        />
+                      ) : (
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '400',
+                            color: '#000',
+                            marginTop: 10,
+                          }}>
+                          {item.value}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              />
             </View>
-            <View style={{marginTop:20}}>
-              <Text   style={{
+            <View style={{marginTop: 20}}>
+              <Text
+                style={{
                   fontSize: 17,
                   fontWeight: '700',
                   color: '#000',
                 }}>
-                
-                Base information</Text>
+                Contact information
+              </Text>
             </View>
 
             <View>
-
-              <FlatList  
-              data={UserInfor}
-
-              renderItem={({item})=>(
-                <View style={[{
-                  backgroundColor:'#FFF',
-                  height:60,
-                 borderRadius:5,
-                  marginTop:15,
-                  marginVertical:10,
-                
-                  paddingHorizontal:10
-                }]}>
-                 
-                <View style={{marginLeft:10}}>
-                  <Text style={{
-                      fontSize: 17,
-                      fontWeight: '700',
-                      color: '#000',
-                    }}>{item.titile}</Text>
-                  <Text style={{
-                      fontSize: 12,
-                      fontWeight: '400',
-                      marginTop:10,
-                      color: '#000',
-                    }}>{item.value}</Text>
-                </View>
-    
-                
-                </View>
-              )}
-              />
-            </View>
-            <View style={{marginTop:20}}>
-              <Text   style={{
-                  fontSize: 17,
-                  fontWeight: '700',
-                  color: '#000',
-                }}>
-                
-                Contact information</Text>
-            </View>
-
-            <View>
-
-              <FlatList  
-              data={ContactInfo}
-
-              renderItem={({item})=>(
-                <View style={[{
-                  backgroundColor:'#FFF',
-                  height:60,
-                 borderRadius:5,
-                  marginTop:15,
-                  marginVertical:10,
-                
-                  paddingHorizontal:10
-                }]}>
-                 
-                <View style={{marginLeft:10}}>
-                  <Text style={{
-                      fontSize: 17,
-                      fontWeight: '700',
-                      color: '#000',
-                    }}>{item.titile}</Text>
-                  <Text style={{
-                      fontSize: 12,
-                      fontWeight: '400',
-                      marginTop:10,
-                      color: '#000',
-                    }}>{item.value}</Text>
-                </View>
-    
-                
-                </View>
-              )}
+              <FlatList
+                data={contactData}
+                renderItem={({item}) => (
+                  <View
+                    style={{
+                      backgroundColor: '#FFF',
+                      height: 60,
+                      borderRadius: 5,
+                      marginTop: 15,
+                      marginVertical: 10,
+                      paddingHorizontal: 10,
+                      justifyContent: 'center',
+                    }}>
+                    <View style={{marginLeft: 10, justifyContent: 'center'}}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: '700',
+                          color: '#000',
+                        }}>
+                        {item.title}
+                      </Text>
+                      {isEditing ? (
+                        <TextInput
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '400',
+                            backgroundColor: '#f0f0f0',
+                            height: 35,
+                            color: '#000',
+                          }}
+                          placeholder={editedProfile[item.title]}
+                          value={editedProfile[item.title] || item.value}
+                          onChangeText={text =>
+                            handleInputChange(item.title, text)
+                          }
+                        />
+                      ) : (
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '400',
+                            marginTop: 10,
+                            color: '#000',
+                          }}>
+                          {item.value}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
               />
             </View>
 
-            <View style={{marginTop:20,}}>
-              <Text   style={{
-                  fontSize: 17,
-                  fontWeight: '700',
-                  color: '#000',
-                }}>Optional information</Text>
-            </View>
-
-            <View style={{backgroundColor:'#FFF',height:hp(6),justifyContent:'center',marginHorizontal:15}}>
-              <Text  style={{
-                  fontSize: 14,
-                  fontWeight: '600',
-                  color: '#000',
-                }}>Allergies
-Shubham Patidar</Text>
-            </View>
-            <View style={{backgroundColor:'#FFF',height:hp(6),justifyContent:'center',marginHorizontal:15}}>
-              <Text  style={{
-                  fontSize: 14,
-                  fontWeight: '600',
-                  color: '#000',
-                }}>Other</Text>
-            </View>
-            <View  
-            style={{height:hp(5)}}
-            />
+            <View style={{height: hp(5)}} />
           </View>
         )}
       </ScrollView>
@@ -848,68 +1041,7 @@ const styles = StyleSheet.create({
 });
 
 
-const UserInfor = [
-  {
-    titile:'Name',
-    value:'Shubham Patidar'
-  },
-  {
-    titile:'Age',
-    value:'24'
-  },
-  {
-    titile:'Birth date',
-    value:'2000-02-11'
-  },
-  {
-    titile:'Gender',
-    value:'Male'
-  },
-  {
-    titile:'Height',
-    value:'5.5'
-  },
-  {
-    titile:'Nationality',
-    value:'Indian'
-  },
 
-]
-const ContactInfo = [
-  {
-    titile:'Email',
-    value:'Shubham Patidar'
-  },
-  {
-    titile:'Login methods',
-    value:'24'
-  },
-  {
-    titile:'Cellphone number',
-    value:'2000-02-11'
-  },
-  {
-    titile:'Street address',
-    value:'Male'
-  },
-  {
-    titile:'ZIP code',
-    value:'5.5'
-  },
-  {
-    titile:'City',
-    value:'Indian'
-  },
-  {
-    titile:'State or region',
-    value:'Mp'
-  },
-  {
-    titile:'Country',
-    value:'Indian'
-  },
-
-]
 const AttendanceList = [
   {
     titile: 'Total events',
@@ -933,17 +1065,17 @@ const AttendanceList = [
   },
 ];
 const tabData = [
+  // {
+  //   name: 'Overview',
+  // },
   {
-    name: 'Overview',
+    name: 'Info & Contact',
   },
   {
     name: 'Attendance',
   },
   {
     name: 'Videos',
-  },
-  {
-    name: 'Info & Contact',
   },
 ];
 

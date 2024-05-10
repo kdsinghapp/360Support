@@ -39,6 +39,7 @@ export default function Step2() {
   const [firstName,setfirstName] = useState('')
   const [lastName,setlastName] = useState('')
   const isLoading = useSelector(state => state.auth.isLoading);
+  const group_code = useSelector(state => state.auth.group_code);
 const dispatch =useDispatch()
   
   const openImageLibrary = () => {
@@ -78,6 +79,7 @@ const dispatch =useDispatch()
         dob:`${Dd}-${Mm}-${YYYY}`,
         country:value,
         type:selected,
+        group_code:group_code,
         image:{
           uri: Platform.OS == "android" ? profile.path : profile?.path?.replace("file://", ""),
           type: profile.mime,

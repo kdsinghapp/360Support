@@ -9,7 +9,7 @@ import {
     FlatList,
     ScrollView,
   } from 'react-native';
-  import React from 'react';
+  import React, { useEffect } from 'react';
   import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -19,116 +19,128 @@ import {
   import ScreenNameEnum from '../routes/screenName.enum';
 import BackBtn from '../assets/svg/BackBtn.svg'
 import AddIcon from '../assets/svg/AddIcon.svg'
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Wall() {
 
-    const navigation = useNavigation()
-    const RecentListItem = ({item}) => (
+  const My_Profile = useSelector(state => state.auth.GetUserProfile);
+  const get_PostList = useSelector(state => state.feature.get_PostList);
 
 
-        <View
-          style={[
-            styles.shdow,
-            {
-            paddingVertical:15,
-              padding: 10,
-              marginHorizontal: 15,
-              backgroundColor: '#FFF',
-              borderRadius: 20,
-              marginVertical: 10,
-            },
-          ]}>
-          <View>
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: '500',
-                lineHeight: 18,
-                color: '#294247',
-              }}>
-              STICKY POST
-            </Text>
-          </View>
-          <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center'}}>
-            <View style={{}}>
-              <Image
-                source={require('../assets/Cropping/dp.jpeg')}
-                style={{height: 40, width: 40, borderRadius: 20}}
-              />
-            </View>
-            <View
-              style={{
-                marginLeft: 10,
-    
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{
-                  color: '#000000',
-                  fontSize: 14,
-                  fontWeight: '800',
-                  lineHeight: 18,
-                }}>
-                {item.name}
-              </Text>
-              <Text
-                style={{
-                  color: '#B0B0B0',
-                  fontSize: 12,
-                  fontWeight: '400',
-                  lineHeight: 18,
-                }}>
-                {item.subTitile}
-              </Text>
-            </View>
-          </View>
-    
-          <View style={{marginTop: 10}}>
-            <Text
-              style={{
-                color: '#B0B0B0',
-                fontSize: 12,
-                fontWeight: '400',
-                lineHeight: 18,
-              }}>
-              {item.details}
-            </Text>
-          </View>
-          <View style={{marginTop: 15}}>
-            <Image
-              source={require('../assets/Cropping/match.jpeg')}
-              style={{width: '100%', height: 190}}
-              resizeMode="cover"
-            />
-          </View>
-    
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 15,
-              
-            }}>
-            <View style={styles.listLikeRow}>
-              <Image
-                source={require('../assets/Cropping/Like2x.png')}
-                style={{height: 15, width: 15, marginHorizontal: 10}}
-                resizeMode="contain"
-              />
-              <Text style={styles.likeTxt}>Like</Text>
-            </View>
-            <View style={styles.listLikeRow}>
-              <Image
-                source={require('../assets/Cropping/Comment2x.png')}
-                style={{height: 15, width: 15, marginHorizontal: 10}}
-                resizeMode="contain"
-              />
-    
-              <Text style={styles.likeTxt}>Comments</Text>
-            </View>
-          
-          </View>
+  const navigation = useNavigation();
+
+ 
+  const RecentListItem = ({item}) => (
+    <View
+      style={[
+        styles.shdow,
+        {
+          paddingVertical: 15,
+          padding: 10,
+          marginHorizontal: 15,
+          backgroundColor: '#FFF',
+          borderRadius: 20,
+          marginVertical: 10,
+        },
+      ]}>
+      <View>
+        <Text
+          style={{
+            fontSize: 12,
+            fontWeight: '500',
+            lineHeight: 18,
+            color: '#294247',
+          }}>
+          STICKY POST
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center'}}>
+        <View style={{}}>
+          <Image
+            source={{uri:item.image}}
+            style={{height: 40, width: 40, borderRadius: 20}}
+          />
         </View>
-      );
+        <View
+          style={{
+            marginLeft: 10,
+
+            justifyContent: 'center',
+          }}>
+          <Text
+            style={{
+              color: '#000000',
+              fontSize: 14,
+              fontWeight: '800',
+              lineHeight: 18,
+            }}>
+            {item.title}
+          </Text>
+          <Text
+            style={{
+              color: '#B0B0B0',
+              fontSize: 12,
+              fontWeight: '400',
+              lineHeight: 18,
+            }}>
+            {item.description}
+          </Text>
+          <Text
+            style={{
+              color: '#B0B0B0',
+              fontSize: 10,
+              fontWeight: '400',
+              lineHeight: 18,
+            }}>
+            time: {item.date_time}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{marginTop: 10}}>
+        <Text
+          style={{
+            color: '#B0B0B0',
+            fontSize: 12,
+            fontWeight: '400',
+            lineHeight: 18,
+          }}>
+          {item.details}
+        </Text>
+      </View>
+      <View style={{marginTop: 15}}>
+        <Image
+          source={{uri: item.image}}
+          style={{width: '100%', height: 190}}
+          resizeMode="cover"
+        />
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 15,
+        }}>
+        <View style={styles.listLikeRow}>
+          <Image
+            source={require('../assets/Cropping/Like2x.png')}
+            style={{height: 15, width: 15, marginHorizontal: 10}}
+            resizeMode="contain"
+          />
+          <Text style={styles.likeTxt}>Like</Text>
+        </View>
+        <View style={styles.listLikeRow}>
+          <Image
+            source={require('../assets/Cropping/Comment2x.png')}
+            style={{height: 15, width: 15, marginHorizontal: 10}}
+            resizeMode="contain"
+          />
+
+          <Text style={styles.likeTxt}>Comments</Text>
+        </View>
+      </View>
+    </View>
+  );
   return (
     <View style={{flex: 1, backgroundColor: '#FFF'}}>
           
@@ -151,7 +163,7 @@ export default function Wall() {
         style={{width:'25%'}}>
           <BackBtn />
         </TouchableOpacity>
-        <View style={{width:'20%'}}>
+        <View style={{width:My_Profile?.type == 'Parent'?'55%':'20%'}}>
           <Text
             style={{
               fontWeight: '700',
@@ -162,18 +174,19 @@ export default function Wall() {
             Wall
           </Text>
         </View>
-        <View style={{}}>
+       {My_Profile?.type !== 'Parent' && <View style={{}}>
           <Image  source={require('../assets/Cropping/WhiteAdd.png')}  
           style={{height:50,width:50}}
           resizeMode='contain'
           />
         </View>
+}
       </View>
     
     </View>
     <View style={{flex: 1, paddingTop: 20}}>
           <FlatList
-            data={data}
+            data={get_PostList}
             renderItem={RecentListItem}
             keyExtractor={item => item.id}
           />

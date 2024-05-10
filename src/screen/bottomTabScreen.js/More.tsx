@@ -17,11 +17,11 @@ import {
 import Right from '../../assets/svg/WhiteRight.svg';
 import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import  Close from '../../assets/svg/Close.svg'
 export default function More() {
   const navigation = useNavigation();
-
+  const selected = useSelector(state => state.auth.selectedRole);
   const [isVisible, setIsVisible] = useState(false);
   const dispatch = useDispatch();
   const RecentListItem = ({item}) => (
@@ -252,13 +252,13 @@ const data = [
 const data2 = [
   {
     id: '1',
-    titile: 'Profile',
+    titile: 'Children Profile',
     logo: require('../../assets/Cropping/MyProfile-1.png'),
     screen: ScreenNameEnum.CHILD_PROFILE,
   },
   {
     id: '2',
-    titile: 'My children',
+    titile: 'Children Setting',
     logo: require('../../assets/Cropping/profile-2user.png'),
     screen: ScreenNameEnum.MY_CHILDREN,
   },

@@ -3,6 +3,8 @@ import {API} from '../Api';
 import {Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ScreenNameEnum from '../../routes/screenName.enum';
+import Toast from 'react-native-toast-message';
+import { errorToast, successToast } from '../../configs/customToast';
 
 const initialState = {
   isLoading: false,
@@ -12,6 +14,7 @@ const initialState = {
   isLogin: false,
   isLogOut: false,
   selectedRole: null,
+  group_code:null,
   Group_Details: null,
   Country_List: null,
   UserInformation: null,
@@ -36,20 +39,17 @@ export const login = createAsyncThunk('login', async (params, thunkApi) => {
     if (response.data.status == '1') {
       thunkApi.dispatch(loginSuccess(response.data.data));
       params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
-      Alert.alert('Success', response.data.message);
+     successToast(response.data.message)
     } else {
-      Alert.alert('Failed', response.data.message);
+ 
+      errorToast(`${response.data.message}`)
     }
 
     return response.data.result;
   } catch (error) {
     console.log('Error:', error);
-    Alert.alert(
-      'Network error',
-      'Server not responding. Please try again later.',
-      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-      {cancelable: false},
-    );
+    errorToast(`Network error`)
+    
     return thunkApi.rejectWithValue(error);
   }
 });
@@ -70,17 +70,26 @@ export const Get_Group = createAsyncThunk(
         response.data,
       );
       if (response.data.status == '1') {
-        // Alert.alert('Success', response.data.message);
+        
+       if(!params.profile){    
         params.navigation.navigate(ScreenNameEnum.STEP_ONE);
+       }
+       else{
+
+       }
       } else {
-        Alert.alert('Group Not Found', 'Please Enter Valid Group Code');
+       
+       errorToast(`${response.data.message}`)
       }
 
       return response.data.result;
     } catch (error) {
       console.log('Error:', error);
-      Alert.alert('Server', 'Server not response');
-
+     
+      if(!params.profile){
+       
+        errorToast(`Server not response`)
+       }
       return thunkApi.rejectWithValue(error);
     }
   },
@@ -200,13 +209,14 @@ export const validOtp = createAsyncThunk(
       );
 
       if (response.data.status == '1') {
-        Alert.alert('Success', 'Otp Verify Successfully');
+       
+        successToast('Otp Verify Successfully')
 
         params.navigation.navigate(ScreenNameEnum.CREATE_NEWPASS, {
           email: params.data.email,
         });
       } else {
-        Alert.alert('Failed', response.data.message);
+      errorToast(response.data.message)
         // params.navigation.navigate(ScreenNameEnum.CREATE_NEWPASS,{email:params.data.email});
       }
 
@@ -243,16 +253,16 @@ export const CreateNewPassword = createAsyncThunk(
       );
 
       if (response.data.status) {
-        Alert.alert('Success', 'Password Reset Successfully');
+       successToast('Password Reset Successfully')
 
         params.navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
       } else {
-        Alert.alert('Failed', response.data.message);
+        errorToast('response.data.message')
       }
 
       return response.data;
     } catch (error) {
-      Alert.alert('Network error', 'server not responding please try later');
+     errorToast('Network error')
       console.log(
         '🚀 ~ file: AuthSlice.js:16 ~ CreatePassword ~ error:',
         error,
@@ -279,6 +289,7 @@ export const Add_UserInfo = createAsyncThunk(
       formData.append('dob', params.data.dob);
       formData.append('country', params.data.country);
       formData.append('type', params.data.type);
+      formData.append('group_code', params.data.group_code);
       formData.append('image', params.data.image);
 
       const config = {
@@ -297,16 +308,14 @@ export const Add_UserInfo = createAsyncThunk(
       if (response.data.status == '1') {
         params.navigation.navigate(ScreenNameEnum.STEP_FOUR);
       } else {
-        Alert.alert('Failed', response.data.message);
+       errorToast(response.data.message)
       }
 
       return response.data.result;
     } catch (error) {
       console.log('Error:', error);
-      Alert.alert(
-        'Network error',
-        'Server not responding. Please try again later.',
-      );
+    
+      errorToast('Network error')
       return thunkApi.rejectWithValue(error);
     }
   },
@@ -353,16 +362,15 @@ export const Updated_UserInfo = createAsyncThunk(
          
         }
       } else {
-        Alert.alert('Failed', response.data.message);
+ 
+        errorToast(response.data.message)
       }
 
       return response.data.result;
     } catch (error) {
       console.log('Error:', error);
-      Alert.alert(
-        'Network error',
-        'Server not responding. Please try again later.',
-      );
+      errorToast('Network error')
+     
       return thunkApi.rejectWithValue(error);
     }
   },
@@ -403,16 +411,13 @@ export const Add_ChildInfo = createAsyncThunk(
       if (response.data.status == '1') {
         params.navigation.navigate(ScreenNameEnum.FIRST_TIMECHILD);
       } else {
-        Alert.alert('Failed', response.data.message);
+        errorToast('Network error')
       }
 
       return response.data.result;
     } catch (error) {
       console.log('Error:', error);
-      Alert.alert(
-        'Network error',
-        'Server not responding. Please try again later.',
-      );
+     errorToast('Network error')
       return thunkApi.rejectWithValue(error);
     }
   },
@@ -448,16 +453,13 @@ export const Updated_ChildInfo = createAsyncThunk(
       if (response.data.status == '1') {
         params.navigation.navigate(ScreenNameEnum.NOWITHOUTSCREEN);
       } else {
-        Alert.alert('Failed', response.data.message);
+       errorToast(response.data.message);
       }
 
       return response.data.result;
     } catch (error) {
       console.log('Error:', error);
-      Alert.alert(
-        'Network error',
-        'Server not responding. Please try again later.',
-      );
+   errorToast('Network error')
       return thunkApi.rejectWithValue(error);
     }
   },
@@ -477,24 +479,14 @@ export const logout = createAsyncThunk('logout', async (params, thunkApi) => {
     );
 
     if (response.data.status) {
-      Alert.alert('LogOut', response.data.message);
+      errorToast(response.data.message);
     } else {
-      Alert.alert('LogOut', response.data.message);
+    errorToast(response.data.message);
     }
 
     params.navigation.navigate('Login');
   } catch (error) {
-    Alert.alert(
-      'Network error',
-      'server not responding please try later',
-      [
-        {
-          text: 'OK',
-          onPress: () => console.log('OK Pressed'),
-        },
-      ],
-      {cancelable: false},
-    );
+   errorToast('Network error')
     console.log('🚀 ~ file: AuthSlice.js:32 ~ logout ~ error:', error);
     return thunkApi.rejectWithValue(error);
   }
@@ -538,7 +530,23 @@ export const get_profile = createAsyncThunk(
     }
   },
 );
+export const update_parent_profile = createAsyncThunk(
+  'update_parent_profile',
+  async (params, thunkApi) => {
+    try {
+      const response = await API.get(`/update_parent_profile?`,params.data);
 
+      if (response.data.status == '1') {
+        successToast('Profile Update Successfuly');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_posts .js:16 ~  ~ error:', error);
+      errorToast(response.data.message);
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 const AuthSlice = createSlice({
   name: 'authSlice',
   initialState,
@@ -553,6 +561,9 @@ const AuthSlice = createSlice({
     },
     updateSelectedRole(state, action) {
       state.selectedRole = action.payload;
+    },
+    updateGroup_code(state, action) {
+      state.group_code = action.payload;
     },
   },
   extraReducers: builder => {
@@ -707,9 +718,23 @@ const AuthSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
     });
+    builder.addCase(update_parent_profile.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(update_parent_profile.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.get_PostList = action.payload;
+    });
+    builder.addCase(update_parent_profile.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
   },
 });
 
-export const {loginSuccess, updateSelectedRole} = AuthSlice.actions;
+export const {loginSuccess, updateSelectedRole,updateGroup_code} = AuthSlice.actions;
 
 export default AuthSlice.reducer;

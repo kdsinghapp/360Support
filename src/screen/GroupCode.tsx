@@ -9,7 +9,7 @@ import ScreenNameEnum from '../routes/screenName.enum';
 import GoBack from '../assets/svg/GoBack.svg';
 import Loading from '../configs/Loader';
 import { useDispatch, useSelector } from 'react-redux';
-import { Get_Group } from '../redux/feature/authSlice';
+import { Get_Group ,updateGroup_code } from '../redux/feature/authSlice';
 export default function GroupCode({route}) {
   const navigation = useNavigation();
 
@@ -18,6 +18,8 @@ const {showCreateaccount }= route.params
 const dispatch = useDispatch()
 const [groupCode ,setgroupCode] =  useState('')
 const isLoading = useSelector(state => state.auth.isLoading);
+
+
 const checkScreenGroupCode =()=>{
   getGroupDetails()
   // if(showCreateaccount){
@@ -34,11 +36,12 @@ const getGroupDetails =()=>{
   const params = {
 
       group_code: groupCode,
+      profile:false,
  
     navigation:navigation 
   };
 
-
+  dispatch(updateGroup_code(groupCode));
   dispatch(Get_Group(params));
 }
 

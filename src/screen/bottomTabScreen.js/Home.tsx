@@ -8,27 +8,223 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP,
 } from 'react-native-responsive-screen';
 import Bell from '../../assets/svg/bell.svg';
 import Down from '../../assets/svg/Down.svg';
 import Line from '../../assets/svg/Line.svg';
-import { useNavigation } from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
+import {useDispatch, useSelector} from 'react-redux';
+import {Get_Group, get_profile} from '../../redux/feature/authSlice';
+import {get_posts} from '../../redux/feature/featuresSlice';
 export default function Home() {
+  const My_Profile = useSelector(state => state.auth.GetUserProfile);
+  const user_data = useSelector(state => state.auth.userData);
+  const get_PostList = useSelector(state => state.feature.get_PostList);
+  const dispatch = useDispatch();
+  const GroupDetails = useSelector(state => state.auth.Group_Details);
+const IsFocus = useIsFocused()
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    params = {
+      user_id: user_data?.id,
+    };
+    dispatch(get_profile(params));
+    getGroupDetails();
+    getPost();
+  }, [user_data,IsFocus]);
+  const getGroupDetails = () => {
+    const params = {
+      group_code: '1234',
+      profile: true,
+      //GroupDetails?.group_code,
+    };
+
+    dispatch(Get_Group(params));
+  };
+
+  const getPost = () => {
+    params = {
+      id: user_data.id,
+    };
+
+    dispatch(get_posts(params));
+  };
+
+  const RenderTeamState = ({item}) => (
+    <TouchableOpacity
+      style={[
+        styles.shdow,
+        {
+          paddingVertical: 15,
+          padding: 10,
+          marginHorizontal: 7,
+          backgroundColor: '#FFF',
+          borderRadius: 20,
+          marginVertical: 10,
+          width: '46%',
+          height: hp(22),
+        },
+      ]}>
+      <View>
+        <Text
+          style={{
+            fontSize: 16,
+            color: '#000',
+            fontWeight: '700',
+          }}>
+          {item.title}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: '#9E9E9E',
+            fontWeight: '400',
+          }}>
+          {item.last}
+        </Text>
+      </View>
+      <View
+        style={{alignSelf: 'flex-end', paddingHorizontal: 10, marginTop: 20}}>
+        <Text
+          style={{
+            alignSelf: 'flex-end',
+            fontSize: 36,
+            color: '#000',
+            fontWeight: '800',
+          }}>
+          {item.length}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: '#9E9E9E',
+            fontWeight: '400',
+            alignSelf: 'flex-end',
+          }}>
+          Register at least 3{' '}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: '#9E9E9E',
+            fontWeight: '400',
+            alignSelf: 'flex-end',
+          }}>
+          games
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+  const RenderLastgames = ({item}) => (
+    <TouchableOpacity
+      style={[
+        styles.shdow,
+        {
+          paddingVertical: 15,
+          padding: 10,
+          backgroundColor: '#FFF',
+          borderRadius: 20,
+          marginVertical: 10,
+          width: wp(90),
+          marginLeft: 10,
+          height: hp(22),
+        },
+      ]}>
+      <View
+        style={{
+          alignItems: 'center',
+          borderBottomWidth: 1,
+          paddingVertical: 5,
+          borderColor: '#f0f0f0',
+        }}>
+        <Text
+          style={{
+            fontSize: 16,
+            color: '#777777',
+            fontWeight: '400',
+          }}>
+          {item.time}
+        </Text>
+      </View>
+      <View
+        style={{
+          paddingHorizontal: 10,
+          marginTop: 50,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Image
+            source={item.team1Logo}
+            style={{height: 30, width: 30, borderRadius: 15}}
+          />
+          <Text style={{fontSize: 14, color: '#000', fontWeight: '700'}}>
+            {item.team1}
+          </Text>
+        </View>
+        <View
+          style={{
+            justifyContent: 'center',
+            flexDirection: 'row',
+            width: '50%',
+            alignItems: 'center',
+          }}>
+          <Text
+            style={{
+              fontSize: 20,
+              color: '#000',
+              fontWeight: '700',
+              marginHorizontal: 10,
+            }}>
+            {item.pointTeam1}
+          </Text>
+          <Text
+            style={{
+              fontSize: 22,
+              color: '#000',
+              fontWeight: '700',
+              marginHorizontal: 10,
+            }}>
+            -
+          </Text>
+          <Text
+            style={{
+              fontSize: 20,
+              color: '#000',
+              fontWeight: '700',
+              marginHorizontal: 10,
+            }}>
+            {item.pointTeam2}
+          </Text>
+        </View>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Image
+            source={item.team2Logo}
+            style={{height: 30, width: 30, borderRadius: 15}}
+          />
+          <Text style={{fontSize: 14, color: '#000', fontWeight: '700'}}>
+            {item.team2}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
   const RecentListItem = ({item}) => (
-
-
     <View
       style={[
         styles.shdow,
         {
-        paddingVertical:15,
+          paddingVertical: 15,
           padding: 10,
           marginHorizontal: 15,
           backgroundColor: '#FFF',
@@ -67,7 +263,7 @@ export default function Home() {
               fontWeight: '800',
               lineHeight: 18,
             }}>
-            {item.name}
+            {item.title}
           </Text>
           <Text
             style={{
@@ -76,7 +272,16 @@ export default function Home() {
               fontWeight: '400',
               lineHeight: 18,
             }}>
-            {item.subTitile}
+            {item.description}
+          </Text>
+          <Text
+            style={{
+              color: '#B0B0B0',
+              fontSize: 10,
+              fontWeight: '400',
+              lineHeight: 18,
+            }}>
+            time: {item.date_time}
           </Text>
         </View>
       </View>
@@ -94,7 +299,7 @@ export default function Home() {
       </View>
       <View style={{marginTop: 15}}>
         <Image
-          source={require('../../assets/Cropping/match.jpeg')}
+          source={{uri:item.image}}
           style={{width: '100%', height: 190}}
           resizeMode="cover"
         />
@@ -104,7 +309,6 @@ export default function Home() {
         style={{
           flexDirection: 'row',
           marginTop: 15,
-          justifyContent: 'space-between',
         }}>
         <View style={styles.listLikeRow}>
           <Image
@@ -123,169 +327,205 @@ export default function Home() {
 
           <Text style={styles.likeTxt}>Comments</Text>
         </View>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../assets/Cropping/Eye2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.likeTxt}>Seen by</Text>
-        </View>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../assets/Cropping/Message2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
-          <Text style={styles.likeTxt}>0</Text>
-        </View>
       </View>
     </View>
   );
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-      <ScrollView  showsVerticalScrollIndicator={false}>
-      <View style={styles.colorDiv}>
-        <View style={styles.Div1}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-around',
-              width: '30%',
-            }}>
-            <Image
-              source={require('../../assets/Cropping/dp.jpeg')}
-              style={{height: 25, width: 25, borderRadius: 12.5}}
-            />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.colorDiv}>
+          <View style={styles.Div1}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-around',
+                width: '30%',
+              }}>
+              {GroupDetails?.image == '' ? (
+                <Text>{GroupDetails?.group_name[0]}</Text>
+              ) : (
+                <Image
+                  source={{uri: GroupDetails?.image}}
+                  style={{height: 25, width: 25, borderRadius: 12.5}}
+                />
+              )}
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '500',
+                  lineHeight: 24,
+                  color: '#FFF',
+                  marginHorizontal: 10,
+                }}>
+                {GroupDetails?.group_name}
+              </Text>
+              <Down />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate(ScreenNameEnum.NOTIFICATION_SCREEN);
+              }}>
+              <Bell />
+            </TouchableOpacity>
+          </View>
 
+          <View style={styles.SecondDiv}>
+            <View>
+              <Text
+                style={{
+                  fontWeight: '700',
+                  fontSize: 22,
+                  lineHeight: 32,
+                  color: '#FFF',
+                }}>
+                {My_Profile?.first_name} {My_Profile?.last_name}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: '400',
+                  fontSize: 16,
+                  lineHeight: 24,
+                  color: '#FFF',
+                }}>
+                Welcome back!
+              </Text>
+            </View>
+            <View>
+              <Image
+                source={{uri: My_Profile?.image}}
+                style={{height: 45, width: 45, borderRadius: 22.5}}
+              />
+            </View>
+          </View>
+        </View>
+
+        <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
+          <View style={{marginHorizontal: 15, marginTop: 30}}>
             <Text
               style={{
-                fontSize: 16,
-                fontWeight: '500',
+                fontSize: 18,
+                color: '#294247',
+                fontWeight: '700',
                 lineHeight: 24,
-                color: '#FFF',
-                marginHorizontal: 10,
               }}>
-              NFC U16
+              Upcoming Events
             </Text>
-            <Down />
           </View>
           <TouchableOpacity
-          onPress={()=>{
-            navigation.navigate(ScreenNameEnum.NOTIFICATION_SCREEN)
-          }}
-          >
-            <Bell />
-          </TouchableOpacity>
-        </View>
+            onPress={() => {
+              navigation.navigate(ScreenNameEnum.UPCOMING_EVENT);
+            }}
+            style={[styles.shdow, styles.Event, {}]}>
+            <View>
+              <Line />
+            </View>
+            <View>
+              <Text
+                style={[
+                  styles.txt,
+                  {
+                    fontSize: 22,
+                    fontWeight: '700',
+                    lineHeight: 33,
+                  },
+                ]}>
+                12
+              </Text>
+              <Text style={styles.txt}>Oct</Text>
+            </View>
 
-        <View style={styles.SecondDiv}>
-          <View>
-            <Text
-              style={{
-                fontWeight: '700',
-                fontSize: 22,
-                lineHeight: 32,
-                color: '#FFF',
-              }}>
-              Mira Donin
-            </Text>
-            <Text
-              style={{
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#FFF',
-              }}>
-              Welcome back!
-            </Text>
-          </View>
-          <View>
-            <Image
-              source={require('../../assets/Cropping/dp.jpeg')}
-              style={{height: 45, width: 45, borderRadius: 22.5}}
-            />
-          </View>
-        </View>
-      </View>
-
-      <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-      <View style={{marginHorizontal: 15, marginTop: 30}}>
-                <Text
-                  style={{
+            <View style={{width: '65%'}}>
+              <Text
+                style={[
+                  styles.txt,
+                  {
                     fontSize: 18,
-                    color: '#294247',
                     fontWeight: '700',
                     lineHeight: 24,
-                  }}>
-                  Upcoming Events
-                </Text>
-              </View>
-        <TouchableOpacity
-        onPress={()=>{
-          navigation.navigate(ScreenNameEnum.UPCOMING_EVENT)
-        }}
-        style={[styles.shdow, styles.Event, {}]}>
-          <View>
-            <Line />
-          </View>
-          <View>
-            <Text
-              style={[
-                styles.txt,
-                {
-                  fontSize: 22,
-                  fontWeight: '700',
-                  lineHeight: 33,
-                },
-              ]}>
-              12
-            </Text>
-            <Text style={styles.txt}>Oct</Text>
-          </View>
+                  },
+                ]}>
+                VS Eastside
+              </Text>
+              <Text style={styles.txt}>Saturday 15:00 PM</Text>
+              <Text style={styles.txt}>Homefields</Text>
+            </View>
+            <View>
+              <Text style={styles.txt}>Match</Text>
+            </View>
+          </TouchableOpacity>
 
-          <View style={{width: '65%'}}>
+          <View style={{marginHorizontal: 15, marginTop: 30}}>
             <Text
-              style={[
-                styles.txt,
-                {
-                  fontSize: 18,
-                  fontWeight: '700',
-                  lineHeight: 24,
-                },
-              ]}>
-              VS Eastside
+              style={{
+                fontSize: 18,
+                color: '#294247',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              Wall
             </Text>
-            <Text style={styles.txt}>Saturday 15:00 PM</Text>
-            <Text style={styles.txt}>Homefields</Text>
           </View>
-          <View>
-            <Text style={styles.txt}>Match</Text>
+          <View style={{flex: 1, paddingTop: 20}}>
+            <FlatList
+              data={get_PostList}
+              renderItem={RecentListItem}
+              keyExtractor={item => item.id}
+            />
           </View>
-        </TouchableOpacity>
-
-        <View style={{marginHorizontal: 15, marginTop: 30}}>
-          <Text
-            style={{
-              fontSize: 18,
-              color: '#294247',
-              fontWeight: '700',
-              lineHeight: 24,
-            }}>
-            Recent Post
-          </Text>
-        </View>
-        <View style={{flex: 1, paddingTop: 20}}>
+          <View style={{marginHorizontal: 15, marginTop: 30}}>
+            <Text
+              style={{
+                fontSize: 18,
+                color: '#294247',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              Team videos
+            </Text>
+          </View>
+          <View style={{flex: 1, paddingTop: 20}}>
+            <FlatList
+              data={data}
+              renderItem={RecentListItem}
+              keyExtractor={item => item.id}
+            />
+          </View>
+          <View style={{marginHorizontal: 15, marginTop: 30}}>
+            <Text
+              style={{
+                fontSize: 18,
+                color: '#294247',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              Last games
+            </Text>
+          </View>
           <FlatList
-            data={data}
-            renderItem={RecentListItem}
-            keyExtractor={item => item.id}
+            data={LastGamesList}
+            horizontal
+            renderItem={RenderLastgames}
+            showsHorizontalScrollIndicator={false}
+          />
+          <View style={{marginHorizontal: 15, marginTop: 30}}>
+            <Text
+              style={{
+                fontSize: 18,
+                color: '#294247',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              Team stats
+            </Text>
+          </View>
+          <FlatList
+            data={TeamState}
+            renderItem={RenderTeamState}
+            numColumns={2}
           />
         </View>
-      </View>
       </ScrollView>
     </View>
   );
@@ -373,5 +613,49 @@ const data = [
     details:
       'Hey team! Check out this video of how we can improve our play through the middle.',
     img: require('../../assets/Cropping/match.jpeg'),
+  },
+];
+const TeamState = [
+  {
+    title: 'Scored goals',
+    last: 'Last 3 games',
+    length: '0',
+  },
+  {
+    title: 'Conceded goals',
+    last: 'Last 3 games',
+    length: '0',
+  },
+  {
+    title: 'Match wins',
+    last: 'Last 3 games',
+    length: '0',
+  },
+  {
+    title: 'Physical strain',
+    last: 'Last 3 games',
+    length: '0',
+  },
+];
+const LastGamesList = [
+  {
+    team1: 'U17',
+    team1Logo: require('../../assets/Cropping/Logo1.png'),
+    team2Logo: require('../../assets/Cropping/Logo2.png'),
+    team2: 'Opponent',
+    last: 'Last 3 games',
+    time: 'Sat,Aug26-Homeground',
+    pointTeam1: '3',
+    pointTeam2: '1',
+  },
+  {
+    team1: 'U17',
+    team1Logo: require('../../assets/Cropping/Logo1.png'),
+    team2Logo: require('../../assets/Cropping/Logo2.png'),
+    team2: 'Opponent',
+    last: 'Last 3 games',
+    time: 'Sat,Aug26-Homeground',
+    pointTeam1: '3',
+    pointTeam2: '1',
   },
 ];

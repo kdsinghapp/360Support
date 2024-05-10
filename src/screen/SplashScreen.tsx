@@ -1,19 +1,39 @@
 import { View, Text, Image } from 'react-native'
 import React, { useEffect } from 'react'
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
+import { useSelector } from 'react-redux';
 
 export default function SplashScreen() {
 
   const navigation = useNavigation();
-useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
-    }, 3000);
+  const isLogOut = useSelector(state => state.auth.isLogOut);
+  const isLogin = useSelector(state => state.auth.isLogin);
 
-    return () => clearTimeout(timer);
-  }, []);
 
+
+const isFoucs = useIsFocused();
+  
+    const checkLogout =()=>{
+      console.log('================checkLogout===========isLogOut=========',isLogOut);
+      console.log('================checkLogout===========isLogin=========',isLogin);
+      if (!isLogOut && !isLogin ||isLogOut && !isLogin) {
+        console.log('================Login====================');
+         navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
+ 
+      }
+      if (!isLogOut && isLogin) {
+        console.log('================HomeTab====================');
+        
+       navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+      }
+    }
+  useEffect(() => {
+    
+      checkLogout();
+  
+
+  }, [isFoucs,isLogOut]);
   return (
     <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
      
