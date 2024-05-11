@@ -23,7 +23,7 @@ export default function SplashScreen() {
     console.log('================checkLogout===========isLogin=========', isLogin);
     if (!isLogOut && !isLogin || isLogOut && !isLogin) {
       console.log('================Login====================');
-      navigation.navigate(ScreenNameEnum.SENT_CONNECTIONREQ);
+      navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
     }
     if (!isLogOut && isLogin) {
       console.log('================HomeTab====================');
