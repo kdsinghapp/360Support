@@ -1,53 +1,46 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { addMonths, format, getDaysInMonth, startOfWeek, addDays } from 'date-fns';
+import { addMonths, format, getDaysInMonth, startOfWeek, addDays, DateResult } from 'date-fns';
 
-const CustomCalendar = ({ startingMonth }) => {
+interface CustomCalendarProps {
+  startingMonth: Date;
+}
 
-  if (!(startingMonth instanceof Date && !isNaN(startingMonth))) {
+const CustomCalendar: React.FC<CustomCalendarProps> = ({ startingMonth }) => {
+
+  if (!(startingMonth instanceof Date && !isNaN(startingMonth.getTime()))) {
     throw new Error('Invalid startingMonth');
   }
 
+  const data: Date[] = Array.from({ length: 12 }, (_, index) => addMonths(startingMonth, index));
 
-  const data = Array.from({ length: 12 }, (_, index) => addMonths(startingMonth, index));
-
-
-
-  const renderItem = ({ item }) => {
-
-    const monthName = format(item, 'MMMM yyyy'); 
-    const daysInMonth = getDaysInMonth(item); 
-    const firstDayOfMonth = new Date(item.getFullYear(), item.getMonth(), 1); // Get the first day of the month
+  const renderItem = ({ item }: { item: Date }) => {
+    const monthName: string = format(item, 'MMMM yyyy'); 
+    const daysInMonth: number = getDaysInMonth(item); 
+    const firstDayOfMonth: Date = new Date(item.getFullYear(), item.getMonth(), 1); 
   
-    const startDayOfWeek = firstDayOfMonth.getDay(); // Get the day of the week (0-6) for the first day of the month
-    const offset = startDayOfWeek; // Use this offset to determine the starting position in the calendar grid
+    const startDayOfWeek: number = firstDayOfMonth.getDay(); 
+    const offset: number = startDayOfWeek; 
   
-   
-  
-console.log(offset);
-
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayNames: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     return (
       <View style={styles.card}>
         <Text style={styles.monthHeader}>{monthName}</Text>
         <View style={styles.daysHeader}>
-          {/* Render day name headers */}
           {dayNames.map(day => (
             <Text key={day} style={styles.dayHeader}>{day}</Text>
           ))}
         </View>
         <View style={styles.daysContainer}>
-          {/* Render empty cells for days before the start of the month */}
-          {Array.from({ length:firstDayOfMonth.getDay() }).map((_, index) => (
+          {Array.from({ length: firstDayOfMonth.getDay() }).map((_, index) => (
             <Text key={`empty-${index}`} style={styles.day}></Text>
           ))}
-          {/* Render day cells for each day of the month */}
           {Array.from({ length: daysInMonth }, (_, index) => {
-            const day = index + 1;
-            const currentDate = addDays(firstDayOfMonth, index);
+            const day: number = index + 1;
+            const currentDate: Date = addDays(firstDayOfMonth, index);
             return (
-              <Text key={currentDate} style={styles.day}>{day}</Text>
+              <Text key={currentDate.toDateString()} style={styles.day}>{day}</Text>
             );
           })}
         </View>
@@ -61,12 +54,11 @@ console.log(offset);
       renderItem={renderItem}
       keyExtractor={(_, index) => index.toString()}
       contentContainerStyle={styles.container}
-      numColumns={2} // Display two columns
+      numColumns={2}
     />
   );
 };
 
-// Styles for the CustomCalendar component
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 20,
@@ -82,8 +74,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    width: '48%', // Width for each month card (occupies 48% to allow for spacing)
-    margin: 5, // Margin between month cards
+    width: '48%',
+    margin: 5,
   },
   monthHeader: {
     fontSize: 10,
@@ -107,11 +99,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   day: {
-    
-   width:12.4,
-   marginLeft:6,
- 
-   height:10,
+    width: 12.4,
+    marginLeft: 6,
+    height: 10,
     fontSize: 8,
     color: '#000',
     fontWeight: 'bold',

@@ -1,165 +1,110 @@
+import React, { useState } from 'react';
 import {
-  StyleSheet,
-  Text,
   View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
   Image,
   TextInput,
-  TouchableOpacity,
   ScrollView,
   FlatList,
 } from 'react-native';
-import React, { useState } from 'react';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import BackBtn from '../assets/svg/BackBtn.svg';
-import Logo from '../assets/svg/Step1.svg';
-import Youtube from '../assets/svg/Youtube.svg';
 import SearchIcon from '../assets/svg/search.svg';
 import BottomToTopModal from './Modal/Modal';
 import { useNavigation } from '@react-navigation/native';
-const Registrations = () => {
+
+interface Item {
+  title: string;
+  description: string;
+  img: any;
+}
+
+const Registrations: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
-const navigation =useNavigation()
+  const navigation = useNavigation();
+
+  const RegisterList: Item[] = [
+    {
+      title: 'Test',
+      description: 'test',
+      img: require('../assets/Cropping/img1.png'),
+    },
+    {
+      title: 'Test',
+      description: 'test',
+      img: require('../assets/Cropping/img1.png'),
+    },
+  ];
+
   return (
-    <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
+    <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
-          <View
-            style={{
-              justifyContent: 'space-between',
-              paddingHorizontal: 20,
-              flexDirection: 'row',
-              marginTop: 20,
-            }}>
+          <View style={styles.header}>
             <TouchableOpacity
               onPress={() => {
                 navigation.goBack();
               }}
-              style={{width: '25%'}}>
+              style={styles.backButton}>
               <BackBtn />
             </TouchableOpacity>
-            <View style={{width: '67%'}}>
-              <Text
-                style={{
-                  fontWeight: '700',
-                  fontSize: 22,
-                  lineHeight: 32,
-                  color: '#FFF',
-                }}>
-                Registrations
-              </Text>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Registrations</Text>
             </View>
           </View>
-
-          <View style={{height: hp(1)}} />
+          <View style={styles.divider} />
         </View>
 
-        <View
-          style={{
-            marginHorizontal: 15,
-            height: hp(5),
-            justifyContent: 'center',
-            marginTop: 5,
-          }}>
-          <Text
-            style={{
-              fontSize: 19,
-              color: '#000',
-              fontWeight: '700',
-            }}>
-            Registrations
-          </Text>
+        <View style={styles.sectionTitleContainer}>
+          <Text style={styles.sectionTitle}>Registrations</Text>
         </View>
-        <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
-          <View style={[styles.shdow, styles.search]}>
+        <View style={styles.searchContainer}>
+          <View style={[styles.shadow, styles.search]}>
             <SearchIcon />
             <TextInput
               placeholder="Search"
-              placeholderTextColor={'#000'}
-              style={{
-                marginLeft: 10,
-                fontSize: 14,
-                color: '#000',
-                lineHeight: 18,
-              }}
+              placeholderTextColor="#000"
+              style={styles.searchInput}
             />
           </View>
         </View>
 
-        <View style={{flex: 1}}>
+        <View style={styles.flatListContainer}>
           <FlatList
             data={RegisterList}
-            renderItem={({item}) => (
-              <View
-                style={[styles.shdow,{
-                
-                  marginHorizontal: 15,
-                  height: hp(20),
-                 backgroundColor:'#FFF',
-                  marginVertical: 5,
-                  borderRadius: 15,
-                  padding:20,
-                }]}>
-                <View
-                  style={{ width: '100%', flexDirection: 'row'}}>
-                  <View>
+            renderItem={({ item }) => (
+              <View style={[styles.shadow, styles.itemContainer]}>
+                <View style={styles.itemContentContainer}>
+                  <View style={styles.imageContainer}>
                     <Image
                       source={item.img}
-                      style={{
-                        height: 45,
-                        width: 45,
-                      }}
+                      style={styles.image}
                     />
                   </View>
-                  <View style={{marginLeft: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: '#000',
-                        fontWeight: '700',
-                      }}>
-                      {item.titile}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: '#000',
-                        fontWeight: '500',
-                      }}>
-                      {item.description}
-                    </Text>
+                  <View style={styles.textContainer}>
+                    <Text style={styles.titleText}>{item.title}</Text>
+                    <Text style={styles.descriptionText}>{item.description}</Text>
                   </View>
                 </View>
 
                 <TouchableOpacity
-                onPress={() => setModalVisible(true)}
-                style={{
-                backgroundColor:'#e7dbfb',
-                height:55,
-                width:'100%',
-                marginTop:20,
-                borderRadius:15,
-                alignItems:'center',
-                justifyContent:'center'
-                }}>
-                  <Text style={{
-                    fontSize:18,
-                    fontWeight:'700',color:'#874BE9'
-                  }}>Register</Text>
+                  onPress={() => setModalVisible(true)}
+                  style={styles.registerButton}>
+                  <Text style={styles.registerButtonText}>Register</Text>
                 </TouchableOpacity>
-                <BottomToTopModal visible={modalVisible}
-        data={item}
-        onClose={() => setModalVisible(false)} 
-        
-        
-        />
+
+                <BottomToTopModal
+                  visible={modalVisible}
+                  data={item}
+                  onClose={() => setModalVisible(false)}
+                />
               </View>
             )}
           />
         </View>
-       
+
       </ScrollView>
     </View>
   );
@@ -167,37 +112,53 @@ const navigation =useNavigation()
 
 export default Registrations;
 
-const RegisterList = [
-  {
-    titile: 'Test',
-    description: 'test',
-    img: require('../assets/Cropping/img1.png'),
-  },
-  {
-    titile: 'Test',
-    description: 'test',
-    img: require('../assets/Cropping/img1.png'),
-  },
-];
-
 const styles = StyleSheet.create({
-  shdow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-
-    elevation: 7,
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFDF5',
   },
-
   colorDiv: {
     backgroundColor: '#874be9',
     height: hp(11),
     borderBottomRightRadius: 50,
     borderBottomLeftRadius: 50,
+  },
+  header: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  backButton: {
+    width: '25%',
+  },
+  titleContainer: {
+    width: '67%',
+  },
+  title: {
+    fontWeight: '700',
+    fontSize: 22,
+    lineHeight: 32,
+    color: '#FFF',
+  },
+  divider: {
+    height: hp(1),
+  },
+  sectionTitleContainer: {
+    marginHorizontal: 15,
+    height: hp(5),
+    justifyContent: 'center',
+    marginTop: 5,
+  },
+  sectionTitle: {
+    fontSize: 19,
+    color: '#000',
+    fontWeight: '700',
+  },
+  searchContainer: {
+    marginTop: 10,
+    height: hp(8),
+    justifyContent: 'center',
   },
   search: {
     backgroundColor: '#FFF',
@@ -207,5 +168,68 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginHorizontal: 20,
     borderRadius: 15,
+  },
+  searchInput: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#000',
+    lineHeight: 18,
+  },
+  flatListContainer: {
+    flex: 1,
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
+  itemContainer: {
+    marginHorizontal: 15,
+    height: hp(20),
+    backgroundColor: '#FFF',
+    marginVertical: 5,
+    borderRadius: 15,
+    padding: 20,
+  },
+  itemContentContainer: {
+    width: '100%',
+    flexDirection: 'row',
+  },
+  imageContainer: {},
+  image: {
+    height: 45,
+    width: 45,
+  },
+  textContainer: {
+    marginLeft: 10,
+  },
+  titleText: {
+    fontSize: 18,
+    color: '#000',
+    fontWeight: '700',
+  },
+  descriptionText: {
+    fontSize: 15,
+    color: '#000',
+    fontWeight: '500',
+  },
+  registerButton: {
+    backgroundColor: '#e7dbfb',
+    height: 55,
+    width: '100%',
+    marginTop: 20,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  registerButtonText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#874BE9',
   },
 });
