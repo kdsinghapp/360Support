@@ -161,13 +161,13 @@ import {
     {
       titile: "Create a new player account",
       describe: "If your child doesn't already have an account in 360Player",
-      logo: require('../assets/Cropping/Logo3.png'),
+      logo: require('../assets/Cropping/ask1.png'),
       type:'CreateAccount'
     },
     {
       titile: "Connect to an existing player account",
       describe: 'If your child already has a 360Player account.',
-      logo: require('../assets/Cropping/Logo1.png'),
+      logo: require('../assets/Cropping/ask2.png'),
       type:'exitAccount'
     },
    

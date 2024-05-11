@@ -8,189 +8,168 @@ import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 
 export default function LoginOption() {
-
   const navigation = useNavigation();
 
   return (
-    <View style={{flex: 1, backgroundColor: '#874be9'}}>
-      <View
-        style={{
-          height: hp(15),
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
         <Image
           source={require('../assets/Cropping/Logo_23x.png')}
-          style={{height: 180, width: 180}}
+          style={styles.logo}
           resizeMode="contain"
         />
       </View>
 
       <View>
-        <View
-          style={{
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '700',
-              color: '#FFF',
-              lineHeight: 36,
-            }}>
-            Empowers{' '}
-          </Text>
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '700',
-              color: '#FFF',
-              lineHeight: 36,
-            }}>
-            clubs at all levels{' '}
-          </Text>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Empowers</Text>
+          <Text style={styles.headerText}>clubs at all levels</Text>
         </View>
-        <View
-          style={{
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: '400',
-              color: '#FFF',
-              lineHeight: 24,
-            }}>
-            The all-in-one platform for clubs, teams{' '}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: '400',
-              color: '#FFF',
-              lineHeight: 24,
-            }}>
-            and players{' '}
-          </Text>
+        <View style={styles.subHeader}>
+          <Text style={styles.subHeaderText}>The all-in-one platform for clubs, teams</Text>
+          <Text style={styles.subHeaderText}>and players</Text>
         </View>
       </View>
-      <View style={{marginTop: hp(15)}}>
-        <TouchableOpacity 
-        onPress={()=>{
-          navigation.navigate(ScreenNameEnum.GROUP_CODE,{showCreateaccount:false})
-        }}
-        style={[styles.btn, {backgroundColor: '#FFFFFF'}]}>
-          <Text
-            style={{
-              fontSize: 17,
-              color: '#874BE9',
-              fontWeight: '600',
-              lineHeight: 25,
-            }}>
-            Create account
-          </Text>
-        </TouchableOpacity>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: hp(3),
-          }}>
-          <Text style={{color: '#FFFFFF', fontSize: 17, lineHeight: 25}}>
-            Or
-          </Text>
-        </View>
+
+      <View style={styles.buttonContainer}>
         <TouchableOpacity
-
-onPress={()=>{
-  navigation.navigate(ScreenNameEnum.SIGNIN_OPTION)
-}}
-          style={[
-            styles.btn,
-            {
-              backgroundColor: '#294247',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: 17,
-              color: '#FFFFFF',
-              fontWeight: '600',
-              lineHeight: 25,
-            }}>
-           SIGN IN
-          </Text>
+          onPress={() => {
+            navigation.navigate(ScreenNameEnum.GROUP_CODE, { showCreateaccount: false })
+          }}
+          style={[styles.btn, { backgroundColor: '#FFFFFF' }]}>
+          <Text style={[styles.buttonText,{   color: '#874BE9',}]}>Create account</Text>
         </TouchableOpacity>
-      </View>
 
-      <View style={{justifyContent:'center',alignItems:'center',marginTop:hp(22)}}>
+        <View style={styles.orContainer}>
+          <Text style={styles.orText}>Or</Text>
+        </View>
+
         <TouchableOpacity
-        style={{borderBottomWidth:0.8,borderColor:'#FFF',paddingVertical:5}}
-        >
-          <Text
-       style={{
-            fontSize: 14,
-            color: '#FFFFFF',
-            fontWeight: '600',
-            lineHeight:18,
+          onPress={() => {
+            navigation.navigate(ScreenNameEnum.SIGNIN_OPTION)
           }}
-          >Is your club not using Team Up?</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{flexDirection:'row',alignSelf:'center',marginTop:20,position:'absolute',bottom:hp(2),}}>
-      <TouchableOpacity
-        style={{borderBottomWidth:1,borderColor:'#b8b4bf',paddingVertical:5}}
-        >
-          <Text
-       style={{
-            fontSize: 14,
-            color: '#b8b4bf',
-            fontWeight: '600',
-            lineHeight:18,
-          }}
-          >Term of Service</Text>
-        </TouchableOpacity>
-      <TouchableOpacity
-        style={{borderBottomWidth:1,borderColor:'#b8b4bf',paddingVertical:5,marginLeft:10}}
-        >
-          <Text
-       style={{
-            fontSize: 14,
-            color: '#b8b4bf',
-            fontWeight: '600',
-            lineHeight:18,
-          }}
-          >Privacy policy</Text>
-        </TouchableOpacity>
-      <TouchableOpacity
-        style={{borderBottomWidth:1,borderColor:'#b8b4bf',paddingVertical:5,marginLeft:10}}
-        >
-          <Text
-       style={{
-            fontSize: 14,
-            color: '#b8b4bf',
-            fontWeight: '600',
-            lineHeight:18,
-          }}
-          >FAQ</Text>
+          style={[styles.btn, { backgroundColor: '#294247' }]}>
+          <Text style={styles.buttonText}>SIGN IN</Text>
         </TouchableOpacity>
       </View>
 
-     
+      <View style={styles.clubNotUsingContainer}>
+        <TouchableOpacity style={styles.clubNotUsingButton}>
+          <Text style={styles.clubNotUsingText}>Is your club not using Team Up?</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.bottomLinksContainer}>
+        <TouchableOpacity style={styles.bottomLink}>
+          <Text style={styles.bottomLinkText}>Term of Service</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomLink}>
+          <Text style={styles.bottomLinkText}>Privacy policy</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomLink}>
+          <Text style={styles.bottomLinkText}>FAQ</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#874be9',
+  },
+  logoContainer: {
+    height: '15%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    height: 180,
+    width: 180,
+  },
+  header: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFF',
+    lineHeight: 36,
+  },
+  subHeader: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  subHeaderText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#FFF',
+    lineHeight: 24,
+  },
+  buttonContainer: {
+    marginTop: '15%',
+  },
   btn: {
     height: 55,
     marginHorizontal: 20,
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  buttonText: {
+    fontSize: 17,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    lineHeight: 25,
+  },
+  orContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  orText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    lineHeight: 25,
+  },
+  clubNotUsingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '22%',
+  },
+  clubNotUsingButton: {
+    borderBottomWidth: 0.8,
+    borderColor: '#FFF',
+    paddingVertical: 5,
+  },
+  clubNotUsingText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    lineHeight: 18,
+  },
+  bottomLinksContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 20,
+    position: 'absolute',
+    bottom: '2%',
+  },
+  bottomLink: {
+    borderBottomWidth: 1,
+    borderColor: '#b8b4bf',
+    paddingVertical: 5,
+    marginLeft: 10,
+  },
+  bottomLinkText: {
+    fontSize: 14,
+    color: '#b8b4bf',
+    fontWeight: '600',
+    lineHeight: 18,
   },
 });

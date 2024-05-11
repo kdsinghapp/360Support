@@ -12,6 +12,8 @@ import GoBack from '../assets/svg/GoBack.svg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Updated_ChildInfo } from '../redux/feature/authSlice';
 import Loading from '../configs/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { errorToast } from '../configs/customToast';
 
 export default function CreateChildAccount() {
 
@@ -39,17 +41,22 @@ export default function CreateChildAccount() {
 
     return passwordRegex.test(password);
   };
-  const UpdatedChild = () => {
+  const UpdatedChild = async() => {
+    const id = await AsyncStorage.getItem('child_user_id');
+
+    console.log('====================================');
+    console.log(id);
+    console.log('====================================');
     if (password != '' && email != '') {
 
 
       if (!validateEmail(email)) {
-        alert('Please enter a valid email address.');
+        errorToast('Please enter a valid email address.');
         return;
       }
 
       if (!validatePassword(password)) {
-        alert(
+        errorToast(
           'Password must contain at least 8 characters, including  letters ,least one special character,  and numbers.',
         );
         return;
@@ -59,26 +66,26 @@ export default function CreateChildAccount() {
         const passwordWithoutSpaces = password.replace(/\s/g, '');
 
         if (email !== Cemail)
-          return Alert.alert('Email', 'Email or Confirm Email not Match');
+          return errorToast('Email or Confirm Email not Match');
         if (password !== Cpassword)
-          return Alert.alert(
-            'Password',
+          return errorToast(
+           
             'Password or Confirm Password not Match',
           );
         const params = {
           data: {
             email: email,
             password: passwordWithoutSpaces,
-            user_id: '30',
+            user_id: id,
           },
           navigation: navigation,
         };
         dispatch(Updated_ChildInfo(params));
       } else {
-        Alert.alert('Failed', 'Invalid email or password');
+        errorToast('Invalid email or password');
       }
     } else {
-      Alert.alert('Require', 'email or password field empty');
+      errorToast('email or password field empty');
     }
   };
   return (

@@ -1,189 +1,194 @@
-import {View, Text, Image, TouchableOpacity, StyleSheet, TextInput, Alert} from 'react-native';
 import React, { useState } from 'react';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import ScreenNameEnum from '../routes/screenName.enum';
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import GoBack from '../assets/svg/GoBack.svg';
+import ScreenNameEnum from '../routes/screenName.enum';
 import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../configs/Loader';
 import { login } from '../redux/feature/authSlice';
 import { errorToast } from '../configs/customToast';
+import GoBack from '../assets/svg/GoBack.svg';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+interface RootState {
+  auth: {
+    isLoading: boolean;
+  };
+}
 
 export default function Login() {
-    const navigation = useNavigation();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  const navigation = useNavigation();
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const [isValidEmail, setIsValidEmail] = useState<boolean>(true);
+  const isFocus = useIsFocused();
 
-    const dispatch = useDispatch();
-    const isLoading = useSelector(state => state.auth.isLoading);
+  const validateEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsValidEmail(emailRegex.test(email));
+  };
 
-    const [isValidEmail, setIsValidEmail] = useState(true);
-
-    const isFocus = useIsFocused();
-    const validateEmail = () => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      setIsValidEmail(emailRegex.test(email));
-    };
-    const Login = () => {
-      if (password != '' && email != '') {
-        validateEmail();
-  
-        if (isValidEmail) {
-          const passwordWithoutSpaces = password.replace(/\s/g, '');
-          const params = {
-            data: {
-              email: email,
-              password: passwordWithoutSpaces,
-            },
-            navigation: navigation,
-          };
-          dispatch(login(params));
-        } else {
-          errorToast(`Invalid email or password`)
-        }
+  const Login = () => {
+    if (password !== '' && email !== '') {
+      validateEmail();
+      if (isValidEmail) {
+        const passwordWithoutSpaces: string = password.replace(/\s/g, '');
+        const params = {
+          data: {
+            email: email,
+            password: passwordWithoutSpaces,
+          },
+          navigation: navigation,
+        };
+        dispatch(login(params));
       } else {
-       
-      
-        errorToast(`email or password field empty`)
+        errorToast(`Invalid email or password`);
       }
-    };
+    } else {
+      errorToast(`Email or password field empty`);
+    }
+  };
   
+
   return (
-    <View style={{flex: 1, backgroundColor: '#874be9'}}>
-       {isLoading ? <Loading /> : null}
-         <View
-          style={{
-            height: hp(20),
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-          }}>
-          <Image
-            source={require('../assets/Cropping/Logo_23x.png')}
-            style={{height: 180, width: 180}}
-            resizeMode="contain"
-          />
-  
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={{position: 'absolute', left: 10, top: 20}}>
-            <GoBack />
-          </TouchableOpacity>
-        </View>
-      
-
-      <View>
-        <View
-          style={{
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '700',
-              color: '#FFF',
-              lineHeight: 36,
-            }}>
-            Login in with email
-          </Text>
-          
-        </View>
-      
-      </View>
-      <View style={{marginTop: hp(8)}}>
-        <View style={[styles.txtInput, {backgroundColor: '#FFFFFF'}]}>
-          <TextInput 
-          placeholder='Your email'
-          placeholderTextColor={'#000'}
-          style={{fontSize:14,color:'#000',lineHeight:18}}
-          onChangeText={(txt)=>setEmail(txt)}
-          value={email}
-          />
-        </View>
-        <View style={[styles.txtInput, {
-            marginTop:30,
-            backgroundColor: '#FFFFFF'}]}>
-          <TextInput 
-          placeholder='Your password'
-          placeholderTextColor={'#000'}
-          style={{fontSize:14,color:'#000',lineHeight:18}}
-          onChangeText={(txt)=>setPassword(txt)}
-          value={password}
-          />
-        </View>
-        </View>
-      <View style={{marginTop: hp(5)}}>
-     
-        
+    <View style={styles.container}>
+      {isLoading ? <Loading /> : null}
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('../assets/Cropping/Logo_23x.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <TouchableOpacity
-
-onPress={()=>{
-  Login()
-}}
-          style={[
-            styles.btn,
-            {
-              backgroundColor: '#294247',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: 17,
-              color: '#FFFFFF',
-              fontWeight: '600',
-              lineHeight: 25,
-            }}>
-        Sign in
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{justifyContent:'center',alignItems:'center',marginTop:hp(5)}}>
-        <TouchableOpacity
-
-        onPress={()=>{
-            navigation.navigate(ScreenNameEnum.PASSWORDRESET_OPTION)
-        }}
-        style={{borderBottomWidth:0.5,borderColor:'#FFF'}}
-        >
-          <Text
-       style={{
-            fontSize: 14,
-            color: '#FFFFFF',
-            fontWeight: '600',
-            lineHeight:18,
+          onPress={() => {
+            navigation.goBack();
           }}
-          >Forgot Your Password?</Text>
+          style={styles.goBack}>
+          <GoBack />
         </TouchableOpacity>
       </View>
-
-  
+      <View>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Login in with email</Text>
+        </View>
+      </View>
+      <View style={styles.inputContainer}>
+        <View style={[styles.textInput, { backgroundColor: '#FFFFFF' }]}>
+          <TextInput
+            placeholder='Your email'
+            placeholderTextColor={'#000'}
+            style={styles.input}
+            onChangeText={(txt) => setEmail(txt)}
+            value={email}
+          />
+        </View>
+        <View style={[styles.textInput, { marginTop: 30, backgroundColor: '#FFFFFF' }]}>
+          <TextInput
+            placeholder='Your password'
+            placeholderTextColor={'#000'}
+            style={styles.input}
+            onChangeText={(txt) => setPassword(txt)}
+            value={password}
+            secureTextEntry={true}
+          />
+        </View>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={() => { Login() }}
+          style={[styles.button, { backgroundColor: '#294247' }]}>
+          <Text style={styles.buttonText}>Sign in</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.forgotPasswordContainer}>
+        <TouchableOpacity
+          onPress={() => { navigation.navigate(ScreenNameEnum.PASSWORDRESET_OPTION) }}
+          style={styles.forgotPasswordButton}>
+          <Text style={styles.forgotPasswordText}>Forgot Your Password?</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  btn: {
-    height: 55,
-    marginHorizontal: 20,
-    borderRadius: 15,
-   justifyContent:'center',
-   alignItems:'center'
- 
+  container: {
+    flex: 1,
+    backgroundColor: '#874be9',
   },
-  txtInput: {
+  logoContainer: {
+    height: hp(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  logo: {
+    height: 180,
+    width: 180,
+  },
+  goBack: {
+    position: 'absolute',
+    left: 10,
+    top: 20,
+  },
+  header: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFF',
+    lineHeight: 36,
+  },
+  inputContainer: {
+    marginTop: hp(8),
+  },
+  textInput: {
     height: 55,
     marginHorizontal: 20,
     borderRadius: 15,
-   justifyContent:'center',
- paddingHorizontal:15
- 
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+  },
+  input: {
+    fontSize: 14,
+    color: '#000',
+    lineHeight: 18,
+  },
+  buttonContainer: {
+    marginTop: hp(5),
+  },
+  button: {
+    height: 55,
+    marginHorizontal: 20,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 17,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    lineHeight: 25,
+  },
+  forgotPasswordContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: hp(5),
+  },
+  forgotPasswordButton: {
+    borderBottomWidth: 0.5,
+    borderColor: '#FFF',
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    lineHeight: 18,
   },
 });

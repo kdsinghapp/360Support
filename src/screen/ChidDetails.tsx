@@ -24,6 +24,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Add_ChildInfo} from '../redux/feature/authSlice';
 import Loading from '../configs/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function ChidDetails() {
   const navigation = useNavigation();
   const selected = useSelector(state => state.auth.selectedRole);
@@ -57,7 +58,8 @@ export default function ChidDetails() {
       });
   };
 
-  const createUser = () => {
+  const createUser =async () => {
+    const id = await AsyncStorage.getItem('user_id');
     if (firstName == '' || lastName == '')
       return Alert.alert('Please enter ', 'First Name or Last Name');
     if (firstName == '' || lastName == '')
@@ -68,8 +70,10 @@ export default function ChidDetails() {
     if (value == '') return Alert.alert('Please selecte ', 'Country');
 
 
-
     
+    console.log('====================================');
+    console.log(id);
+    console.log('====================================');
     const params = {
       data: {
         first_name: firstName,
@@ -77,7 +81,7 @@ export default function ChidDetails() {
         dob: `${Dd}-${Mm}-${YYYY}`,
         country: value,
         type: 'Child',
-        parent_id:'19',
+        parent_id:id,
         image: {
           uri:
             Platform.OS == 'android'

@@ -406,10 +406,13 @@ export const Add_ChildInfo = createAsyncThunk(
 
       console.log('=================Add_ChildInfo===================');
       console.log(response.data);
-      console.log('=============Add_ChildInfo api=======================');
+      console.log('=============Add_ChildInfo api=======================', response?.data?.result.id);
 
       if (response.data.status == '1') {
+        
+        await AsyncStorage.setItem("child_user_id", response?.data?.result.id)
         params.navigation.navigate(ScreenNameEnum.FIRST_TIMECHILD);
+       
       } else {
         errorToast('Network error')
       }

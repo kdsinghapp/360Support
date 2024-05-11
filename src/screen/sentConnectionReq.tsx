@@ -1,6 +1,6 @@
 
     import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput} from 'react-native';
-    import React from 'react';
+    import React, { useState } from 'react';
     import {
       widthPercentageToDP as wp,
       heightPercentageToDP as hp,
@@ -8,15 +8,36 @@
     import ScreenNameEnum from '../routes/screenName.enum';
     import { useNavigation } from '@react-navigation/native';
     import GoBack from '../assets/svg/GoBack.svg';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch, useSelector } from 'react-redux';
+import {send_child_request } from '../redux/feature/featuresSlice.js'
+import Loading from '../configs/Loader';
     export default function sentConnectionReq({route}) {
-
-        const {showCreateaccount} = route.params
-    
+      const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+      const [Email,setEmail] =useState<String>('')
+        const {showCreateaccount } = route.params
+    // const showCreateaccount = false
       const navigation = useNavigation()
+const dispatch = useDispatch()
+
+      const send_request = async()=>{
+        const id = await AsyncStorage.getItem("user_id")
+    const  params ={
+          data:{
+            parent_id:'73',
+            email:Email,
+          },
+          navigation:navigation
+        }
+
+dispatch(send_child_request(params))   
+
+}
+
+
       return (
         <View style={{flex: 1, backgroundColor: '#874be9'}}>
-        
+         {isLoading ? <Loading /> : null}
         <View
             style={{
               height: hp(5),
@@ -69,13 +90,17 @@
               placeholder="Your child's email address"
               placeholderTextColor={'grey'}
               style={{fontSize:14,color:'#000',lineHeight:18,fontWeight:'600'}}
+
+              value={Email}
+              onChangeText={(txt)=>setEmail(txt)}
               />
             </View>
           
     </View>
           <TouchableOpacity
            onPress={() => {
-            navigation.navigate(ScreenNameEnum.REQUESTSENTSETP2);
+           
+            send_request()
           }}
               style={[
                 styles.btn,
