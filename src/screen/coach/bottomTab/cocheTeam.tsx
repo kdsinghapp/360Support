@@ -150,7 +150,11 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
               <FlatList
                 data={player}
                 renderItem={RecentListItem}
-                ListFooterComponent={()=>}
+                ListFooterComponent={({item})=>(
+                  <View 
+                  style={{height:hp(5)}}
+                  />
+                )}
               
               />
             </View>
