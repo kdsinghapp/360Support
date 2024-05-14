@@ -9,14 +9,14 @@ import {
   ScrollView,
   Dimensions,
   Animated,
-  Modal
+  Modal,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-
+import File from '../../../assets/svg/Files.svg';
 import Close from '../../../assets/svg/Close.svg';
 
 const VideoModal = ({visible, onClose, data}) => {
@@ -24,6 +24,21 @@ const VideoModal = ({visible, onClose, data}) => {
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const [selectedCalendar, setSelectedCalendar] = useState('');
   const [value, setValue] = useState(null);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoDescription, setVideoDescription] = useState('');
+
+  const handlePostVideo = () => {
+    // Here you can implement logic to post the video to your backend or storage service
+    // You may use libraries like Axios or fetch to make HTTP requests
+
+    // For demonstration purposes, let's just log the video URL and description
+    console.log('Video URL:', videoUrl);
+    console.log('Video Description:', videoDescription);
+
+    // Reset the form fields after posting
+    setVideoUrl('');
+    setVideoDescription('');
+  };
   useEffect(() => {
     if (visible) {
       openModal();
@@ -54,7 +69,7 @@ const VideoModal = ({visible, onClose, data}) => {
         {
           paddingVertical: 15,
           padding: 10,
-          marginHorizontal:10,
+          marginHorizontal: 10,
           backgroundColor: '#FFF',
           borderRadius: 20,
           marginVertical: 10,
@@ -192,7 +207,7 @@ const VideoModal = ({visible, onClose, data}) => {
                 color: '#000',
                 fontWeight: '700',
               }}>
-              Video
+              Team Video
             </Text>
 
             <TouchableOpacity
@@ -206,13 +221,62 @@ const VideoModal = ({visible, onClose, data}) => {
             </TouchableOpacity>
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={{paddingTop: 20}}>
-              <FlatList
-                data={VideoData}
-                renderItem={RecentListItem}
-                keyExtractor={item => item.id}
-              />
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Video Title</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  multiline
+                  style={styles.input}
+                  placeholder="Video Title"
+                />
+              </View>
             </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Enter video description</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  multiline
+                  style={styles.input}
+                  placeholder="Enter video description"
+                />
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Video URL</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  multiline
+                  style={styles.input}
+                  placeholder="Video URL"
+                />
+              </View>
+            </View>
+            <Text style={[styles.label,{alignSelf:'center'}]}>Or</Text>
+            <TouchableOpacity
+              onPress={() => {}}
+              style={{
+                backgroundColor: '#874BE933',
+                height: 55,
+                width: '94%',
+                marginTop: 20,
+                borderRadius: 15,
+               
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                alignSelf: 'center',
+              }}>
+              <File />
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: '600',
+                  color: '#874BE9',
+                  marginLeft: 10,
+                }}>
+                Add attachment
+              </Text>
+            </TouchableOpacity>
           </ScrollView>
           <TouchableOpacity
             onPress={() => {}}
@@ -255,6 +319,32 @@ const VideoData = [
 ];
 
 const styles = StyleSheet.create({
+  inputContainer: {
+    marginTop: 15,
+   marginHorizontal:10
+  },
+  label: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: '500',
+  },
+  inputWrapper: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+    paddingHorizontal: 10,
+
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    height: 50,
+    marginVertical: 10,
+  },
   shadow: {
     shadowColor: '#000',
     shadowOffset: {

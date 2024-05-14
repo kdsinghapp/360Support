@@ -48,7 +48,7 @@ const IsFocus = useIsFocused()
   const getGroupDetails =async () => {
    
     const params = {
-      group_code: '1234',
+      group_code: user_data?.group_code,
       profile: true,
       //GroupDetails?.group_code,
     };

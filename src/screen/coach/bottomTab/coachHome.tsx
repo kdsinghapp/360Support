@@ -8,7 +8,7 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,13 +17,50 @@ import Bell from '../../../assets/svg/bell.svg';
 import Down from '../../../assets/svg/Down.svg';
 import Line from '../../../assets/svg/Line.svg';
 import SearchIcon from '../../../assets/svg/search.svg';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import BottomToTopModal from '../../Modal/Modal';
+import PostModal from '../modal/PostModal';
+import TrainingModal from '../modal/TrainingModal';
+import VideoModal from '../modal/VideoModal';
+import PerformModal from '../modal/PerformModal';
+import EventModal from '../modal/Addevent';
+import { useDispatch, useSelector } from 'react-redux';
+import Loading from '../../../configs/Loader';
+import { get_profile } from '../../../redux/feature/authSlice';
 
 export default function coachHome() {
   const navigation = useNavigation();
+  const user_data = useSelector(state => state.auth.userData);
+  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
+  const My_Profile = useSelector(state => state.auth.GetUserProfile);
+  const [OpenModal, setOpenModal] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [ModalVisiblePost, setModalVisiblePost] = useState(false);
+  const [eventVisible,seteventVisible] = useState(false)
+const isFocuse = useIsFocused()
+const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+    get_profileDetails()
+  },[isFocuse,user_data])
+
+  const get_profileDetails =async () => {
+   
+    const params = {
+      user_id: user_data?.id,
+     
+    };
+
+    dispatch(get_profile(params));
+  };
+
+console.log('====================================');
+console.log(My_Profile);
+console.log('====================================');
+
   const RecentListItem = ({item}) => (
     <View
       style={[
@@ -118,7 +155,16 @@ export default function coachHome() {
       </View>
     </View>
   );
+  const getGroupDetails =async () => {
+   
+    const params = {
+      group_code: user_data?.group_code,
+      profile: true,
+      //GroupDetails?.group_code,
+    };
 
+    dispatch(Get_Group(params));
+  };
   const PendingRequest = ({item}) => (
     <View
       style={[
@@ -191,8 +237,10 @@ export default function coachHome() {
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
+        {isLoading ? <Loading /> : null}
+        {isLoading2 ? <Loading /> : null}
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.colorDiv}>
+      <View style={styles.colorDiv}>
           <View style={styles.Div1}>
             <View
               style={{
@@ -201,11 +249,14 @@ export default function coachHome() {
                 justifyContent: 'space-around',
                 width: '30%',
               }}>
-              <Image
-                source={require('../../../assets/Cropping/dp.jpeg')}
-                style={{height: 25, width: 25, borderRadius: 12.5}}
-              />
-
+              {GroupDetails?.image == '' ? (
+                <Text>{GroupDetails?.group_name[0]}</Text>
+              ) : (
+                <Image
+                  source={{uri: GroupDetails?.image}}
+                  style={{height: 25, width: 25, borderRadius: 12.5}}
+                />
+              )}
               <Text
                 style={{
                   fontSize: 16,
@@ -214,7 +265,7 @@ export default function coachHome() {
                   color: '#FFF',
                   marginHorizontal: 10,
                 }}>
-                NFC U16
+                {GroupDetails?.group_name}
               </Text>
               <Down />
             </View>
@@ -235,7 +286,7 @@ export default function coachHome() {
                   lineHeight: 32,
                   color: '#FFF',
                 }}>
-                Mira Donin
+                {My_Profile?.first_name} {My_Profile?.last_name}
               </Text>
               <Text
                 style={{
@@ -249,15 +300,56 @@ export default function coachHome() {
             </View>
             <View>
               <Image
-                source={require('../../../assets/Cropping/dp.jpeg')}
+                source={{uri: My_Profile?.image}}
                 style={{height: 45, width: 45, borderRadius: 22.5}}
               />
             </View>
           </View>
         </View>
+        <View style={{height: hp(8), marginTop: 10, marginHorizontal: 15}}>
+            <FlatList
+              data={Create}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              renderItem={({item}) => (
+                <TouchableOpacity
 
+                onPress={()=>{
+                  setModalVisiblePost(true)
+                  seteventVisible(true)
+                  setOpenModal(item.name)
+                }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 15,
+                  }}>
+                  <View style={{paddingTop: 5}}>
+                    <Image
+                      source={item.logo}
+                      style={{
+                        height: 40,
+                        width: 40,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <View style={{marginLeft: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: '#000',
+                        fontWeight: '700',
+                      }}>
+                      {item.name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
         <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-          <View
+          {/* <View
             onPress={() => {
               navigation.navigate(ScreenNameEnum.UPCOMING_EVENT);
             }}
@@ -297,7 +389,7 @@ export default function coachHome() {
                 Mira Donin
               </Text>
             </View>
-          </View>
+          </View> */}
 
           <View style={{marginHorizontal: 15, marginTop: 30}}>
             <Text
@@ -443,6 +535,13 @@ export default function coachHome() {
           />
         </View>
         </View>
+        <PostModal visible={OpenModal=='Post'&&ModalVisiblePost?true:false}  onClose={() => setModalVisiblePost(false)} />
+  
+        <EventModal
+    
+        visible={OpenModal=='Add Event'&&eventVisible?true:false}
+        onClose={() => seteventVisible(false)}
+      />
       </ScrollView>
     </View>
   );
@@ -549,5 +648,29 @@ const PendingRequestData = [
   {
     name: 'U71',
     status: 'Pending staff Request',
+  },
+];
+
+
+const Create = [
+  {
+    name: 'Post',
+    logo: require('../../../assets/Cropping/edit.png'),
+  },
+  {
+    name: 'Add Event',
+    logo: require('../../../assets/Cropping/traning.png'),
+  },
+  {
+    name: 'Add Training',
+    logo: require('../../../assets/Cropping/traning.png'),
+  },
+  {
+    name: ' Add Match Video',
+    logo: require('../../../assets/Cropping/video.png'),
+  },
+  {
+    name: 'Enters match',
+    logo: require('../../../assets/Cropping/perform.png'),
   },
 ];

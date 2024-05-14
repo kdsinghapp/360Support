@@ -15,7 +15,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import GoBack from '../assets/svg/GoBack.svg';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../routes/screenName.enum';
 import BackBtn from '../assets/svg/BackBtn.svg';
 import PickPhoto from '../assets/svg/PickPhoto.svg';
@@ -60,7 +60,10 @@ export default function MyProfile() {
   const [zipCode, setzipCode] = useState('');
   const [City, setCity] = useState('');
   const [Email, setEmail] = useState('');
-
+  const isFocuse = useIsFocused();
+  useEffect(() => {
+    getProfile();
+  }, [isFocuse]);
   const dispatch = useDispatch();
 
   function calculateAge() {
@@ -88,6 +91,13 @@ export default function MyProfile() {
     return age;
   }
 
+  const getProfile = async () => {
+    const id = await AsyncStorage.getItem('user_id');
+    params = {
+      user_id: id,
+    };
+    dispatch(get_profile(params));
+  };
   useEffect(() => {
     setLastName(My_Profile?.last_name);
     setFirstName(My_Profile?.first_name);
@@ -103,6 +113,9 @@ export default function MyProfile() {
     setzipCode(My_Profile?.zip_code);
   }, [My_Profile]);
 
+
+  console.log(My_Profile?.image);
+  
   const pickupDOB = date => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1; // Months are zero indexed
@@ -128,11 +141,8 @@ export default function MyProfile() {
         console.log(err);
       });
   };
+
   const Updated_profile = async () => {
-console.log('=============Updated_profile=======================');
-console.log();
-console.log('====================================');
-   
     const id = await AsyncStorage.getItem('user_id');
 
     const params = {
@@ -142,14 +152,21 @@ console.log('====================================');
       dob: Dob,
       gender: Gender,
       age: Age,
-      image: {
-        uri:
-          Platform.OS === 'android'
-            ? profile.path
-            : profile?.path?.replace('file://', ''),
-        type: profile.mime,
-        name: 'image.png',
-      },
+      image:
+        profile != null
+          ? {
+              uri:
+                Platform.OS === 'android'
+                  ? profile.path
+                  : profile?.path?.replace('file://', ''),
+              type: profile.mime,
+              name: 'image.png',
+            }
+          : {
+              uri: My_Profile?.image,
+              name: 'image.png',
+              type: 'image/jpeg',
+            },
       mobile: number,
       street_address: S_address,
       zip_code: zipCode,
@@ -158,12 +175,12 @@ console.log('====================================');
       city: City,
     };
 
+    console.log('=============Updated_profile=======================', params);
+
     dispatch(update_parent_profile(params));
     setIsEditing(false);
-  
   };
 
-  console.log(isEditing);
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
@@ -213,6 +230,7 @@ console.log('====================================');
                 alignItems: 'center',
               }}>
               <TouchableOpacity
+                disabled={!isEditing}
                 onPress={() => {
                   openImageLibrary();
                 }}
@@ -226,14 +244,22 @@ console.log('====================================');
                   <>
                     <Image
                       source={{
-                        uri: profile == '' ? My_Profile?.image : profile?.path,
+                        uri:
+                          profile == null ? My_Profile?.image : profile?.path,
                       }}
                       style={{height: 80, width: 80, borderRadius: 40}}
                     />
-                    <Text
-                      style={{fontSize: 12, color: '#fff', fontWeight: '700'}}>
-                      Edit Profile
-                    </Text>
+                    {isEditing && (
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          marginTop: 10,
+                          color: '#fff',
+                          fontWeight: '700',
+                        }}>
+                        Edit Profile
+                      </Text>
+                    )}
                   </>
                 )}
               </TouchableOpacity>
@@ -851,6 +877,7 @@ console.log('====================================');
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Date of birth</Text>
               <TouchableOpacity
+              disabled={!isEditing}
                 style={{
                   justifyContent: 'space-between',
                   flexDirection: 'row',
@@ -988,6 +1015,7 @@ console.log('====================================');
               <Text style={[styles.inputLabel, {height: 30}]}>Country</Text>
               {Country_List && (
                 <Dropdown
+                disable={!isEditing}
                   data={Country_List}
                   maxHeight={200}
                   labelField="name"

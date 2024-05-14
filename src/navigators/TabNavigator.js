@@ -106,38 +106,38 @@ export default function TabNavigator() {
           }}
         />
       ));
-    } else if (userData?.type == 'Child') {
-      return _routes.BOTTOMTAB_ROUTE.map(screen => (
-        <Tab.Screen
-          key={screen.name}
-          name={screen.name}
-          component={screen.Component}
-          options={{
-            tabBarIcon: ({focused, color, size}) => (
-              <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                <Image
-                  source={screen.logo} // Assuming you have imported icon for each screen
-                  style={{
-                    width: focused ? 24 : 20,
-                    height: focused ? 24 : 20,
-                    tintColor: focused ? '#7756FC' : color,
-                  }}
-                />
-                <Text
-                  style={{
-                    color: focused ? '#874BE9' : '#9DB2CE',
-                    fontSize: 12,
-                    fontWeight: '600',
-                  }}>
-                  {screen.label}
-                </Text>
-              </View>
-            ),
-            tabBarLabel: screen.label,
-          }}
-        />
-      ));
-    } else {
+    // } else if (userData?.type == 'Child') {
+    //   return _routes.BOTTOMTAB_ROUTE.map(screen => (
+    //     <Tab.Screen
+    //       key={screen.name}
+    //       name={screen.name}
+    //       component={screen.Component}
+    //       options={{
+    //         tabBarIcon: ({focused, color, size}) => (
+    //           <View style={{alignItems: 'center', justifyContent: 'center'}}>
+    //             <Image
+    //               source={screen.logo} // Assuming you have imported icon for each screen
+    //               style={{
+    //                 width: focused ? 24 : 20,
+    //                 height: focused ? 24 : 20,
+    //                 tintColor: focused ? '#7756FC' : color,
+    //               }}
+    //             />
+    //             <Text
+    //               style={{
+    //                 color: focused ? '#874BE9' : '#9DB2CE',
+    //                 fontSize: 12,
+    //                 fontWeight: '600',
+    //               }}>
+    //               {screen.label}
+    //             </Text>
+    //           </View>
+    //         ),
+    //         tabBarLabel: screen.label,
+    //       }}
+    //     />
+    //   ));
+    // } else {
       // Return null if userData is null or undefined
       return null;
     }

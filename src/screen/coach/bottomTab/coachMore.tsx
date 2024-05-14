@@ -230,14 +230,27 @@
       id: '1',
       titile: 'Wall',
       logo: require('../../../assets/Cropping/document-text.png'),
-      screen:ScreenNameEnum.WALL_SCREEN,
+      screen:ScreenNameEnum.coachWall,
     },
    
     {
       id: '2',
-      titile: 'Registration',
+      titile: 'Training Schedule',
       logo: require('../../../assets/Cropping/user-octagon.png'),
       screen: ScreenNameEnum.REGISTRATION_SCREEN,
+    },
+    {
+      id: '2',
+      titile: 'Video',
+      logo: require('../../../assets/Cropping/video-octagon.png'),
+      screen: ScreenNameEnum.cocheVideo,
+    },
+    {
+      id: '2',
+      titile: 'Event Management',
+      logo: require('../../../assets/Cropping/user-octagon.png'),
+     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
+      screen: ScreenNameEnum.cocheEvent,
     },
     
   ];
@@ -246,18 +259,21 @@
       id: '1',
       titile: 'Profile',
       logo: require('../../../assets/Cropping/MyProfile-1.png'),
-      screen: ScreenNameEnum.CHILD_PROFILE,
+      screen: ScreenNameEnum.coachProfile,
     },
+    
     {
-      id: '2',
-      titile: 'My children',
-      logo: require('../../../assets/Cropping/profile-2user.png'),
+      id: '3',
+      titile: 'Notification',
+      
+      logo: require('../../../assets/Cropping/Notification2x.png'),
       screen: ScreenNameEnum.MY_CHILDREN,
     },
     {
       id: '3',
       titile: 'Account settings',
-      logo: require('../../../assets/Cropping/video-octagon.png'),
+    
+      logo: require('../../../assets/Cropping/user-octagon.png'),
       screen: ScreenNameEnum.MY_CHILDREN,
     },
     // {

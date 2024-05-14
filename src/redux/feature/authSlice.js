@@ -33,15 +33,16 @@ export const login = createAsyncThunk('login', async (params, thunkApi) => {
     };
     const response = await API.post('/login', params.data, config);
 
-    console.log('=================response.data ===================');
-    console.log(response.data);
-    console.log('=============Login api=======================');
+   
     if (response.data.status == '1') {
       thunkApi.dispatch(loginSuccess(response.data.data));
 
       if(response.data?.result.child_details){
-
+console.log('================Login====================');
+console.log(params);
+console.log('====================================');
         params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+       await AsyncStorage.setItem('user_id',response.data?.result.id)
       }
       else{
         params.navigation.navigate(ScreenNameEnum.WELCOME_SCREEN);
@@ -468,11 +469,7 @@ export const Updated_ChildInfo = createAsyncThunk(
 
 export const logout = createAsyncThunk('logout', async (params, thunkApi) => {
   try {
-    const response = await API.post('/log_out', params.data, {
-      headers: {
-        Authorization: `Bearer ${params.authToken}`,
-      },
-    });
+    const response = await API.post('/log_out', params.data);
 
     console.log(
       '🚀 ~ file: AuthSlice.js:29 ~ logout ~ response:',
@@ -534,15 +531,16 @@ export const get_profile = createAsyncThunk(
 export const update_parent_profile = createAsyncThunk(
   'update_parent_profile',
   async (params, thunkApi) => {
-console.log('===============update_parent_profile=====================');
+console.log('===============update_parent_profile=====================',params);
 
     try {
       const formData = new FormData();
       formData.append('user_id', params.user_id);
       formData.append('first_name', params.first_name);
-      formData.append('first_name', params.first_name);
+      formData.append('last_name', params.last_name);
       formData.append('gender', params.gender);
       formData.append('dob', params.dob);
+      formData.append('age', params.age);
       formData.append('city', params.city);
       formData.append('mobile', params.mobile);
       formData.append('street_address', params.street_address);

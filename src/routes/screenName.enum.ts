@@ -21,6 +21,11 @@ enum ScreenNameEnum {
   NOWITHOUTSCREEN = 'NOWITHOUTSCREEN',
   REQUESTSENTSETP2 = 'REQUESTSENTSETP2',
   FIRST_TIMECHILD ='FIRST_TIMECHILD',
+  coachWall='coachWall',
+  cocheEvent ='cocheEvent',
+  cocheVideo = 'cocheVideo',
+  coachProfile ='coachProfile',
+  PersnalInfo ='PersnalInfo',
 
   //TAb
   BOTTOM_TAB ='BOTTOM_TAB',

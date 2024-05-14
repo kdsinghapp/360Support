@@ -41,7 +41,7 @@ export default function CoachStep1() {
         <Text style={styles.pendingRequestTitle}>Pending request</Text>
         <Text style={styles.pendingRequestText}>
           An admin needs to accept your request before you will get access as
-          staff in Farham FC U17. You will get notified once you are approved.
+          staff in {GroupDetails?.group_name}. You will get notified once you are approved.
           In the meantime, you can proceed to the club lobby to view club posts
           and registrations.
         </Text>

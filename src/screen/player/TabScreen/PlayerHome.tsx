@@ -18,10 +18,10 @@ import Down from '../../../assets/svg/Down.svg';
 import Line from '../../../assets/svg/Line.svg';
 import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
-import PostModal from '../modal/PostModal';
-import TrainingModal from '../modal/TrainingModal';
-import VideoModal from '../modal/VideoModal';
-import PerformModal from '../modal/PerformModal';
+import PostModal from '../../coach/modal/PostModal';
+import TrainingModal from '../../coach/modal/TrainingModal';
+import VideoModal from '../../coach/modal/VideoModal';
+import PerformModal from '../../coach/modal/PerformModal';
 
 export default function PlayerHome() {
   const [modalVisible, setModalVisible] = useState(false);

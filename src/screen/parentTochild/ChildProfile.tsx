@@ -98,7 +98,7 @@ console.log('====================================');
     setState(My_Profile?.child_details[0].state);
     setCity(My_Profile?.child_details[0].city);
     setzipCode(My_Profile?.child_details[0].zip_code);
-    setProfile(My_Profile?.child_details[0].image)
+
   }, [My_Profile]);
   useEffect(() => {
     getChild_profile();

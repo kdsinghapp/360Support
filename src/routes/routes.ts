@@ -72,6 +72,12 @@ import GroupDetails from "../screen/commanScreen/GroupDetails";
 import UserDetails from "../screen/commanScreen/UserDetails";
 import ContinueUserDeatils from "../screen/commanScreen/ContinueUserDeatils";
 import CreateOrRequestConnection from "../screen/bottomTabScreenParent/parentAuth/CreateOrRequestConnection";
+import CocheTeamScreen from "../screen/coach/bottomTab/cocheTeam";
+import coachWall from "../screen/coach/features/coachWall";
+import cocheEvent from "../screen/coach/features/cocheEvent";
+import cocheVideo from "../screen/coach/features/coachVideo";
+import coachProfile from "../screen/coach/features/coachProfile";
+import PersnalInfo from "../screen/commanScreen/PersnalInfo";
 
 
 const _routes = {
@@ -234,6 +240,26 @@ const _routes = {
       name: ScreenNameEnum.FIRST_TIMECHILD,
       Component: firstTimechildadded,
     },
+    {
+      name: ScreenNameEnum.coachWall,
+      Component: coachWall,
+    },
+    {
+      name: ScreenNameEnum.cocheEvent,
+      Component: cocheEvent,
+    },
+    {
+      name: ScreenNameEnum.cocheVideo,
+      Component: cocheVideo,
+    },
+    {
+      name: ScreenNameEnum.coachProfile,
+      Component: coachProfile,
+    },
+    {
+      name: ScreenNameEnum.PersnalInfo,
+      Component: PersnalInfo,
+    },
 
 
   ],
@@ -299,12 +325,18 @@ const _routes = {
       logo: require('../assets/Cropping/Calendar-2.png'),
       lable: 'Calendar'
     },
-
+   
     {
-      name: ScreenNameEnum.NOTIFICATION_SCREEN,
-      Component: coachNotification,
-      logo: require('../assets/Cropping/Notification-1.png'),
-      lable: 'Notification'
+      name: ScreenNameEnum.TEAM_SCREEN,
+      Component: CocheTeamScreen,
+      logo: require('../assets/Cropping/Team2x.png'),
+      lable: 'Team'
+    },
+    {
+      name: ScreenNameEnum.CHAT_CONTACT_SCREEN,
+      Component: ChatPage,
+      logo: require('../assets/Cropping/Chat2x.png'),
+      lable: 'Chat'
     },
 
     {
