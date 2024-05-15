@@ -23,8 +23,7 @@ import {
     const screenHeight = Dimensions.get('screen').height;
     const translateY = useRef(new Animated.Value(screenHeight)).current;
     
-console.log(data.uri);
-console.log(data.type);
+
 
     useEffect(() => {
       if (visible) {
@@ -97,7 +96,7 @@ console.log(data.type);
             
             <Video
             source={{ uri: data.uri }}
-            style={styles.backgroundVideo}
+            style={{ alignSelf: 'stretch', height: 300 }}
             resizeMode="contain"
             controls={true}
             paused={false} 

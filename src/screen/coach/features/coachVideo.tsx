@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,15 +6,24 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Alert,
 } from 'react-native';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { useNavigation } from '@react-navigation/native';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import BackBtn from '../../../assets/svg/BackBtn.svg';
 import AddIcon from '../../../assets/svg/AddIcon.svg';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import PostModal from '../modal/PostModal';
 import EventModal from '../modal/Addevent';
 import VideoModal from '../modal/VideoModal';
+import {get_video} from '../../../redux/feature/featuresSlice';
+import Loading from '../../../configs/Loader';
+import Video from 'react-native-video';
+import YoutubePlayer from 'react-native-youtube-iframe';
+import { successToast } from '../../../configs/customToast';
 
 interface PostItem {
   id: string;
@@ -28,41 +36,70 @@ interface PostItem {
 
 export default function cocheVideo() {
   const My_Profile = useSelector(state => state.auth.GetUserProfile);
-  const get_PostList: PostItem[] = useSelector(state => state.feature.get_PostList);
+  const get_PostList: PostItem[] = useSelector(
+    state => state.feature.get_PostList,
+  );
+  const Video_list: PostItem[] = useSelector(state => state.feature.Video_list);
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const user_data = useSelector(state => state.auth.userData);
+  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const isFocuse = useIsFocused();
+  useEffect(() => {
+    get_videoList();
+  }, [isFocuse, modalVisible]);
+  const dispatch = useDispatch();
+  const get_videoList = async () => {
+    const params = {
+      user_id: user_data?.id,
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_video(params));
+  };
 
-  const RecentListItem = ({ item }: { item: PostItem }) => (
+  const [playing, setPlaying] = useState(false);
+
+  const onStateChange = useCallback(state => {
+    if (state === 'ended') {
+      setPlaying(false);
+      successToast('video has finished playing!');
+    }
+  }, []);
+
+  const togglePlaying = useCallback(() => {
+    setPlaying(prev => !prev);
+  }, []);
+
+  function getYouTubeVideoId(url) {
+    
+    var regExp =
+      /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      // If match is found and it's a valid YouTube video ID
+      return match[2];
+    } else {
+      return null;
+    }
+  }
+
+  const RecentListItem = ({item}: {item: PostItem}) => (
     <View style={[styles.shadow, styles.recentListItem]}>
-      <View style={styles.stickyPostContainer}>
-        <Text style={styles.stickyPostText}>STICKY POST</Text>
+      <View style={styles.interactionContainer}>
+        <YoutubePlayer
+  
+          height={300}
+          play={playing}
+          videoId={getYouTubeVideoId(item?.video_url)}
+          onChangeState={onStateChange}
+        />
       </View>
       <View style={styles.postContent}>
-        <Image source={{ uri: item.image }} style={styles.profileImage} />
-        <View style={styles.postDetails}>
+        <Text style={styles.postTitle}>{item.title}</Text>
+        <Text style={styles.postDescription}>{item.description}</Text>
+        <View style={{flexDirection: 'row'}}>
           <Text style={styles.postTitle}>{item.title}</Text>
-          <Text style={styles.postDescription}>{item.description}</Text>
-          <Text style={styles.postDateTime}>time: {item.date_time}</Text>
-        </View>
-      </View>
-      <Text style={styles.postDetails}>{item.details}</Text>
-      <Image source={{ uri: item.image }} style={styles.postImage} resizeMode="cover" />
-      <View style={styles.interactionContainer}>
-        <View style={styles.interactionItem}>
-          <Image
-            source={require('../../../assets/Cropping/Like2x.png')}
-            style={styles.interactionIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.interactionText}>Like</Text>
-        </View>
-        <View style={styles.interactionItem}>
-          <Image
-            source={require('../../../assets/Cropping/Comment2x.png')}
-            style={styles.interactionIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.interactionText}>Comments</Text>
         </View>
       </View>
     </View>
@@ -70,34 +107,52 @@ export default function cocheVideo() {
 
   return (
     <View style={styles.container}>
+      {isLoading ? <Loading /> : null}
       <View style={styles.colorDiv}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}>
             <BackBtn />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Video</Text>
           </View>
-         
-            <TouchableOpacity 
-            onPress={()=>{
-              setModalVisible(true)
+
+          <TouchableOpacity
+            onPress={() => {
+              setModalVisible(true);
             }}
             style={styles.addButton}>
-              <Image source={require('../../../assets/Cropping/WhiteAdd.png')} style={styles.addButtonIcon} resizeMode="contain" />
-            </TouchableOpacity>
-      
+            <Image
+              source={require('../../../assets/Cropping/WhiteAdd.png')}
+              style={styles.addButtonIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
       </View>
       <View style={styles.content}>
-        <FlatList data={get_PostList} renderItem={RecentListItem} keyExtractor={item => item.id} />
+        <FlatList
+          data={Video_list}
+          renderItem={RecentListItem}
+          keyExtractor={item => item.id}
+        />
       </View>
-      <VideoModal visible={modalVisible}  onClose={() => setModalVisible(false)} />
+      <VideoModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundVideo: {
+    height: 100,
+    width: 120,
+    borderRadius: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFF',
@@ -142,6 +197,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 20,
     marginVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   stickyPostContainer: {
     flexDirection: 'row',
@@ -155,9 +212,9 @@ const styles = StyleSheet.create({
     color: '#294247',
   },
   postContent: {
-    flexDirection: 'row',
     marginTop: 10,
-    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 14,
   },
   profileImage: {
     height: 40,
@@ -192,8 +249,10 @@ const styles = StyleSheet.create({
     height: 190,
   },
   interactionContainer: {
-    flexDirection: 'row',
+    height: hp(13),
+    borderRadius: 15,
     marginTop: 15,
+    width: wp(40),
   },
   interactionItem: {
     marginHorizontal: 5,

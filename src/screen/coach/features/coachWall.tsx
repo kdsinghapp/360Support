@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,16 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import BackBtn from '../../../assets/svg/BackBtn.svg';
 import AddIcon from '../../../assets/svg/AddIcon.svg';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import PostModal from '../modal/PostModal';
 import Loading from '../../../configs/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { get_post } from '../../../redux/feature/featuresSlice';
+import {get_post} from '../../../redux/feature/featuresSlice';
+import DotModal from '../modal/DotModal';
 
 interface PostItem {
   id: string;
@@ -29,25 +30,75 @@ interface PostItem {
 export default function coachWall() {
   const My_Profile = useSelector(state => state.auth.GetUserProfile);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
-  const get_PostList: PostItem[] = useSelector(state => state.feature.get_PostList);
+  const get_PostList: PostItem[] = useSelector(
+    state => state.feature.get_PostList,
+  );
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [DotmodalVisible, setDotModalVisible] = useState(false);
+  const [DotMdata, setDotMdata] = useState('');
   const user_data = useSelector(state => state.auth.userData);
-  const RecentListItem = ({ item }: { item: PostItem }) => (
+  const RecentListItem = ({item}: {item: PostItem}) => (
     <View style={[styles.shadow, styles.recentListItem]}>
       <View style={styles.stickyPostContainer}>
         <Text style={styles.stickyPostText}>STICKY POST</Text>
+        <TouchableOpacity
+          onPress={() => {
+            setDotModalVisible(true);
+            setDotMdata(item.id);
+          }}
+          style={{
+            flexDirection: 'row',
+            width: '5%',
+            height: 20,
+            justifyContent: 'space-between',
+            marginHorizontal: 5,
+          }}>
+          <View
+            style={{
+              height: 5,
+              width: 5,
+              borderRadius: 2.5,
+              backgroundColor: 'grey',
+            }}
+          />
+          <View
+            style={{
+              height: 5,
+              width: 5,
+              borderRadius: 2.5,
+              backgroundColor: 'grey',
+            }}
+          />
+          <View
+            style={{
+              height: 5,
+              width: 5,
+              borderRadius: 2.5,
+              backgroundColor: 'grey',
+            }}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.postContent}>
-        <Image source={{ uri: item.image }} style={styles.profileImage} />
+        <Image
+          source={{uri: item.user_details?.img}}
+          style={styles.profileImage}
+        />
         <View style={styles.postDetails}>
-          <Text style={styles.postTitle}>{item.title}</Text>
-          <Text style={styles.postDescription}>{item.description}</Text>
+          <Text style={styles.postTitle}>
+            {item.user_details?.first_name} {item.user_details?.last_name}
+          </Text>
           <Text style={styles.postDateTime}>time: {item.date_time}</Text>
         </View>
       </View>
-      <Text style={styles.postDetails}>{item.details}</Text>
-      <Image source={{ uri:item.image }} style={styles.postImage} resizeMode="contain" />
+      <Text style={styles.postDetails}>{item.title}</Text>
+      <Text style={styles.postDetails}>{item.description}</Text>
+      <Image
+        source={{uri: item.image}}
+        style={styles.postImage}
+        resizeMode="stretch"
+      />
       <View style={styles.interactionContainer}>
         <View style={styles.interactionItem}>
           <Image
@@ -68,48 +119,72 @@ export default function coachWall() {
       </View>
     </View>
   );
+
   const isFocuse = useIsFocused();
   useEffect(() => {
-    get_eventList();
-  }, [isFocuse, modalVisible]);
-const dispatch = useDispatch()
-  const get_eventList = async () => {
-   
+    get_Post();
+  }, [isFocuse, modalVisible, DotmodalVisible]);
+  const dispatch = useDispatch();
+  const get_Post = async () => {
     const params = {
       user_id: user_data?.id,
-      //group_code: user_data?.group_code,
+      group_code: user_data?.group_code,
     };
     await dispatch(get_post(params));
   };
   return (
     <View style={styles.container}>
-  {isLoading ? <Loading /> : null}
+      {isLoading ? <Loading /> : null}
 
       <View style={styles.colorDiv}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}>
             <BackBtn />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Wall</Text>
           </View>
-         
-            <TouchableOpacity 
-            onPress={()=>{
-              setModalVisible(true)
+
+          <TouchableOpacity
+            onPress={() => {
+              setModalVisible(true);
             }}
             style={styles.addButton}>
-              <Image source={require('../../../assets/Cropping/WhiteAdd.png')} style={styles.addButtonIcon} resizeMode="contain" />
-            </TouchableOpacity>
-      
+            <Image
+              source={require('../../../assets/Cropping/WhiteAdd.png')}
+              style={styles.addButtonIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.content}>
-        <FlatList 
-        showsVerticalScrollIndicator={false}
-        data={get_PostList} renderItem={RecentListItem} keyExtractor={item => item.id} />
-      </View>
-      <PostModal visible={modalVisible}  onClose={() => setModalVisible(false)} />
+      {get_PostList != null && (
+        <View style={styles.content}>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={get_PostList}
+            renderItem={RecentListItem}
+            keyExtractor={item => item.id}
+          />
+        </View>
+      )}
+
+      {get_PostList == null && (
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+          <Text style={{color: '#777777', fontSize: 12}}>No Post Found</Text>
+        </View>
+      )}
+      <PostModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
+      <DotModal
+        visible={DotmodalVisible}
+        onClose={() => setDotModalVisible(false)}
+        data={DotMdata}
+      />
     </View>
   );
 }
@@ -164,6 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   stickyPostText: {
     fontSize: 12,
@@ -183,6 +259,7 @@ const styles = StyleSheet.create({
   },
   postDetails: {
     marginLeft: 10,
+
     justifyContent: 'center',
   },
   postTitle: {
@@ -206,8 +283,7 @@ const styles = StyleSheet.create({
   postImage: {
     marginTop: 15,
     width: '95%',
-    height:hp(15),
-   
+    height: hp(20),
   },
   interactionContainer: {
     flexDirection: 'row',

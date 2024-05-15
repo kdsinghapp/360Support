@@ -10,35 +10,30 @@ import {
   Dimensions,
   Animated,
   Modal,
+  Alert,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import File from '../../../assets/svg/Files.svg';
 import Close from '../../../assets/svg/Close.svg';
+import Loader from 'react-native-three-dots-loader';
+import YoutubePlayer from 'react-native-youtube-iframe';
+import {useDispatch, useSelector} from 'react-redux';
+import {errorToast} from '../../../configs/customToast';
+import {add_video} from '../../../redux/feature/featuresSlice';
 
 const VideoModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
-  const [selectedCalendar, setSelectedCalendar] = useState('');
-  const [value, setValue] = useState(null);
-  const [videoUrl, setVideoUrl] = useState('');
-  const [videoDescription, setVideoDescription] = useState('');
+  const user_data = useSelector(state => state.auth.userData);
+  const [SelectedOption, setSelectedOption] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [Title, setTitle] = useState('');
+  const [Description, setDescription] = useState('');
 
-  const handlePostVideo = () => {
-    // Here you can implement logic to post the video to your backend or storage service
-    // You may use libraries like Axios or fetch to make HTTP requests
-
-    // For demonstration purposes, let's just log the video URL and description
-    console.log('Video URL:', videoUrl);
-    console.log('Video Description:', videoDescription);
-
-    // Reset the form fields after posting
-    setVideoUrl('');
-    setVideoDescription('');
-  };
   useEffect(() => {
     if (visible) {
       openModal();
@@ -62,266 +57,203 @@ const VideoModal = ({visible, onClose, data}) => {
       useNativeDriver: true,
     }).start();
   };
-  const RecentListItem = ({item}) => (
-    <View
-      style={[
-        styles.shadow,
-        {
-          paddingVertical: 15,
-          padding: 10,
-          marginHorizontal: 10,
-          backgroundColor: '#FFF',
-          borderRadius: 20,
-          marginVertical: 10,
-        },
-      ]}>
-      <View>
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: '500',
-            lineHeight: 18,
-            color: '#294247',
-          }}>
-          STICKY POST
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center'}}>
-        <View style={{}}>
-          <Image
-            source={require('../../../assets/Cropping/dp.jpeg')}
-            style={{height: 40, width: 40, borderRadius: 20}}
-          />
-        </View>
-        <View
-          style={{
-            marginLeft: 10,
+  function getYouTubeVideoId(url) {
+    console.log('==============getYouTubeVideoId======================');
+    console.log(url);
+    console.log('====================================', typeof url);
+    var regExp =
+      /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
 
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              color: '#000000',
-              fontSize: 14,
-              fontWeight: '800',
-              lineHeight: 18,
-            }}>
-            {item.name}
-          </Text>
-          <Text
-            style={{
-              color: '#B0B0B0',
-              fontSize: 12,
-              fontWeight: '400',
-              lineHeight: 18,
-            }}>
-            {item.subTitile}
-          </Text>
-        </View>
-      </View>
+    if (match && match[2].length === 11) {
+      console.log('====================================', match[2]);
+      return match[2];
+    } else {
+      console.log('=================er===================', match);
+      return null;
+    }
+  }
 
-      <View style={{marginTop: 10}}>
-        <Text
-          style={{
-            color: '#B0B0B0',
-            fontSize: 12,
-            fontWeight: '400',
-            lineHeight: 18,
-          }}>
-          {item.details}
-        </Text>
-      </View>
-      <View style={{marginTop: 15}}>
-        <Image
-          source={require('../../../assets/Cropping/match.jpeg')}
-          style={{width: '100%', height: 190}}
-          resizeMode="cover"
-        />
-      </View>
+  const [playing, setPlaying] = useState(false);
 
-      <View
-        style={{
-          flexDirection: 'row',
-          marginTop: 15,
-          justifyContent: 'space-between',
-        }}>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../../assets/Cropping/Like2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
-          <Text style={styles.likeTxt}>Like</Text>
-        </View>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../../assets/Cropping/Comment2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
+  const onStateChange = useCallback(state => {
+    if (state === 'ended') {
+      setPlaying(false);
+      Alert.alert('video has finished playing!');
+    }
+  }, []);
+  const dispatch = useDispatch();
+  const Publish_Video = async () => {
+    if (Title == '' && Description == '' && videoUrl == '')
+      return errorToast('Please Enter all field');
+    const params = {
+      user_id: user_data?.id,
+      title: Title,
+      description: Description,
+      video_url: videoUrl,
+      group_code: user_data?.group_code,
+    };
 
-          <Text style={styles.likeTxt}>Comments</Text>
-        </View>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../../assets/Cropping/Eye2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.likeTxt}>Seen by</Text>
-        </View>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../../assets/Cropping/Message2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
-          <Text style={styles.likeTxt}>0</Text>
-        </View>
-      </View>
-    </View>
-  );
+    onClose();
+    await dispatch(add_video(params));
+  };
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
-        <Animated.View
-          style={[
-            styles.modal,
-            {
-              transform: [{translateY: translateY}],
-            },
-          ]}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingHorizontal: 10,
-              marginTop: 10,
-            }}>
-            <View style={{marginLeft: 20}} />
-
-            <Text
-              style={{
-                fontSize: 20,
-                color: '#000',
-                fontWeight: '700',
-              }}>
-              Team Video
-            </Text>
-
-            <TouchableOpacity
-              onPress={onClose}
+        <ScrollView style={{}}>
+          <Animated.View
+            style={[
+              styles.modal,
+              {
+                transform: [{translateY: translateY}],
+              },
+            ]}>
+            <View
               style={{
                 flexDirection: 'row',
-
                 justifyContent: 'space-between',
+                paddingHorizontal: 10,
+                marginTop: 10,
               }}>
-              <Close />
-            </TouchableOpacity>
-          </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Video Title</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  multiline
-                  style={styles.input}
-                  placeholder="Video Title"
-                />
+              <View style={{marginLeft: 20}} />
+
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: '#000',
+                  fontWeight: '700',
+                }}>
+                Select video source
+              </Text>
+
+              <TouchableOpacity
+                onPress={onClose}
+                style={{
+                  flexDirection: 'row',
+
+                  justifyContent: 'space-between',
+                }}>
+                <Close />
+              </TouchableOpacity>
+            </View>
+
+            <View showsVerticalScrollIndicator={false} style={{height: hp(60)}}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Title</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    multiline
+                    style={styles.input}
+                    placeholder="title"
+                    value={Title}
+                    onChangeText={txt => setTitle(txt)}
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Description</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    multiline
+                    style={styles.input}
+                    placeholder="description"
+                    value={Description}
+                    onChangeText={txt => setDescription(txt)}
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Paste link to youtube video only</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    multiline
+                    style={styles.input}
+                    placeholder="Video URL"
+                    value={videoUrl}
+                    onChangeText={txt => setVideoUrl(txt)}
+                  />
+                </View>
+              </View>
+              <View
+                style={{
+                  borderWidth: 1,
+                  height: hp(25),
+                  marginTop: 20,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 15,
+                  backgroundColor: videoUrl == null ? '#303030' : '#fff',
+                }}>
+                {videoUrl == null && <Loader size={10} />}
+                {videoUrl != null && (
+                  <View style={styles.interactionContainer}>
+                    <YoutubePlayer
+                      height={300}
+                      play={playing}
+                      videoId={getYouTubeVideoId(videoUrl)}
+                      onChangeState={onStateChange}
+                    />
+                  </View>
+                )}
               </View>
             </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Enter video description</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  multiline
-                  style={styles.input}
-                  placeholder="Enter video description"
-                />
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Video URL</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  multiline
-                  style={styles.input}
-                  placeholder="Video URL"
-                />
-              </View>
-            </View>
-            <Text style={[styles.label,{alignSelf:'center'}]}>Or</Text>
+
             <TouchableOpacity
-              onPress={() => {}}
+              onPress={() => {
+                Publish_Video();
+              }}
               style={{
-                backgroundColor: '#874BE933',
+                backgroundColor: '#294247',
                 height: 55,
-                width: '94%',
+                width: '100%',
                 marginTop: 20,
                 borderRadius: 15,
-               
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexDirection: 'row',
+                position: 'absolute',
+                bottom: 10,
                 alignSelf: 'center',
               }}>
-              <File />
               <Text
                 style={{
                   fontSize: 18,
                   fontWeight: '600',
-                  color: '#874BE9',
-                  marginLeft: 10,
+                  color: '#FFF',
                 }}>
-                Add attachment
+                Continue
               </Text>
             </TouchableOpacity>
-          </ScrollView>
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              backgroundColor: '#294247',
-              height: 55,
-              width: '100%',
-              marginTop: 20,
-              borderRadius: 15,
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'absolute',
-              bottom: 10,
-              alignSelf: 'center',
-            }}>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: '600',
-                color: '#FFF',
-              }}>
-              Watch
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
+          </Animated.View>
+        </ScrollView>
       </View>
     </Modal>
   );
 };
 
-const VideoData = [
-  {
-    id: '1',
-    name: 'Jaylon Ekstrom Bothman',
-    subTitile: 'Johan Smihs',
-    details:
-      'Hey team! Check out this video of how we can improve our play through the middle.',
-    img: require('../../../assets/Cropping/match.jpeg'),
-  },
-];
-
 const styles = StyleSheet.create({
+  interactionContainer: {
+    height: hp(23),
+
+    width: wp(80),
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
+
+  backgroundVideo: {
+    height: hp(20),
+    width: '100%',
+  },
+
   inputContainer: {
     marginTop: 15,
-   marginHorizontal:10
+    marginHorizontal: 10,
   },
   label: {
     fontSize: 16,
@@ -356,17 +288,14 @@ const styles = StyleSheet.create({
 
     elevation: 5,
   },
-  container: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
+
   modal: {
     backgroundColor: 'white',
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    height: hp(85),
+    height: hp(90),
+    marginTop: hp(10),
     elevation: 5, // Add this for Android shadow
   },
 });

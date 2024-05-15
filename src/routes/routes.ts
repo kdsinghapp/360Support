@@ -78,6 +78,7 @@ import cocheEvent from "../screen/coach/features/cocheEvent";
 import cocheVideo from "../screen/coach/features/coachVideo";
 import coachProfile from "../screen/coach/features/coachProfile";
 import PersnalInfo from "../screen/commanScreen/PersnalInfo";
+import EventDetilas from "../screen/commanScreen/EventDetilas";
 
 
 const _routes = {
@@ -259,6 +260,10 @@ const _routes = {
     {
       name: ScreenNameEnum.PersnalInfo,
       Component: PersnalInfo,
+    },
+    {
+      name: ScreenNameEnum.EventDetilas,
+      Component: EventDetilas,
     },
 
 

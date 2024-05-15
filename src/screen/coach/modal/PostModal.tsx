@@ -8,8 +8,9 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  Image,
   ScrollView,
+  Image,
+
   TextInput,
 } from 'react-native';
 
@@ -66,7 +67,7 @@ const PostModal = ({visible, onClose, data}) => {
   const handleChooseMedia = () => {
     const options = {
       title: 'Select Media',
-      mediaType: 'mixed', // Allows both images and videos to be picked
+      mediaType: 'photo', // Allows both images and videos to be picked
       takePhotoButtonTitle: null, // Hide the option to take a photo
       chooseFromLibraryButtonTitle: 'Choose from Gallery',
       cancelButtonTitle: 'Cancel',
@@ -102,6 +103,7 @@ const PostModal = ({visible, onClose, data}) => {
         type: Profile.type,
         name: Profile.fileName,
       },
+      group_code: user_data?.group_code,
     };
 
   
@@ -112,6 +114,7 @@ const PostModal = ({visible, onClose, data}) => {
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
+      <ScrollView>
         <Animated.View
           style={[
             styles.modal,
@@ -206,7 +209,7 @@ const PostModal = ({visible, onClose, data}) => {
                 setshowMedia(true);
               }}
               style={{
-                height: hp(15),
+                height: hp(20),
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderWidth: 1,
@@ -217,8 +220,8 @@ const PostModal = ({visible, onClose, data}) => {
                   <Image
                     source={{uri: mediaUri}}
                     style={{
-                      width: 180,
-                      height: 180,
+                      width:wp(100),
+                      height: wp(35),
 
                       resizeMode: 'contain',
                     }}
@@ -233,7 +236,7 @@ const PostModal = ({visible, onClose, data}) => {
                   />
                 )
               ) : (
-                <Text>Select Image or Video</Text>
+                <Text>Select Image</Text>
               )}
             </TouchableOpacity>
           </ScrollView>
@@ -263,6 +266,7 @@ const PostModal = ({visible, onClose, data}) => {
             </Text>
           </TouchableOpacity>
         </Animated.View>
+        </ScrollView>
       </View>
       <ShowMediaModal
         visible={showMedia}
@@ -277,6 +281,8 @@ const PostModal = ({visible, onClose, data}) => {
 };
 
 const styles = StyleSheet.create({
+
+       
   backgroundVideo: {
     height: 100,
     width: 120,
@@ -329,7 +335,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    minHeight: hp(65),
+    minHeight: hp(70),
+    marginTop:hp(30),
     elevation: 5, // Add this for Android shadow
   },
 });

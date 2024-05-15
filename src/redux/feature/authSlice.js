@@ -38,10 +38,7 @@ export const login = createAsyncThunk('login', async (params, thunkApi) => {
       thunkApi.dispatch(loginSuccess(response.data.data));
 
       if(response.data?.result.child_details){
-console.log('================Login====================');
-console.log(params);
-console.log('====================================');
-        params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+     params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
        await AsyncStorage.setItem('user_id',response.data?.result.id)
       }
       else{
@@ -63,19 +60,13 @@ console.log('====================================');
 export const Get_Group = createAsyncThunk(
   'Get_Group',
   async (params, thunkApi) => {
-    console.log(
-      '===============Get_Group=====================',
-      params.group_code,
-    );
+   
 
     try {
       const response = await API.get(
         `/get_group_details?group_code=${params.group_code}`,
       );
-      console.log(
-        '===============Get_Group=====responser================',
-        response.data,
-      );
+    
       if (response.data.status == '1') {
         if (!params.profile) {
           params.navigation.navigate(ScreenNameEnum.GROUP_DETAILS);
@@ -99,17 +90,10 @@ export const Get_Group = createAsyncThunk(
 export const Get_UserProfile = createAsyncThunk(
   'Get_UserProfile',
   async (params, thunkApi) => {
-    console.log(
-      '===============Get_UserProfile=====================',
-      params.group_code,
-    );
 
     try {
       const response = await API.get('/get_profile', params.data);
-      console.log(
-        '===============Get_UserProfile=====responser================',
-        response.data,
-      );
+     
       if (response.data.status == '1') {
         console.log('Get_UserProfile Success', response.data.message);
       } else {
@@ -268,10 +252,7 @@ export const CreateNewPassword = createAsyncThunk(
 export const Add_UserInfo = createAsyncThunk(
   'Add_UserInfo',
   async (params, thunkApi) => {
-    console.log(
-      '===============Add_UserInfo=====================',
-      params.data,
-    );
+  
 
     try {
       const formData = new FormData();
@@ -292,9 +273,6 @@ export const Add_UserInfo = createAsyncThunk(
 
       const response = await API.post('/user_info', formData, config);
 
-      console.log('=================Add_UserInfo===================');
-      console.log(response.data);
-      console.log('=============Add_UserInfo api=======================');
 
       if (response.data.status == '1') {
         await AsyncStorage.setItem('user_id', response?.data.result.id);
@@ -316,10 +294,7 @@ export const Add_UserInfo = createAsyncThunk(
 export const Updated_UserInfo = createAsyncThunk(
   'Updated_UserInfo',
   async (params, thunkApi) => {
-    console.log(
-      '===============Updated_UserInfo=====================',
-      params.data,
-    );
+  
 
     try {
       const formData = new FormData();
@@ -336,10 +311,7 @@ export const Updated_UserInfo = createAsyncThunk(
 
       const response = await API.post('/update_signup', formData, config);
 
-      console.log('=================update_signup===================');
-      console.log(response.data);
-      console.log('=============update_signup api=======================');
-
+  
       if (response.data.status == '1') {
         if (params.selected === 'Coach') {
           params.navigation.navigate(ScreenNameEnum.COACH_STEP1);
@@ -368,10 +340,7 @@ export const Updated_UserInfo = createAsyncThunk(
 export const Add_ChildInfo = createAsyncThunk(
   'Add_ChildInfo',
   async (params, thunkApi) => {
-    console.log(
-      '===============Add_ChildInfo=====================',
-      params.data,
-    );
+ 
 
     try {
       const formData = new FormData();
@@ -392,12 +361,7 @@ export const Add_ChildInfo = createAsyncThunk(
 
       const response = await API.post('/add_child_info', formData, config);
 
-      console.log('=================Add_ChildInfo===================');
-      console.log(response.data);
-      console.log(
-        '=============Add_ChildInfo api=======================',
-        response?.data?.result.id,
-      );
+     
 
       if (response.data.status == '1') {
         await AsyncStorage.setItem('child_user_id', response?.data?.result.id);
@@ -424,10 +388,7 @@ export const Add_ChildInfo = createAsyncThunk(
 export const Updated_ChildInfo = createAsyncThunk(
   'Updated_ChildInfo',
   async (params, thunkApi) => {
-    console.log(
-      '===============Updated_ChildInfo=====================',
-      params.data,
-    );
+  
 
     try {
       const formData = new FormData();
@@ -443,10 +404,6 @@ export const Updated_ChildInfo = createAsyncThunk(
       };
 
       const response = await API.post('/update_child_signup', formData, config);
-
-      console.log('=================Updated_ChildInfo===================');
-      console.log(response.data);
-      console.log('=============Updated_ChildInfo api=======================');
 
       if (response.data.status == '1') {
         if (params.Childprofile) {
@@ -494,10 +451,7 @@ export const logout = createAsyncThunk('logout', async (params, thunkApi) => {
 export const get_profile = createAsyncThunk(
   'get_profile',
   async (params, thunkApi) => {
-    console.log(
-      '===============get_profile=====================',
-      params.user_id,
-    );
+
 
     try {
       const formData = new FormData();
@@ -511,10 +465,7 @@ export const get_profile = createAsyncThunk(
       };
 
       const response = await API.post('/get_profile', formData, config);
-      console.log(
-        '===============get_profile=====responser================',
-        response.data,
-      );
+     
       if (response.data.status == '1') {
         // Alert.alert('Success', response.data.message);
       } else {
@@ -531,7 +482,6 @@ export const get_profile = createAsyncThunk(
 export const update_parent_profile = createAsyncThunk(
   'update_parent_profile',
   async (params, thunkApi) => {
-console.log('===============update_parent_profile=====================',params);
 
     try {
       const formData = new FormData();
@@ -558,9 +508,7 @@ console.log('===============update_parent_profile=====================',params);
       const response = await API.post('/update_parent_profile', formData, config);
 
 
-      console.log('===============update_parent_profile=====================');
-      console.log(response.data);
-      console.log('====================================');
+      
       if (response.data.status == '1') {
         successToast('Profile Update Successfuly');
       }

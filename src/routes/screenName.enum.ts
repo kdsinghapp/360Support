@@ -26,6 +26,7 @@ enum ScreenNameEnum {
   cocheVideo = 'cocheVideo',
   coachProfile ='coachProfile',
   PersnalInfo ='PersnalInfo',
+  EventDetilas ='EventDetilas',
 
   //TAb
   BOTTOM_TAB ='BOTTOM_TAB',

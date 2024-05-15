@@ -7,8 +7,9 @@ import {
   TextInput,
   FlatList,
   ScrollView,
+  Alert,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -25,138 +26,146 @@ import TrainingModal from '../modal/TrainingModal';
 import VideoModal from '../modal/VideoModal';
 import PerformModal from '../modal/PerformModal';
 import EventModal from '../modal/Addevent';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../configs/Loader';
-import { get_profile } from '../../../redux/feature/authSlice';
-
+import {get_profile} from '../../../redux/feature/authSlice';
+import {
+  get_event,
+  get_post,
+  get_video,
+} from '../../../redux/feature/featuresSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import YoutubePlayer from 'react-native-youtube-iframe';
+import {successToast} from '../../../configs/customToast';
 export default function coachHome() {
   const navigation = useNavigation();
   const user_data = useSelector(state => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
   const My_Profile = useSelector(state => state.auth.GetUserProfile);
+  const get_PostList = useSelector(state => state.feature.get_PostList);
   const [OpenModal, setOpenModal] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [ModalVisiblePost, setModalVisiblePost] = useState(false);
-  const [eventVisible,seteventVisible] = useState(false)
-const isFocuse = useIsFocused()
-const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const [ModalVisibleVideo, setModalVisibleVideo] = useState(false);
+  const [eventVisible, seteventVisible] = useState(false);
+  const isFocuse = useIsFocused();
+  const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const Video_list = useSelector(state => state.feature.Video_list);
   const dispatch = useDispatch();
-
-  useEffect(()=>{
-    get_profileDetails()
-  },[isFocuse,user_data])
-
-  const get_profileDetails =async () => {
+  const [playing, setPlaying] = useState(false);
+  function getYouTubeVideoId(url) {
    
-    const params = {
-      user_id: user_data?.id,
-     
-    };
+    var regExp =
+      /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
 
-    dispatch(get_profile(params));
+    if (match && match[2].length === 11) {
+      // If match is found and it's a valid YouTube video ID
+      return match[2];
+    } else {
+      return null;
+    }
+  }
+  const onStateChange = useCallback(state => {
+    if (state === 'ended') {
+      setPlaying(false);
+      successToast('video has finished playing!');
+    }
+  }, []);
+
+  const togglePlaying = useCallback(() => {
+    setPlaying(prev => !prev);
+  }, []);
+  const Event_List = useSelector(state => state.feature.Event_list);
+
+  const get_monthName = dateStr => {
+    const dateParts = dateStr.split('/');
+    const year = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
+    const day = parseInt(dateParts[1]);
+
+    const dateObject = new Date(year, month, day);
+
+    const monthName = dateObject.toLocaleString('default', {month: 'long'});
+    return monthName;
   };
 
-console.log('====================================');
-console.log(My_Profile);
-console.log('====================================');
+  const get_DayName = dateStr => {
+    const dateParts = dateStr.split('/');
+    const year = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
+    const day = parseInt(dateParts[1]);
+    const dayOfWeekIndex = new Date(year, month, day).getDay();
 
-  const RecentListItem = ({item}) => (
-    <View
-      style={[
-        styles.shdow,
-        {
-          paddingVertical: 15,
-          padding: 15,
-          marginHorizontal: 15,
-          backgroundColor: '#FFF',
-          borderRadius: 20,
-          marginVertical: 10,
-        },
-      ]}>
-      <View>
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: '500',
-            lineHeight: 18,
-            color: '#294247',
-          }}>
-          STICKY POST
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center'}}>
-        <View style={{}}>
-          <Image
-            source={require('../../../assets/Cropping/dp.jpeg')}
-            style={{height: 40, width: 40, borderRadius: 20}}
-          />
-        </View>
-        <View
-          style={{
-            marginLeft: 10,
+    // Convert day of week index to string representation
+    let dayOfWeek;
+    switch (dayOfWeekIndex) {
+      case 0:
+        dayOfWeek = 'Sunday';
+        break;
+      case 1:
+        dayOfWeek = 'Monday';
+        break;
+      case 2:
+        dayOfWeek = 'Tuesday';
+        break;
+      case 3:
+        dayOfWeek = 'Wednesday';
+        break;
+      case 4:
+        dayOfWeek = 'Thursday';
+        break;
+      case 5:
+        dayOfWeek = 'Friday';
+        break;
+      case 6:
+        dayOfWeek = 'Saturday';
+        break;
+      default:
+        dayOfWeek = 'Invalid day';
+    }
 
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              color: '#000000',
-              fontSize: 14,
-              fontWeight: '800',
-              lineHeight: 18,
-            }}>
-            {item.name}
-          </Text>
-          <Text
-            style={{
-              color: '#B0B0B0',
-              fontSize: 12,
-              fontWeight: '400',
-              lineHeight: 18,
-            }}>
-            {item.subTitile}
-          </Text>
-        </View>
-      </View>
+    return dayOfWeek;
+  };
 
-      <View style={{marginTop: 15}}>
-        <Text
-          style={{
-            fontSize: 20,
-            color: '#1C1B1B',
-            fontWeight: '700',
-          }}>
-          Club Lobby Offer
-        </Text>
-        <Text
-          style={{
-            fontSize: 12,
-            color: '#1C1B1B',
-            fontWeight: '700',
-          }}>
-          10 % Off
-        </Text>
-      </View>
+  const get_dayDate =dateStr =>{
+  
+    const parts = dateStr.split('/');
+    const month = parseInt(parts[0], 10);
+    const day = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    
+    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
+    
+    const dayOfMonth = date.getDate(); // This will give you the day of the month
+    
+    return dayOfMonth
+      }
+  useEffect(() => {
+    get_profileDetails();
+    get_Post();
+    get_eventList();
+    get_videoList();
+  }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
 
-      <View
-        style={{
-          flexDirection: 'row',
-          marginTop: 15,
-          justifyContent: 'space-between',
-        }}>
-        <View style={styles.listLikeRow}>
-          <Image
-            source={require('../../../assets/Cropping/Like2x.png')}
-            style={{height: 15, width: 15, marginHorizontal: 10}}
-            resizeMode="contain"
-          />
-          <Text style={styles.likeTxt}>Like</Text>
-        </View>
-      </View>
-    </View>
-  );
-  const getGroupDetails =async () => {
-   
+  const get_Post = async () => {
+    const params = {
+      user_id: user_data?.id,
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_post(params));
+  };
+
+  const get_profileDetails = async () => {
+    const params = {
+      user_id: user_data?.id,
+    };
+
+    await dispatch(get_profile(params));
+  };
+
+  const getGroupDetails = async () => {
     const params = {
       group_code: user_data?.group_code,
       profile: true,
@@ -165,82 +174,29 @@ console.log('====================================');
 
     dispatch(Get_Group(params));
   };
-  const PendingRequest = ({item}) => (
-    <View
-      style={[
-        styles.shdow,
-        {
-          paddingVertical: 15,
-          padding: 10,
-          marginHorizontal: 15,
-          backgroundColor: '#FFF',
-          borderRadius: 20,
-          marginVertical: 10,
-        },
-      ]}>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginTop: 10,
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <View style={{}}>
-          <Image
-            source={require('../../../assets/Cropping/dp.jpeg')}
-            style={{height: 40, width: 40, borderRadius: 20}}
-          />
-        </View>
-        <View
-          style={{
-            marginLeft: 10,
-            width: '36%',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              color: '#000000',
-              fontSize: 14,
-              fontWeight: '800',
-              lineHeight: 18,
-            }}>
-            {item.name}
-          </Text>
-        </View>
+  const get_eventList = async () => {
+    const id = await AsyncStorage.getItem('user_id');
+    const params = {
+      user_id: id,
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_event(params));
+  };
 
-        <View
-          style={{
-            backgroundColor: '#F8F8F8',
-            borderRadius: 20,
-            padding: 5,
-            paddingHorizontal: 10,
-          }}>
-          <Text style={{fontSize: 10, fontWeight: '400', color: '#B0B0B0'}}>
-            {item.status}
-          </Text>
-        </View>
-      </View>
-
-      <View style={{}}>
-        <Text
-          style={{
-            color: '#B0B0B0',
-            fontSize: 12,
-            fontWeight: '400',
-            lineHeight: 18,
-          }}>
-          {item.details}
-        </Text>
-      </View>
-    </View>
-  );
+  const get_videoList = async () => {
+    const params = {
+      user_id: user_data?.id,
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_video(params));
+  };
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-        {isLoading ? <Loading /> : null}
-        {isLoading2 ? <Loading /> : null}
+      {isLoading ? <Loading /> : null}
+      {isLoading2 ? <Loading /> : null}
       <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.colorDiv}>
+        <View style={styles.colorDiv}>
           <View style={styles.Div1}>
             <View
               style={{
@@ -307,49 +263,49 @@ console.log('====================================');
           </View>
         </View>
         <View style={{height: hp(8), marginTop: 10, marginHorizontal: 15}}>
-            <FlatList
-              data={Create}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              renderItem={({item}) => (
-                <TouchableOpacity
-
-                onPress={()=>{
-                  setModalVisiblePost(true)
-                  seteventVisible(true)
-                  setOpenModal(item.name)
+          <FlatList
+            data={Create}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            renderItem={({item}) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisiblePost(true);
+                  seteventVisible(true);
+                  setModalVisibleVideo(true);
+                  setOpenModal(item.name);
                 }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: 15,
-                  }}>
-                  <View style={{paddingTop: 5}}>
-                    <Image
-                      source={item.logo}
-                      style={{
-                        height: 40,
-                        width: 40,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={{marginLeft: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: '#000',
-                        fontWeight: '700',
-                      }}>
-                      {item.name}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-          {/* <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: 15,
+                }}>
+                <View style={{paddingTop: 5}}>
+                  <Image
+                    source={item.logo}
+                    style={{
+                      height: 40,
+                      width: 40,
+                    }}
+                    resizeMode="contain"
+                  />
+                </View>
+                <View style={{marginLeft: 10}}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: '#000',
+                      fontWeight: '700',
+                    }}>
+                    {item.name}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+
+        {/* <View
             onPress={() => {
               navigation.navigate(ScreenNameEnum.UPCOMING_EVENT);
             }}
@@ -391,64 +347,450 @@ console.log('====================================');
             </View>
           </View> */}
 
-          <View style={{marginHorizontal: 15, marginTop: 30}}>
-            <Text
-              style={[
-                styles.txt,
-                {
-                  color: '#000000',
-                  fontSize: 20,
-                  fontWeight: '700',
-                  lineHeight: 24,
-                },
-              ]}>
-              Your Pending Request
-            </Text>
-          </View>
-          <View style={{paddingTop: 20}}>
-            <FlatList
-              data={PendingRequestData}
-              renderItem={PendingRequest}
-              keyExtractor={item => item.id}
-            />
-          </View>
-          <View style={{marginHorizontal: 15, marginTop: 30}}>
-            <Text
-              style={[
-                styles.txt,
-                {
-                  color: '#000000',
-                  fontSize: 20,
-                  fontWeight: '700',
-                  lineHeight: 24,
-                },
-              ]}>
-              Recent Post
-            </Text>
-          </View>
-          <View style={{flex: 1, paddingTop: 20}}>
-            <FlatList
-              data={data}
-              renderItem={RecentListItem}
-              keyExtractor={item => item.id}
-            />
-          </View>
-          <View style={{marginHorizontal: 15, marginTop: 30}}>
-            <Text
-              style={[
-                styles.txt,
-                {
-                  color: '#000000',
-                  fontSize: 20,
-                  fontWeight: '700',
-                  lineHeight: 24,
-                },
-              ]}>
-              Registrations
-            </Text>
-          </View>
+        <View style={{marginHorizontal: 15, marginTop: 30}}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
+            Your Pending Request
+          </Text>
+        </View>
+        <View style={{paddingTop: 20}}>
+          <View
+            style={[
+              styles.shdow,
+              {
+                paddingVertical: 15,
+                padding: 10,
+                marginHorizontal: 15,
+                backgroundColor: '#FFF',
+                borderRadius: 20,
+                marginVertical: 10,
+              },
+            ]}>
+            <View
+              style={{
+                flexDirection: 'row',
 
-          <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <View style={{}}>
+                <Image
+                  source={require('../../../assets/Cropping/dp.jpeg')}
+                  style={{height: 40, width: 40, borderRadius: 20}}
+                />
+              </View>
+              <View
+                style={{
+                  marginLeft: 10,
+                  width: '65%',
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#000000',
+                    fontSize: 14,
+                    fontWeight: '800',
+                    lineHeight: 18,
+                  }}>
+                  sdsd
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  backgroundColor: '#F8F8F8',
+                  borderRadius: 20,
+                  padding: 5,
+                  paddingHorizontal: 10,
+                }}>
+                <Text
+                  style={{fontSize: 10, fontWeight: '400', color: '#B0B0B0'}}>
+                  Pending
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={{
+            marginHorizontal: 15,
+            marginTop: 30,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
+            Upcoming Events
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenNameEnum.cocheEvent);
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#874BE9',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              See all
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {Event_List.length > 0 && (
+          <View style={{height: hp(20), marginHorizontal: 20}}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate(ScreenNameEnum.EventDetilas,{event_id:Event_List[Event_List?.length - 1].id});
+              }}
+              style={[
+                styles.shdow,
+                styles.Event,
+                {marginVertical: 10, alignSelf: 'center'},
+              ]}>
+              <View>
+                <Line />
+              </View>
+              <View>
+                <Text
+                  style={[
+                    styles.txt,
+                    {
+                      fontSize: 22,
+                      fontWeight: '700',
+                      lineHeight: 33,
+                    },
+                  ]}>
+                  {Event_List[Event_List?.length - 1]?.event_date != null &&
+                    get_dayDate(Event_List[Event_List?.length - 1]?.event_date)}
+                </Text>
+                <Text style={styles.txt}>
+                  {get_monthName(
+                    Event_List[Event_List?.length - 1]?.event_date,
+                  )}
+                </Text>
+              </View>
+
+              <View style={{width: '65%'}}>
+                <Text
+                  style={[
+                    styles.txt,
+                    {
+                      fontSize: 18,
+                      fontWeight: '700',
+                      lineHeight: 24,
+                    },
+                  ]}>
+                  {Event_List[Event_List?.length - 1]?.event_name}
+                </Text>
+                <Text style={[styles.txt, {fontSize: 10}]}>
+                  {Event_List[Event_List?.length - 1]?.event_description}
+                </Text>
+                <Text style={styles.txt}>
+                  {get_DayName(Event_List[Event_List?.length - 1]?.event_date)}{' '}
+                  {Event_List[Event_List?.length - 1]?.event_time}
+                </Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Image
+                    source={require('../../../assets/Cropping/pin.png')}
+                    style={{height: 12, width: 12}}
+                  />
+                  <Text style={[styles.txt, {marginLeft: 5}]}>
+                    {Event_List[Event_List?.length - 1]?.event_location}
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <Text
+                  style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
+                  {Event_List[Event_List?.length - 1]?.type}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+        {Event_List.length == 0 && (
+          <Text
+            style={{
+              fontSize: 14,
+              color: '#777777',
+              fontWeight: '500',
+              alignSelf: 'center',
+              marginTop: 10,
+            }}>
+            No Event Found
+          </Text>
+        )}
+
+        <View
+          style={{
+            marginHorizontal: 15,
+            marginTop: 30,
+            flexDirection: 'row',
+            alignContent: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
+            Recent Post
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenNameEnum.coachWall);
+            }}
+            style={{paddingHorizontal: 15}}>
+            <Text
+              style={[
+                styles.txt,
+                {
+                  color: '#874BE9',
+                  fontSize: 16,
+                  fontWeight: '700',
+                  lineHeight: 24,
+                },
+              ]}>
+              See all
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{flex: 1, paddingTop: 20}}>
+          {get_PostList.length > 1 && (
+            <View
+              style={[
+                styles.shdow,
+                {
+                  paddingVertical: 15,
+                  padding: 15,
+                  marginHorizontal: 15,
+                  backgroundColor: '#FFF',
+                  borderRadius: 20,
+                  marginVertical: 10,
+                },
+              ]}>
+              <View>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: '500',
+                    lineHeight: 18,
+                    color: '#294247',
+                  }}>
+                  STICKY POST
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 10,
+                  alignItems: 'center',
+                }}>
+                <View style={{}}>
+                  <Image
+                    source={{
+                      uri: get_PostList[get_PostList?.length - 1]?.user_details
+                        ?.image,
+                    }}
+                    style={{height: 40, width: 40, borderRadius: 20}}
+                  />
+                </View>
+                <View
+                  style={{
+                    marginLeft: 10,
+
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: '#000000',
+                      fontSize: 14,
+                      fontWeight: '800',
+                      lineHeight: 18,
+                    }}>
+                    {
+                      get_PostList[get_PostList.length - 1]?.user_details
+                        ?.first_name
+                    }{' '}
+                    {
+                      get_PostList[get_PostList.length - 1]?.user_details
+                        ?.last_name
+                    }
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{marginTop: 15}}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    color: '#1C1B1B',
+                    fontWeight: '700',
+                  }}>
+                  {get_PostList[get_PostList.length - 1]?.title}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: '#1C1B1B',
+                    fontWeight: '700',
+                  }}>
+                  {get_PostList[get_PostList.length - 1]?.description}
+                </Text>
+              </View>
+              {get_PostList[get_PostList.length - 1]?.image != '' && (
+                <Image
+                  source={{uri: get_PostList[get_PostList.length - 1]?.image}}
+                  style={styles.postImage}
+                  resizeMode="stretch"
+                />
+              )}
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 15,
+                }}>
+                <View style={styles.listLikeRow}>
+                  <Image
+                    source={require('../../../assets/Cropping/Like2x.png')}
+                    style={{height: 15, width: 15, marginHorizontal: 10}}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.likeTxt}>Like</Text>
+                </View>
+                <View style={styles.listLikeRow}>
+                  <Image
+                    source={require('../../../assets/Cropping/Comment2x.png')}
+                    style={{height: 15, width: 15, marginHorizontal: 10}}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.likeTxt}>Comments</Text>
+                </View>
+              </View>
+            </View>
+          )}
+          {get_PostList.length == 0 && (
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{color: '#777777', fontSize: 12}}>
+                No Post Found
+              </Text>
+            </View>
+          )}
+        </View>
+        <View
+          style={{
+            marginHorizontal: 15,
+            marginTop: 30,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
+            Recent Video
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenNameEnum.cocheEvent);
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#874BE9',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              See all
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {Video_list.length > 0 && (
+          <View style={[styles.shadow, styles.recentListItem]}>
+            <View style={styles.interactionContainer}>
+              <YoutubePlayer
+                height={300}
+                play={playing}
+                videoId={getYouTubeVideoId(
+                  Video_list[Video_list.length - 1]?.video_url,
+                )}
+                onChangeState={onStateChange}
+              />
+            </View>
+            <View style={styles.postContent}>
+              <Text style={styles.postTitle}>
+                {Video_list[Video_list.length - 1].title}
+              </Text>
+              <Text style={styles.postDescription}>
+                {Video_list[Video_list.length - 1].description}
+              </Text>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={styles.postTitle}>
+                  {Video_list[Video_list.length - 1].title}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+        {Video_list.length == 0 && (
+          <Text
+            style={{
+              fontSize: 14,
+              color: '#777777',
+              fontWeight: '500',
+              alignSelf: 'center',
+              marginTop: 10,
+            }}>
+            No Video Found
+          </Text>
+        )}
+        <View style={{marginHorizontal: 15, marginTop: 30}}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
+            Registrations
+          </Text>
+        </View>
+
+        <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
           <View style={[styles.shdow, styles.search]}>
             <SearchIcon />
             <TextInput
@@ -468,17 +810,18 @@ console.log('====================================');
             data={RegisterList}
             renderItem={({item}) => (
               <View
-                style={[styles.shdow,{
-                
-                  marginHorizontal: 15,
-                  height: hp(20),
-                 backgroundColor:'#FFF',
-                  marginVertical: 5,
-                  borderRadius: 15,
-                  padding:20,
-                }]}>
-                <View
-                  style={{ width: '100%', flexDirection: 'row'}}>
+                style={[
+                  styles.shdow,
+                  {
+                    marginHorizontal: 20,
+                    height: hp(20),
+                    backgroundColor: '#FFF',
+                    marginVertical: 5,
+                    borderRadius: 15,
+                    padding: 20,
+                  },
+                ]}>
+                <View style={{width: '100%', flexDirection: 'row'}}>
                   <View>
                     <Image
                       source={item.img}
@@ -509,45 +852,123 @@ console.log('====================================');
                 </View>
 
                 <TouchableOpacity
-                onPress={() => setModalVisible(true)}
-                style={{
-                backgroundColor:'#e7dbfb',
-                height:55,
-                width:'100%',
-                marginTop:20,
-                borderRadius:15,
-                alignItems:'center',
-                justifyContent:'center'
-                }}>
-                  <Text style={{
-                    fontSize:18,
-                    fontWeight:'700',color:'#874BE9'
-                  }}>Register</Text>
+                  onPress={() => setModalVisible(true)}
+                  style={{
+                    backgroundColor: '#e7dbfb',
+                    height: 55,
+                    width: '100%',
+                    marginTop: 20,
+                    borderRadius: 15,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: '700',
+                      color: '#874BE9',
+                    }}>
+                    Register
+                  </Text>
                 </TouchableOpacity>
-                <BottomToTopModal visible={modalVisible}
-        data={item}
-        onClose={() => setModalVisible(false)} 
-        
-        
-        />
+                <BottomToTopModal
+                  visible={modalVisible}
+                  data={item}
+                  onClose={() => setModalVisible(false)}
+                />
               </View>
             )}
           />
         </View>
-        </View>
-        <PostModal visible={OpenModal=='Post'&&ModalVisiblePost?true:false}  onClose={() => setModalVisiblePost(false)} />
-  
+        <PostModal
+          visible={OpenModal == 'Post' && ModalVisiblePost ? true : false}
+          onClose={() => setModalVisiblePost(false)}
+        />
+        <VideoModal
+          visible={
+            OpenModal == 'Add Match Video' && ModalVisibleVideo ? true : false
+          }
+          onClose={() => setModalVisibleVideo(false)}
+        />
         <EventModal
-    
-        visible={OpenModal=='Add Event'&&eventVisible?true:false}
-        onClose={() => seteventVisible(false)}
-      />
+          visible={OpenModal == 'Add Event' && eventVisible ? true : false}
+          onClose={() => seteventVisible(false)}
+        />
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  postTitle: {
+    color: '#000000',
+    fontSize: 14,
+    fontWeight: '800',
+    lineHeight: 18,
+  },
+  postDescription: {
+    color: '#B0B0B0',
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 18,
+  },
+  postDetails: {
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  postContent: {
+    marginTop: 10,
+    justifyContent: 'center',
+    marginLeft: 14,
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
+  recentListItem: {
+    paddingVertical: 15,
+    padding: 10,
+    marginHorizontal: 15,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    marginVertical: 10,
+    flexDirection: 'row',
+
+    alignItems: 'center',
+  },
+  postDateTime: {
+    color: '#B0B0B0',
+    fontSize: 10,
+    fontWeight: '400',
+    lineHeight: 18,
+  },
+  postImage: {
+    marginTop: 15,
+    width: '100%',
+    height: 190,
+  },
+  interactionContainer: {
+    height: hp(13),
+    borderRadius: 15,
+    marginTop: 15,
+    width: wp(40),
+  },
+  interactionItem: {
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  postImage: {
+    marginTop: 15,
+    width: '95%',
+    height: hp(20),
+  },
   likeTxt: {
     fontSize: 12,
     lineHeight: 18,
@@ -569,7 +990,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     height: hp(12),
     backgroundColor: '#FFF',
-    marginTop: 20,
+    width: wp(90),
+
     marginHorizontal: 0,
     borderRadius: 20,
     flexDirection: 'row',
@@ -594,7 +1016,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     justifyContent: 'space-between',
   },
- 
+
   SecondDiv: {
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -651,7 +1073,6 @@ const PendingRequestData = [
   },
 ];
 
-
 const Create = [
   {
     name: 'Post',
@@ -666,11 +1087,37 @@ const Create = [
     logo: require('../../../assets/Cropping/traning.png'),
   },
   {
-    name: ' Add Match Video',
+    name: 'Add Match Video',
     logo: require('../../../assets/Cropping/video.png'),
   },
   {
     name: 'Enters match',
     logo: require('../../../assets/Cropping/perform.png'),
+  },
+];
+const EventList = [
+  {
+    id: '1',
+    name: 'Jaylon Ekstrom Bothman',
+    subTitile: 'Johan Smihs',
+    details:
+      'Hey team! Check out this video of how we can improve our play through the middle.',
+    img: require('../../../assets/Cropping/match.jpeg'),
+  },
+  {
+    id: '2',
+    name: 'Gretchen Curtis',
+    subTitile: 'Johan Smihs',
+    details:
+      'Hey team! Check out this video of how we can improve our play through the middle.',
+    img: require('../../../assets/Cropping/match.jpeg'),
+  },
+  {
+    id: '3',
+    name: 'Gretchen Curtis',
+    subTitile: 'Johan Smihs',
+    details:
+      'Hey team! Check out this video of how we can improve our play through the middle.',
+    img: require('../../../assets/Cropping/match.jpeg'),
   },
 ];

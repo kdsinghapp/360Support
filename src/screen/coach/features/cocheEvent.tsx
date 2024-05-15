@@ -21,6 +21,7 @@ import Loading from '../../../configs/Loader';
 import {get_event} from '../../../redux/feature/featuresSlice';
 import Line from '../../../assets/svg/Line.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ScreenNameEnum from '../../../routes/screenName.enum';
 interface PostItem {
   id: string;
   title: string;
@@ -99,7 +100,19 @@ export default function cocheEvent() {
 
     return dayOfWeek;
   };
-
+  const get_dayDate =dateStr =>{
+  
+    const parts = dateStr.split('/');
+    const month = parseInt(parts[0], 10);
+    const day = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    
+    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
+    
+    const dayOfMonth = date.getDate(); // This will give you the day of the month
+    
+    return dayOfMonth
+      }
   const isFocuse = useIsFocused();
   useEffect(() => {
     get_eventList();
@@ -141,63 +154,81 @@ export default function cocheEvent() {
           </TouchableOpacity>
         </View>
       </View>
-      {Event_List !== 'data not found'  && (   <View style={styles.content}>
-        <FlatList
-          data={Event_List}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate(ScreenNameEnum.UPCOMING_EVENT);
-              }}
-              style={[styles.shdow, styles.Event, {marginVertical: 10,alignSelf:'center'}]}>
-              <View>
-                <Line />
-              </View>
-              <View>
-                <Text
-                  style={[
-                    styles.txt,
-                    {
-                      fontSize: 22,
-                      fontWeight: '700',
-                      lineHeight: 33,
-                    },
-                  ]}>
-                {item?.event_date != null && item?.event_date[0] }
-                </Text>
-                <Text style={styles.txt}>{get_monthName(item?.event_date)}</Text>
-              </View>
+      {Event_List.length > 0 && (
+        <View style={styles.content}>
+          <FlatList
+            data={Event_List}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({item}) => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate(ScreenNameEnum.EventDetilas,{event_id:item.id});
+                }}
+                style={[
+                  styles.shdow,
+                  styles.Event,
+                  {marginVertical: 10, alignSelf: 'center'},
+                ]}>
+                <View>
+                  <Line />
+                </View>
+                <View>
+                  <Text
+                    style={[
+                      styles.txt,
+                      {
+                        fontSize: 22,
+                        fontWeight: '700',
+                        lineHeight: 33,
+                      },
+                    ]}>
+                    {item?.event_date != null && get_dayDate(item?.event_date)}
+                  </Text>
+                  <Text style={styles.txt}>
+                    {get_monthName(item?.event_date)}
+                  </Text>
+                </View>
 
-              <View style={{width: '65%'}}>
-                <Text
-                  style={[
-                    styles.txt,
-                    {
-                      fontSize: 18,
-                      fontWeight: '700',
-                      lineHeight: 24,
-                    },
-                  ]}>
-                  {item?.event_name}
-                </Text>
-                <Text style={[styles.txt, {fontSize: 10}]}>
-                  {item?.event_description}
-                </Text>
-                <Text style={styles.txt}>
-                  {get_DayName(item?.event_date)} {item?.event_time}
-                </Text>
-                <Text style={styles.txt}>{item?.event_location}</Text>
-              </View>
-              <View>
-                <Text style={styles.txt}>Match</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      </View> )
-}
-      {Event_List == 'data not found' && Event_List !== null && (
+                <View style={{width: '65%'}}>
+                  <Text
+                    style={[
+                      styles.txt,
+                      {
+                        fontSize: 18,
+                        fontWeight: '700',
+                        lineHeight: 24,
+                      },
+                    ]}>
+                    {item?.event_name}
+                  </Text>
+                  <Text style={[styles.txt, {fontSize: 10}]}>
+                    {item?.event_description}
+                  </Text>
+                  <Text style={styles.txt}>
+                    {get_DayName(item?.event_date)} {item?.event_time}
+                  </Text>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Image
+                      source={require('../../../assets/Cropping/pin.png')}
+                      style={{height: 12, width: 12}}
+                    />
+                    <Text style={[styles.txt, {marginLeft: 5}]}>
+                      {item?.event_location}
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <Text
+                    style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
+                    {item?.type}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
+      {Event_List.length == 0 && Event_List !== null && (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Text>No events available</Text>
         </View>
