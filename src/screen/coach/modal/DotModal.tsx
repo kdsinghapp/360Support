@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
 
 import {
@@ -85,7 +86,25 @@ const DotModal = ({ visible, onClose, data }) => {
           >
             <TouchableOpacity 
             onPress={()=>{
-              Delete_post()
+             
+              Alert.alert(
+                'Delete Post',
+                'Are you sure you want to delete this post?',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Delete',
+                    onPress: () => {
+                      Delete_post()
+                    },
+                    style: 'destructive',
+                  },
+                ],
+                { cancelable: false }
+              );
             }}
             style={styles.option}>
               <Image

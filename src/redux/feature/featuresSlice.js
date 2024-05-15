@@ -101,6 +101,7 @@ export const delete_event = createAsyncThunk(
      
       if (response.data.status == '1') {
         successToast('Event Deleted Successfully');
+       params.navigation.navigate(ScreenNameEnum.cocheEvent)
        
       }
       return response.data.result;
