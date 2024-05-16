@@ -198,7 +198,7 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
   
     colorDiv: {
       backgroundColor: '#874be9',
-      height: hp(12),
+      height: hp(8),
       borderBottomRightRadius: 50,
       borderBottomLeftRadius: 50,
     },
