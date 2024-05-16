@@ -51,6 +51,8 @@ export default function cocheEvent() {
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const user_data = useSelector(state => state.auth.userData);
+
+  const [Eventtype, setEventtype] = useState('user');
   const get_monthName = dateStr => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
@@ -100,29 +102,29 @@ export default function cocheEvent() {
 
     return dayOfWeek;
   };
-  const get_dayDate =dateStr =>{
-  
+  const get_dayDate = dateStr => {
     const parts = dateStr.split('/');
     const month = parseInt(parts[0], 10);
     const day = parseInt(parts[1], 10);
     const year = parseInt(parts[2], 10);
-    
+
     const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-    
+
     const dayOfMonth = date.getDate(); // This will give you the day of the month
-    
-    return dayOfMonth
-      }
+
+    return dayOfMonth;
+  };
   const isFocuse = useIsFocused();
   useEffect(() => {
-    get_eventList();
+    get_eventList('user');
   }, [isFocuse, modalVisible]);
 
-  const get_eventList = async () => {
+  const get_eventList = async Eventtype => {
     const id = await AsyncStorage.getItem('user_id');
     const params = {
       user_id: id,
       group_code: user_data?.group_code,
+      type: Eventtype,
     };
     await dispatch(get_event(params));
   };
@@ -154,6 +156,48 @@ export default function cocheEvent() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          marginTop: 20,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            setEventtype('user');
+            get_eventList('user');
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            borderWidth: Eventtype == 'user' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: Eventtype == 'user' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            My Event
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setEventtype('all');
+            get_eventList('all');
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            marginLeft: 20,
+            borderWidth: Eventtype == 'all' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: Eventtype == 'all' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            All Event
+          </Text>
+        </TouchableOpacity>
+      </View>
       {Event_List.length > 0 && (
         <View style={styles.content}>
           <FlatList
@@ -162,7 +206,9 @@ export default function cocheEvent() {
             renderItem={({item}) => (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate(ScreenNameEnum.EventDetilas,{event_id:item.id});
+                  navigation.navigate(ScreenNameEnum.EventDetilas, {
+                    event_id: item.id,
+                  });
                 }}
                 style={[
                   styles.shdow,
@@ -182,10 +228,15 @@ export default function cocheEvent() {
                         lineHeight: 33,
                       },
                     ]}>
-                    {item?.event_date != null && get_dayDate(item?.event_date)}
+                    {item?.event_date != null &&
+                      get_dayDate(
+                        new Date(item?.event_date).toLocaleDateString(),
+                      )}
                   </Text>
                   <Text style={styles.txt}>
-                    {get_monthName(item?.event_date)}
+                    {get_monthName(
+                      new Date(item?.event_date).toLocaleDateString(),
+                    )}
                   </Text>
                 </View>
 
@@ -205,7 +256,13 @@ export default function cocheEvent() {
                     {item?.event_description}
                   </Text>
                   <Text style={styles.txt}>
-                    {get_DayName(item?.event_date)} {item?.event_time}
+                    {get_DayName(
+                      new Date(item?.event_date).toLocaleDateString(),
+                    )}{' '}
+                    {new Date(item?.event_time).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </Text>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Image
@@ -220,7 +277,7 @@ export default function cocheEvent() {
                 <View>
                   <Text
                     style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
-                    {item?.type}
+                    Match
                   </Text>
                 </View>
               </TouchableOpacity>

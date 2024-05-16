@@ -10,7 +10,6 @@ import {
   FlatList,
   ScrollView,
   Image,
-
   TextInput,
 } from 'react-native';
 
@@ -38,7 +37,7 @@ const PostModal = ({visible, onClose, data}) => {
   const [mediaType, setMediaType] = useState(null); // 'image' or 'video'
   const [mediaUri, setMediaUri] = useState(null);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   useEffect(() => {
     if (visible) {
       openModal();
@@ -63,7 +62,6 @@ const PostModal = ({visible, onClose, data}) => {
     }).start();
   };
 
-  
   const handleChooseMedia = () => {
     const options = {
       title: 'Select Media',
@@ -88,10 +86,7 @@ const PostModal = ({visible, onClose, data}) => {
     });
   };
 
-
-
   const Publish_post = async () => {
-
     if (title == '' && description == '')
       return errorToast('Please Enter all field');
     const params = {
@@ -106,166 +101,165 @@ const PostModal = ({visible, onClose, data}) => {
       group_code: user_data?.group_code,
     };
 
-  
-   onClose();
-   await dispatch(add_post(params));
+    onClose();
+    await dispatch(add_post(params));
   };
 
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
-      <ScrollView>
-        <Animated.View
-          style={[
-            styles.modal,
-            {
-              transform: [{translateY: translateY}],
-            },
-          ]}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingHorizontal: 10,
-              marginTop: 10,
-            }}>
-            <View style={{marginLeft: 20}} />
-
-            <Text
-              style={{
-                fontSize: 20,
-                color: '#000',
-                fontWeight: '700',
-              }}>
-              New Post
-            </Text>
-
-            <TouchableOpacity
-              onPress={onClose}
+        <ScrollView>
+          <Animated.View
+            style={[
+              styles.modal,
+              {
+                transform: [{translateY: translateY}],
+              },
+            ]}>
+            <View
               style={{
                 flexDirection: 'row',
-
                 justifyContent: 'space-between',
+                paddingHorizontal: 10,
+                marginTop: 10,
               }}>
-              <Close />
-            </TouchableOpacity>
-          </View>
-          <ScrollView>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Title</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  multiline
-                  style={styles.input}
-                  placeholder="enter title"
-                  value={title}
-                  onChangeText={(txt) => setTitle(txt)}
-                />
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Description</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  multiline
-                  style={styles.input}
-                  placeholder="enter description"
-                  value={description}
-                  onChangeText={(txt)=>setDescription(txt)}
-                />
-              </View>
-            </View>
+              <View style={{marginLeft: 20}} />
 
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: '#000',
+                  fontWeight: '700',
+                }}>
+                New Post
+              </Text>
+
+              <TouchableOpacity
+                onPress={onClose}
+                style={{
+                  flexDirection: 'row',
+
+                  justifyContent: 'space-between',
+                }}>
+                <Close />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Title</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    multiline
+                    style={styles.input}
+                    placeholder="enter title"
+                    value={title}
+                    onChangeText={txt => setTitle(txt)}
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Description</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    multiline
+                    style={styles.input}
+                    placeholder="enter description"
+                    value={description}
+                    onChangeText={txt => setDescription(txt)}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => {
+                  handleChooseMedia();
+                }}
+                style={{
+                  backgroundColor: '#e7dbfb',
+                  height: 55,
+                  width: '95%',
+                  marginTop: 20,
+                  borderRadius: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  alignSelf: 'center',
+                  marginHorizontal: 15,
+                }}>
+                <File />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: '700',
+                    color: '#874BE9',
+                    marginLeft: 10,
+                  }}>
+                  Add attachment
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setshowMedia(true);
+                }}
+                style={{
+                  height: hp(20),
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  marginTop: 10,
+                }}>
+                {mediaUri ? (
+                  mediaType === 'image' ? (
+                    <Image
+                      source={{uri: mediaUri}}
+                      style={{
+                        width: wp(100),
+                        height: wp(35),
+
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  ) : (
+                    <Video
+                      source={{uri: mediaUri}}
+                      style={styles.backgroundVideo}
+                      resizeMode="cover"
+                      controls={false}
+                      paused={false}
+                    />
+                  )
+                ) : (
+                  <Text>Select Image</Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
             <TouchableOpacity
               onPress={() => {
-                handleChooseMedia();
+                Publish_post();
               }}
               style={{
-                backgroundColor: '#e7dbfb',
+                backgroundColor: '#294247',
                 height: 55,
-                width: '95%',
+                width: '100%',
                 marginTop: 20,
                 borderRadius: 15,
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexDirection: 'row',
+                position: 'absolute',
+                bottom: 10,
                 alignSelf: 'center',
-                marginHorizontal: 15,
               }}>
-              <File />
               <Text
                 style={{
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: '700',
-                  color: '#874BE9',
-                  marginLeft: 10,
+                  color: '#FFF',
                 }}>
-                Add attachment
+                Publish
               </Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                setshowMedia(true);
-              }}
-              style={{
-                height: hp(20),
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: 1,
-                marginTop: 10,
-              }}>
-              {mediaUri ? (
-                mediaType === 'image' ? (
-                  <Image
-                    source={{uri: mediaUri}}
-                    style={{
-                      width:wp(100),
-                      height: wp(35),
-
-                      resizeMode: 'contain',
-                    }}
-                  />
-                ) : (
-                  <Video
-                    source={{uri: mediaUri}}
-                    style={styles.backgroundVideo}
-                    resizeMode="cover"
-                    controls={false}
-                    paused={false}
-                  />
-                )
-              ) : (
-                <Text>Select Image</Text>
-              )}
-            </TouchableOpacity>
-          </ScrollView>
-          <TouchableOpacity
-            onPress={() => {
-              Publish_post();
-            }}
-            style={{
-              backgroundColor: '#294247',
-              height: 55,
-              width: '100%',
-              marginTop: 20,
-              borderRadius: 15,
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'absolute',
-              bottom: 10,
-              alignSelf: 'center',
-            }}>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: '700',
-                color: '#FFF',
-              }}>
-              Publish
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
+          </Animated.View>
         </ScrollView>
       </View>
       <ShowMediaModal
@@ -281,8 +275,6 @@ const PostModal = ({visible, onClose, data}) => {
 };
 
 const styles = StyleSheet.create({
-
-       
   backgroundVideo: {
     height: 100,
     width: 120,
@@ -336,7 +328,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     minHeight: hp(70),
-    marginTop:hp(30),
+    marginTop: hp(30),
     elevation: 5, // Add this for Android shadow
   },
 });

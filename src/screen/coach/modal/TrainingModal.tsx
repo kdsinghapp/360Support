@@ -10,6 +10,7 @@ import {
   FlatList,
   ScrollView,
   TextInput,
+  Image,
 } from 'react-native';
 
 import {
@@ -21,12 +22,24 @@ import CheckBox from 'react-native-check-box';
 import Close from '../../../assets/svg/Close.svg';
 import {Calendar} from 'react-native-calendars';
 import {Dropdown} from 'react-native-element-dropdown';
+import {useSelector} from 'react-redux';
+import { errorToast } from '../../../configs/customToast';
 
 const TrainingModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const [selectedCalendar, setSelectedCalendar] = useState('');
-  const [value, setValue] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+  const [time, setTime] = useState(new Date());
+  const [Timeopen, setTimeOpen] = useState(false);
+  const user_data = useSelector(state => state.auth.userData);
+  const [name, setName] = useState('');
+  const [Location, setLocation] = useState('');
+  const [eventType, setEventType] = useState('');
+  const [description, setDiscription] = useState('');
+  const [value, setValue] = useState<string | null>(null);
+  const [isFocus, setIsFocus] = useState(false);
   useEffect(() => {
     if (visible) {
       openModal();
@@ -34,7 +47,9 @@ const TrainingModal = ({visible, onClose, data}) => {
       closeModal();
     }
   }, [visible]);
-
+  const formatTime = () => {
+    return time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+  };
   const openModal = () => {
     Animated.timing(translateY, {
       toValue: 0,
@@ -54,6 +69,7 @@ const TrainingModal = ({visible, onClose, data}) => {
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
+       <ScrollView showsVerticalScrollIndicator={false}>
         <Animated.View
           style={[
             styles.modal,
@@ -72,11 +88,11 @@ const TrainingModal = ({visible, onClose, data}) => {
 
             <Text
               style={{
-                fontSize: 20,
+                fontSize: 18,
                 color: '#000',
                 fontWeight: '700',
               }}>
-              Training Log
+              Add Training
             </Text>
 
             <TouchableOpacity
@@ -89,42 +105,7 @@ const TrainingModal = ({visible, onClose, data}) => {
               <Close />
             </TouchableOpacity>
           </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <FlatList
-              style={{marginTop: 30}}
-              data={btnData}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  onPress={() => {}}
-                  style={[
-                    styles.shadow,
-                    {
-                      backgroundColor: '#FFF',
-                      height: 55,
-                      marginVertical: 6,
-                      width: '95%',
-
-                      borderRadius: 10,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexDirection: 'row',
-                      alignSelf: 'center',
-                      marginHorizontal: 15,
-                    },
-                  ]}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: '700',
-                      color: false ? '#874BE9' : '#000',
-                      marginLeft: 10,
-                    }}>
-                    {item.name}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-
+         
             <View style={{marginTop: 20, marginHorizontal: 10}}>
               <Text
                 style={{
@@ -132,7 +113,7 @@ const TrainingModal = ({visible, onClose, data}) => {
                   color: '#000',
                   fontWeight: '500',
                 }}>
-                What did you practice?
+                What did you training?
               </Text>
             </View>
             <View
@@ -155,61 +136,115 @@ const TrainingModal = ({visible, onClose, data}) => {
               ]}>
               <Dropdown
                 data={DropData}
-                style={{width:'100%'}}
+                placeholder="Select training type"
+                style={{width: '100%'}}
                 maxHeight={200}
-                labelField="label"
-                valueField="value"
-              />
-            </View>
-
-            <View style={{marginTop: 20, marginHorizontal: 10}}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: '#000',
-                  fontWeight: '500',
-                }}>
-                What did you ?
-              </Text>
-            </View>
-            <View
-              onPress={() => {}}
-              style={[
-                styles.shadow,
-                {
-                  backgroundColor: '#FFF',
-                  height: 55,
-                  marginVertical: 6,
-                  width: '95%',
-
-                  borderRadius: 10,
-                  alignItems: 'center',
-                  paddingHorizontal: 10,
-                  flexDirection: 'row',
-                  alignSelf: 'center',
-                  marginHorizontal: 15,
-                },
-              ]}>
-              <TextInput placeholder=" 04/18/2024 05:54 PM" />
-            </View>
-
-            <View style={{padding: 10}}>
-              <Calendar
-                onDayPress={day => {
-                  setSelectedCalendar(day.dateString);
-                }}
-                markedDates={{
-                  [selectedCalendar]: {
-                    selectedCalendar: true,
-                    disableTouchEvent: true,
-                    selectedDotColor: 'orange',
-                  },
+                labelField="name"
+                itemContainerStyle={{marginTop: 10}}
+                containerStyle={{marginTop: 30, borderRadius: 10}}
+                showsVerticalScrollIndicator={false}
+                valueField="name"
+                onChange={item => {
+                  setValue(item.name);
+                  setIsFocus(false);
                 }}
               />
             </View>
-          </ScrollView>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Name</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Event Name"
+                  value={name}
+                  onChangeText={txt => setName(txt)}
+                />
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={[styles.inputContainer, {width: '40%'}]}>
+                <Text style={styles.label}>Training Date</Text>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    {
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    },
+                  ]}>
+                  <Text
+                    style={{fontSize: 12, fontWeight: '700', color: '#000'}}>
+                    {date.toLocaleDateString()}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setOpen(true);
+                    }}>
+                    <Image
+                      style={{height: 25, width: 25}}
+                      source={require('../../../assets/Cropping/date.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={[styles.inputContainer, {width: '40%'}]}>
+                <Text style={styles.label}>Training Time</Text>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    {
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    },
+                  ]}>
+                  <Text
+                    style={{fontSize: 12, fontWeight: '700', color: '#000'}}>
+                    {formatTime()}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setTimeOpen(true);
+                    }}>
+                    <Image
+                      style={{height: 20, width: 20}}
+                      source={require('../../../assets/Cropping/time.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Training Location</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  value={Location}
+                  onChangeText={txt => setLocation(txt)}
+                  style={styles.input}
+                  placeholder="Event Location"
+                />
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Training Description</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  value={description}
+                  onChangeText={txt => setDiscription(txt)}
+                  style={styles.input}
+                  placeholder="Event Description"
+                />
+              </View>
+            </View>
+        
           <TouchableOpacity
-            onPress={() => {}}
+             onPress={() => {
+              errorToast('this feature coming soon')
+              onClose()
+   
+               }}
             style={{
               backgroundColor: '#294247',
               height: 55,
@@ -218,8 +253,7 @@ const TrainingModal = ({visible, onClose, data}) => {
               borderRadius: 15,
               alignItems: 'center',
               justifyContent: 'center',
-              position: 'absolute',
-              bottom: 10,
+             
               alignSelf: 'center',
             }}>
             <Text
@@ -228,10 +262,12 @@ const TrainingModal = ({visible, onClose, data}) => {
                 fontWeight: '600',
                 color: '#FFF',
               }}>
-              Register training
+              Add training
             </Text>
           </TouchableOpacity>
+         
         </Animated.View>
+      </ScrollView>
       </View>
     </Modal>
   );
@@ -253,6 +289,35 @@ const btnData = [
 ];
 
 const styles = StyleSheet.create({
+  inputContainer: {
+    marginTop: 15,
+    marginHorizontal: 15,
+  },
+  label: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: '500',
+  },
+  inputWrapper: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+    paddingHorizontal: 10,
+
+    backgroundColor: '#FFF',
+    marginTop: 10,
+    borderRadius: 15,
+    height: 50,
+  },
+  input: {
+    flex: 1,
+  },
   shadow: {
     shadowColor: '#000',
     shadowOffset: {
@@ -274,19 +339,24 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    height: hp(85),
+    marginTop:hp(10),
+    height: hp(90),
     elevation: 5, // Add this for Android shadow
   },
 });
 const DropData = [
-  {label: 'Item 1', value: '1'},
-  {label: 'Item 2', value: '2'},
-  {label: 'Item 3', value: '3'},
-  {label: 'Item 4', value: '4'},
-  {label: 'Item 5', value: '5'},
-  {label: 'Item 6', value: '6'},
-  {label: 'Item 7', value: '7'},
-  {label: 'Item 8', value: '8'},
+  {
+    name: 'Team training',
+  },
+  {
+    name: 'Individual training',
+  },
+  {
+    name: 'Match',
+  },
+  {
+    name: 'Other activity',
+  },
 ];
 
 export default TrainingModal;

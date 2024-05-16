@@ -21,11 +21,15 @@ import {
   get_event_details,
 } from '../../redux/feature/featuresSlice';
 import Loading from '../../configs/Loader';
+import UpdateEventModal from '../coach/modal/UpdateEventModal';
 
 export default function EventDetilas({route}) {
+  const {event_id} = route.params;
   const navigation = useNavigation();
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const eventdetails = useSelector(state => state.feature.event_details);
+  const user_data = useSelector(state => state.auth.userData);
+  const [UpdatedModal, setUpdatedModal] = useState(false);
   const get_monthName = dateStr => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
@@ -89,12 +93,10 @@ export default function EventDetilas({route}) {
     return dayOfMonth;
   };
 
-  const {event_id} = route.params;
-
   const isFocuse = useIsFocused();
   useEffect(() => {
     event_details();
-  }, [isFocuse, event_id]);
+  }, [isFocuse, event_id,UpdatedModal]);
   const dispatch = useDispatch();
 
   const event_details = async () => {
@@ -115,7 +117,7 @@ export default function EventDetilas({route}) {
     <View style={styles.container}>
       {isLoading ? <Loading /> : null}
 
-      {eventdetails && (
+      {eventdetails != null && (
         <>
           <View style={styles.colorDiv}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -131,45 +133,48 @@ export default function EventDetilas({route}) {
             <View style={styles.matchTypeItem}>
               <Text style={styles.matchTypeText}>Match</Text>
             </View>
-            <View style={styles.matchTypeItem}>
-              <Text style={styles.matchTypeText}>{eventdetails?.type}</Text>
-            </View>
 
-            <View style={styles.actionButtonsContainer}>
-              <TouchableOpacity style={styles.actionButton}>
-                <Image
-                  source={require('../../assets/Cropping/arrow.png')}
-                  style={styles.actionButtonIcon}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  Alert.alert(
-                    'Delete Event',
-                    'Are you sure you want to delete this event?',
-                    [
-                      {
-                        text: 'Cancel',
-                        style: 'cancel',
-                      },
-                      {
-                        text: 'Delete',
-                        onPress: () => {
-                          delete_events();
+            {user_data?.id == eventdetails?.user_details.id && (
+              <View style={styles.actionButtonsContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setUpdatedModal(true);
+                  }}
+                  style={styles.actionButton}>
+                  <Image
+                    source={require('../../assets/Cropping/arrow.png')}
+                    style={styles.actionButtonIcon}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    Alert.alert(
+                      'Delete Event',
+                      'Are you sure you want to delete this event?',
+                      [
+                        {
+                          text: 'Cancel',
+                          style: 'cancel',
                         },
-                        style: 'destructive',
-                      },
-                    ],
-                    {cancelable: false},
-                  );
-                }}
-                style={styles.actionButton}>
-                <Image
-                  source={require('../../assets/Cropping/delete.png')}
-                  style={styles.actionButtonIcon}
-                />
-              </TouchableOpacity>
-            </View>
+                        {
+                          text: 'Delete',
+                          onPress: () => {
+                            delete_events();
+                          },
+                          style: 'destructive',
+                        },
+                      ],
+                      {cancelable: false},
+                    );
+                  }}
+                  style={styles.actionButton}>
+                  <Image
+                    source={require('../../assets/Cropping/delete.png')}
+                    style={styles.actionButtonIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
           <View style={styles.contentContainer}>
             <View>
@@ -187,14 +192,25 @@ export default function EventDetilas({route}) {
               />
               <View>
                 <Text style={styles.sectionText}>
-                  {get_DayName(eventdetails?.event_date)},{' '}
-                  {get_monthName(eventdetails?.event_date)}{' '}
-                  {get_dayDate(eventdetails?.event_date)} ,
-                  {eventdetails?.event_time}
+                  {get_DayName(
+                    new Date(eventdetails?.event_date).toLocaleDateString(),
+                  )}
+                  ,{' '}
+                  {get_monthName(
+                    new Date(eventdetails?.event_date).toLocaleDateString(),
+                  )}{' '}
+                  {get_dayDate(
+                    new Date(eventdetails?.event_date).toLocaleDateString(),
+                  )}{' '}
+                  ,
+                  {new Date(eventdetails?.event_time).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </Text>
               </View>
             </View>
-            <View style={styles.sectionContainer}>
+            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
               <Image
                 source={require('../../assets/Cropping/location.png')}
                 style={styles.sectionIcon}
@@ -203,21 +219,21 @@ export default function EventDetilas({route}) {
                 {eventdetails?.event_location}
               </Text>
             </View>
-            <View style={styles.sectionContainer}>
+            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
               <Image
                 source={require('../../assets/Cropping/position.png')}
                 style={styles.sectionIcon}
               />
               <Text style={styles.sectionText}>Northside field</Text>
             </View>
-            <View style={styles.sectionContainer}>
+            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
               <Image
                 source={require('../../assets/Cropping/appointment.png')}
                 style={styles.sectionIcon}
               />
-              <Text style={styles.sectionText}>Match Vs South</Text>
+              <Text style={styles.sectionText}>{eventdetails?.event_date}</Text>
             </View>
-            <View style={styles.userDetailsContainer}>
+            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
               <Image
                 source={{uri: eventdetails?.user_details.image}}
                 style={styles.userImage}
@@ -232,7 +248,7 @@ export default function EventDetilas({route}) {
         </>
       )}
 
-      {!eventdetails && (
+      {eventdetails == null && (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Text>No Details found</Text>
 
@@ -245,6 +261,10 @@ export default function EventDetilas({route}) {
           </TouchableOpacity>
         </View>
       )}
+      <UpdateEventModal
+        visible={UpdatedModal}
+        onClose={() => setUpdatedModal(false)}
+      />
     </View>
   );
 }
@@ -274,7 +294,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop:30,
   },
   sectionTitle: {
     fontSize: 20,

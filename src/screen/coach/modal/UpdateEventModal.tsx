@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import {
   Modal,
   View,
@@ -18,11 +18,13 @@ import {
 } from 'react-native-responsive-screen';
 import Close from '../../../assets/svg/Close.svg';
 import DatePicker from 'react-native-date-picker';
-import { errorToast } from '../../../configs/customToast';
-import { useDispatch, useSelector } from 'react-redux';
-import { add_event } from '../../../redux/feature/featuresSlice';
+import {errorToast} from '../../../configs/customToast';
+import {useDispatch, useSelector} from 'react-redux';
+import {add_event, update_event} from '../../../redux/feature/featuresSlice';
 import {Dropdown} from 'react-native-element-dropdown';
-const EventModal = ({ visible, onClose, data }) => {
+import {useIsFocused} from '@react-navigation/native';
+
+const UpdateEventModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const [date, setDate] = useState(new Date());
@@ -35,12 +37,12 @@ const EventModal = ({ visible, onClose, data }) => {
   const [eventType, setEventType] = useState('');
   const [description, setDiscription] = useState('');
   const [value, setValue] = useState<string | null>(null);
-  const [isFocus, setIsFocus] = useState(false);
-  // Function to format time
+  const eventdetails = useSelector(state => state.feature.event_details);
   const formatTime = () => {
-    return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
   };
 
+  const isFocuse = useIsFocused();
   useEffect(() => {
     if (visible) {
       openModal();
@@ -49,6 +51,17 @@ const EventModal = ({ visible, onClose, data }) => {
     }
   }, [visible]);
 
+  useEffect(() => {
+    setName(eventdetails?.event_name);
+    setDate(new Date(eventdetails?.event_date));
+    setTime(new Date(eventdetails?.event_time));
+    setLocation(eventdetails?.event_location);
+    setDiscription(eventdetails?.event_description);
+  }, [isFocuse]);
+
+  console.log('====================================');
+  console.log(new Date(eventdetails?.event_date));
+  console.log('====================================');
   const openModal = () => {
     Animated.timing(translateY, {
       toValue: 0,
@@ -67,42 +80,42 @@ const EventModal = ({ visible, onClose, data }) => {
 
   const dispatch = useDispatch();
 
-  const Publish_Event = () => {
-    if (name === '' && Location === '' && description === '') // Changed comparison operator
+  const update_Event = () => {
+    if (name === '' && Location === '' && description === '')
+      // Changed comparison operator
       return errorToast('Please Enter all fields');
     const params = {
-      user_id: user_data?.id,
+      event_id: eventdetails?.id,
       event_name: name,
       event_location: Location,
       event_description: description,
       event_date: date.toString(),
-      event_time: time.toString(),
+      event_time: date.toString(),
       group_code: user_data?.group_code,
       
     };
     onClose();
-    dispatch(add_event(params));
+    dispatch(update_event(params));
   };
 
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
-      <ScrollView>
-        <Animated.View
-          style={[
-            styles.modal,
-            {
-              transform: [{ translateY: translateY }],
-            },
-          ]}>
-          
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Add Event</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Close />
-            </TouchableOpacity>
-          </View>
-      
+        <ScrollView>
+          <Animated.View
+            style={[
+              styles.modal,
+              {
+                transform: [{translateY: translateY}],
+              },
+            ]}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Update Event</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Close />
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Event Name</Text>
               <View style={styles.inputWrapper}>
@@ -114,8 +127,8 @@ const EventModal = ({ visible, onClose, data }) => {
                 />
               </View>
             </View>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={[styles.inputContainer, { width: '40%' }]}>
+            <View style={{flexDirection: 'row'}}>
+              <View style={[styles.inputContainer, {width: '40%'}]}>
                 <Text style={styles.label}>Event Date</Text>
                 <View
                   style={[
@@ -127,7 +140,7 @@ const EventModal = ({ visible, onClose, data }) => {
                     },
                   ]}>
                   <Text
-                    style={{ fontSize: 12, fontWeight: '700', color: '#000' }}>
+                    style={{fontSize: 12, fontWeight: '700', color: '#000'}}>
                     {date.toLocaleDateString()}
                   </Text>
                   <TouchableOpacity
@@ -135,14 +148,14 @@ const EventModal = ({ visible, onClose, data }) => {
                       setOpen(true);
                     }}>
                     <Image
-                      style={{ height: 25, width: 25 }}
+                      style={{height: 25, width: 25}}
                       source={require('../../../assets/Cropping/date.png')}
                     />
                   </TouchableOpacity>
                 </View>
               </View>
 
-              <View style={[styles.inputContainer, { width: '40%' }]}>
+              <View style={[styles.inputContainer, {width: '40%'}]}>
                 <Text style={styles.label}>Event Time</Text>
                 <View
                   style={[
@@ -154,7 +167,7 @@ const EventModal = ({ visible, onClose, data }) => {
                     },
                   ]}>
                   <Text
-                    style={{ fontSize: 12, fontWeight: '700', color: '#000' }}>
+                    style={{fontSize: 12, fontWeight: '700', color: '#000'}}>
                     {formatTime()}
                   </Text>
                   <TouchableOpacity
@@ -162,7 +175,7 @@ const EventModal = ({ visible, onClose, data }) => {
                       setTimeOpen(true);
                     }}>
                     <Image
-                      style={{ height: 20, width: 20 }}
+                      style={{height: 20, width: 20}}
                       source={require('../../../assets/Cropping/time.png')}
                     />
                   </TouchableOpacity>
@@ -191,37 +204,13 @@ const EventModal = ({ visible, onClose, data }) => {
                 />
               </View>
             </View>
-            {/* <View style={styles.inputContainer}>
-              <Text style={styles.label}>Select Sport</Text>
-              <View style={[styles.inputWrapper,{justifyContent:'center'}]}>
-              <Dropdown
-          
-                  data={sportList}
-                  maxHeight={200}
-                  labelField="name"
-                  valueField="name"
-                  placeholder={!isFocus ? 'Select sport' : '...'}
-                  containerStyle={styles.dropdownContainer}
-                  
-                  value={value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={item => {
-                    setValue(item.name);
-                    setIsFocus(false);
-                  }}
-                />
-              </View>
-            </View> */}
 
-          
-        
-          <TouchableOpacity
-            onPress={Publish_Event} // Simplified function call
-            style={styles.publishButton}>
-            <Text style={styles.publishButtonText}>Publish</Text>
-          </TouchableOpacity>
-        </Animated.View>
+            <TouchableOpacity
+              onPress={update_Event} // Simplified function call
+              style={styles.publishButton}>
+              <Text style={styles.publishButtonText}>Update</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </ScrollView>
       </View>
       {/* Date and Time pickers */}
@@ -268,7 +257,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop:hp(25),
+    marginTop: hp(25),
     minHeight: hp(75),
     elevation: 5, // Add this for Android shadow
   },
@@ -345,20 +334,19 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventModal;
-
+export default UpdateEventModal;
 
 const sportList = [
   {
-    name:'soccer'
+    name: 'soccer',
   },
   {
-    name:'basketball'
+    name: 'basketball',
   },
   {
-    name:'volleyball'
+    name: 'volleyball',
   },
   {
-    name:'hockey'
+    name: 'hockey',
   },
-]
+];

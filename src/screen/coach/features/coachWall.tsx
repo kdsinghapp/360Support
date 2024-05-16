@@ -92,8 +92,20 @@ export default function coachWall() {
           <Text style={styles.postDateTime}>time: {item.date_time}</Text>
         </View>
       </View>
-      <Text style={styles.postDetails}>{item.title}</Text>
-      <Text style={styles.postDetails}>{item.description}</Text>
+      <Text
+        style={[
+          styles.postDetails,
+          {fontWeight: '600', color: '#000', marginTop: 10, height: 20},
+        ]}>
+        {item.title}
+      </Text>
+      <Text
+        style={[
+          styles.postDetails,
+          {marginTop: 0, color: '#777777', height: 20},
+        ]}>
+        {item.description}
+      </Text>
       <Image
         source={{uri: item.image}}
         style={styles.postImage}
@@ -123,7 +135,7 @@ export default function coachWall() {
   const isFocuse = useIsFocused();
   useEffect(() => {
     get_Post();
-  }, [isFocuse, modalVisible, DotmodalVisible]);
+  }, [isFocuse, DotmodalVisible, modalVisible, user_data]);
   const dispatch = useDispatch();
   const get_Post = async () => {
     const params = {
@@ -131,6 +143,16 @@ export default function coachWall() {
       group_code: user_data?.group_code,
     };
     await dispatch(get_post(params));
+  };
+
+  const after_delete = async () => {
+    console.log('==================after_delete==================');
+    get_Post();
+    const timeoutId = setTimeout(() => {
+      get_Post();
+    }, 3000); // Delay of 2 seconds
+
+    return () => clearTimeout(timeoutId);
   };
   return (
     <View style={styles.container}>
@@ -178,11 +200,17 @@ export default function coachWall() {
       )}
       <PostModal
         visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        onClose={() => {
+          setModalVisible(false);
+          get_Post();
+        }}
       />
       <DotModal
         visible={DotmodalVisible}
-        onClose={() => setDotModalVisible(false)}
+        onClose={() => {
+          setDotModalVisible(false);
+          after_delete();
+        }}
         data={DotMdata}
       />
     </View>

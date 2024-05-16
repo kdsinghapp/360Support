@@ -28,7 +28,7 @@ import PerformModal from '../modal/PerformModal';
 import EventModal from '../modal/Addevent';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../configs/Loader';
-import {get_profile} from '../../../redux/feature/authSlice';
+import {Get_Group, get_profile} from '../../../redux/feature/authSlice';
 import {
   get_event,
   get_post,
@@ -37,6 +37,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import {successToast} from '../../../configs/customToast';
+import AddMatchResult from '../modal/AddMatchResult';
+import AddGroup from '../modal/AddGroup';
 export default function coachHome() {
   const navigation = useNavigation();
   const user_data = useSelector(state => state.auth.userData);
@@ -48,14 +50,28 @@ export default function coachHome() {
   const [modalVisible, setModalVisible] = useState(false);
   const [ModalVisiblePost, setModalVisiblePost] = useState(false);
   const [ModalVisibleVideo, setModalVisibleVideo] = useState(false);
+  const [AddGroupModal, setAddGroupModal] = useState(false);
+  const [TrainingVisible, setTrainingVisible] = useState(false);
+  const [AddMatchResultModal, setAddMatchResultModal] = useState(false);
   const [eventVisible, seteventVisible] = useState(false);
   const isFocuse = useIsFocused();
   const GroupDetails = useSelector(state => state.auth.Group_Details);
   const Video_list = useSelector(state => state.feature.Video_list);
   const dispatch = useDispatch();
   const [playing, setPlaying] = useState(false);
+
+  console.log('====================================');
+  console.log(get_PostList.length);
+  console.log('====================================');
+  useEffect(() => {
+    get_profileDetails();
+    get_Post();
+    get_eventList();
+    getGroupDetails();
+    get_videoList();
+  }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
+
   function getYouTubeVideoId(url) {
-   
     var regExp =
       /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     var match = url.match(regExp);
@@ -74,9 +90,6 @@ export default function coachHome() {
     }
   }, []);
 
-  const togglePlaying = useCallback(() => {
-    setPlaying(prev => !prev);
-  }, []);
   const Event_List = useSelector(state => state.feature.Event_list);
 
   const get_monthName = dateStr => {
@@ -129,25 +142,18 @@ export default function coachHome() {
     return dayOfWeek;
   };
 
-  const get_dayDate =dateStr =>{
-  
+  const get_dayDate = dateStr => {
     const parts = dateStr.split('/');
     const month = parseInt(parts[0], 10);
     const day = parseInt(parts[1], 10);
     const year = parseInt(parts[2], 10);
-    
+
     const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-    
+
     const dayOfMonth = date.getDate(); // This will give you the day of the month
-    
-    return dayOfMonth
-      }
-  useEffect(() => {
-    get_profileDetails();
-    get_Post();
-    get_eventList();
-    get_videoList();
-  }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
+
+    return dayOfMonth;
+  };
 
   const get_Post = async () => {
     const params = {
@@ -198,7 +204,10 @@ export default function coachHome() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.Div1}>
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                setAddGroupModal(true);
+              }}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -224,7 +233,7 @@ export default function coachHome() {
                 {GroupDetails?.group_name}
               </Text>
               <Down />
-            </View>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate(ScreenNameEnum.NOTIFICATION_SCREEN);
@@ -254,12 +263,15 @@ export default function coachHome() {
                 Welcome back!
               </Text>
             </View>
-            <View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate(ScreenNameEnum.MY_PROFILE);
+              }}>
               <Image
                 source={{uri: My_Profile?.image}}
                 style={{height: 45, width: 45, borderRadius: 22.5}}
               />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
         <View style={{height: hp(8), marginTop: 10, marginHorizontal: 15}}>
@@ -273,6 +285,8 @@ export default function coachHome() {
                   setModalVisiblePost(true);
                   seteventVisible(true);
                   setModalVisibleVideo(true);
+                  setTrainingVisible(true);
+                  setAddMatchResultModal(true);
                   setOpenModal(item.name);
                 }}
                 style={{
@@ -458,7 +472,9 @@ export default function coachHome() {
           <View style={{height: hp(20), marginHorizontal: 20}}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate(ScreenNameEnum.EventDetilas,{event_id:Event_List[Event_List?.length - 1].id});
+                navigation.navigate(ScreenNameEnum.EventDetilas, {
+                  event_id: Event_List[Event_List?.length - 1].id,
+                });
               }}
               style={[
                 styles.shdow,
@@ -479,11 +495,17 @@ export default function coachHome() {
                     },
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_date != null &&
-                    get_dayDate(Event_List[Event_List?.length - 1]?.event_date)}
+                    get_dayDate(
+                      new Date(
+                        Event_List[Event_List?.length - 1]?.event_date,
+                      ).toLocaleDateString(),
+                    )}
                 </Text>
                 <Text style={styles.txt}>
                   {get_monthName(
-                    Event_List[Event_List?.length - 1]?.event_date,
+                    new Date(
+                      Event_List[Event_List?.length - 1]?.event_date,
+                    ).toLocaleDateString(),
                   )}
                 </Text>
               </View>
@@ -504,8 +526,17 @@ export default function coachHome() {
                   {Event_List[Event_List?.length - 1]?.event_description}
                 </Text>
                 <Text style={styles.txt}>
-                  {get_DayName(Event_List[Event_List?.length - 1]?.event_date)}{' '}
-                  {Event_List[Event_List?.length - 1]?.event_time}
+                  {get_DayName(
+                    new Date(
+                      Event_List[Event_List?.length - 1]?.event_date,
+                    ).toLocaleDateString(),
+                  )}{' '}
+                  {new Date(
+                    Event_List[Event_List?.length - 1]?.event_time,
+                  ).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Image
@@ -579,7 +610,7 @@ export default function coachHome() {
           </TouchableOpacity>
         </View>
         <View style={{flex: 1, paddingTop: 20}}>
-          {get_PostList.length > 1 && (
+          {get_PostList.length > 0 && (
             <View
               style={[
                 styles.shdow,
@@ -723,7 +754,7 @@ export default function coachHome() {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate(ScreenNameEnum.cocheEvent);
+              navigation.navigate(ScreenNameEnum.cocheVideo);
             }}>
             <Text
               style={{
@@ -894,6 +925,24 @@ export default function coachHome() {
           visible={OpenModal == 'Add Event' && eventVisible ? true : false}
           onClose={() => seteventVisible(false)}
         />
+        <TrainingModal
+          visible={
+            OpenModal == 'Add Training' && TrainingVisible ? true : false
+          }
+          onClose={() => setTrainingVisible(false)}
+        />
+        <AddMatchResult
+          visible={
+            OpenModal == 'Add match result' && AddMatchResultModal
+              ? true
+              : false
+          }
+          onClose={() => setAddMatchResultModal(false)}
+        />
+        <AddGroup
+          visible={AddGroupModal}
+          onClose={() => setAddGroupModal(false)}
+        />
       </ScrollView>
     </View>
   );
@@ -1056,22 +1105,6 @@ const RegisterList = [
     img: require('../../../assets/Cropping/img1.png'),
   },
 ];
-const data = [
-  {
-    id: '1',
-    name: 'Jaylon Ekstrom Bothman',
-    subTitile: 'Johan Smihs',
-
-    img: require('../../../assets/Cropping/match.jpeg'),
-  },
-];
-
-const PendingRequestData = [
-  {
-    name: 'U71',
-    status: 'Pending staff Request',
-  },
-];
 
 const Create = [
   {
@@ -1091,33 +1124,7 @@ const Create = [
     logo: require('../../../assets/Cropping/video.png'),
   },
   {
-    name: 'Enters match',
+    name: 'Add match result',
     logo: require('../../../assets/Cropping/perform.png'),
-  },
-];
-const EventList = [
-  {
-    id: '1',
-    name: 'Jaylon Ekstrom Bothman',
-    subTitile: 'Johan Smihs',
-    details:
-      'Hey team! Check out this video of how we can improve our play through the middle.',
-    img: require('../../../assets/Cropping/match.jpeg'),
-  },
-  {
-    id: '2',
-    name: 'Gretchen Curtis',
-    subTitile: 'Johan Smihs',
-    details:
-      'Hey team! Check out this video of how we can improve our play through the middle.',
-    img: require('../../../assets/Cropping/match.jpeg'),
-  },
-  {
-    id: '3',
-    name: 'Gretchen Curtis',
-    subTitile: 'Johan Smihs',
-    details:
-      'Hey team! Check out this video of how we can improve our play through the middle.',
-    img: require('../../../assets/Cropping/match.jpeg'),
   },
 ];

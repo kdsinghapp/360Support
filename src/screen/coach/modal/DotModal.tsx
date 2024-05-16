@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import {
   Modal,
   View,
@@ -16,23 +16,20 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import File from '../../../assets/svg/Files.svg';
-import CheckBox from 'react-native-check-box';
-import Close from '../../../assets/svg/Close.svg';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import Video from 'react-native-video';
 import ShowMediaModal from './ShowMediaModal';
-import { add_post, delete_posts } from '../../../redux/feature/featuresSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { errorToast } from '../../../configs/customToast';
+import {add_post, delete_posts} from '../../../redux/feature/featuresSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {errorToast} from '../../../configs/customToast';
+import {useNavigation} from '@react-navigation/native';
 
-const DotModal = ({ visible, onClose, data }) => {
+const DotModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const user_data = useSelector(state => state.auth.userData);
   const dispatch = useDispatch();
 
+  const navigation = useNavigation();
 
-  
   useEffect(() => {
     if (visible) {
       openModal();
@@ -58,10 +55,11 @@ const DotModal = ({ visible, onClose, data }) => {
   };
 
   const Delete_post = async () => {
-
     const params = {
       post_id: data,
-     
+      user_id: user_data?.id,
+      group_code: user_data?.group_code,
+      navigation: navigation,
     };
 
     onClose();
@@ -70,57 +68,54 @@ const DotModal = ({ visible, onClose, data }) => {
 
   return (
     <Modal visible={visible} transparent>
-      <TouchableOpacity 
-      onPress={()=>{
-        onClose()
-      }}
-      activeOpacity={1} style={styles.container}>
+      <TouchableOpacity
+        onPress={() => {
+          onClose();
+        }}
+        activeOpacity={1}
+        style={styles.container}>
         <ScrollView>
           <Animated.View
             style={[
               styles.modal,
               {
-                transform: [{ translateY: translateY }],
+                transform: [{translateY: translateY}],
               },
-            ]}
-          >
-            <TouchableOpacity 
-            onPress={()=>{
-             
-              Alert.alert(
-                'Delete Post',
-                'Are you sure you want to delete this post?',
-                [
-                  {
-                    text: 'Cancel',
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Delete',
-                    onPress: () => {
-                      Delete_post()
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  'Delete Post',
+                  'Are you sure you want to delete this post?',
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
                     },
-                    style: 'destructive',
-                  },
-                ],
-                { cancelable: false }
-              );
-            }}
-            style={styles.option}>
+                    {
+                      text: 'Delete',
+                      onPress: () => {
+                        Delete_post();
+                      },
+                      style: 'destructive',
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }}
+              style={styles.option}>
               <Image
                 source={require('../../../assets/Cropping/delete.png')}
                 style={styles.optionIcon}
               />
               <Text style={styles.optionText}>Delete Post</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-            
-            onPress={()=>{
-              errorToast('this feature coming soon')
-              onClose()
-            }}
-            
-            style={styles.option}>
+            <TouchableOpacity
+              onPress={() => {
+                errorToast('this feature coming soon');
+                onClose();
+              }}
+              style={styles.option}>
               <Image
                 source={require('../../../assets/Cropping/arrow.png')}
                 style={styles.optionIcon}
@@ -128,11 +123,11 @@ const DotModal = ({ visible, onClose, data }) => {
               <Text style={styles.optionText}>Update Post</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={()=>{
-                errorToast('this feature coming soon')
-                onClose()
+              onPress={() => {
+                errorToast('this feature coming soon');
+                onClose();
               }}
-            style={styles.option}>
+              style={styles.option}>
               <Image
                 source={require('../../../assets/Cropping/letter.png')}
                 style={styles.optionIcon}
