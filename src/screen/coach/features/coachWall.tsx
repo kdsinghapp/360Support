@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,15 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { add_like_unlike_posts, get_post } from '../../../redux/feature/featuresSlice';
 import BackBtn from '../../../assets/svg/BackBtn.svg';
 import AddIcon from '../../../assets/svg/AddIcon.svg';
-import {useDispatch, useSelector} from 'react-redux';
 import PostModal from '../modal/PostModal';
 import Loading from '../../../configs/Loader';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {get_post} from '../../../redux/feature/featuresSlice';
 import DotModal from '../modal/DotModal';
 
 interface PostItem {
@@ -27,7 +27,7 @@ interface PostItem {
   image: string;
 }
 
-export default function coachWall() {
+export default function CoachWall() {
   const My_Profile = useSelector(state => state.auth.GetUserProfile);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const get_PostList: PostItem[] = useSelector(
@@ -38,105 +38,147 @@ export default function coachWall() {
   const [DotmodalVisible, setDotModalVisible] = useState(false);
   const [DotMdata, setDotMdata] = useState('');
   const user_data = useSelector(state => state.auth.userData);
-  const RecentListItem = ({item}: {item: PostItem}) => (
-    <View style={[styles.shadow, styles.recentListItem]}>
-      <View style={styles.stickyPostContainer}>
-        <Text style={styles.stickyPostText}>STICKY POST</Text>
-        <TouchableOpacity
-          onPress={() => {
-            setDotModalVisible(true);
-            setDotMdata(item.id);
-          }}
-          style={{
-            flexDirection: 'row',
-            width: '5%',
-            height: 20,
-            justifyContent: 'space-between',
-            marginHorizontal: 5,
-          }}>
-          <View
-            style={{
-              height: 5,
-              width: 5,
-              borderRadius: 2.5,
-              backgroundColor: 'grey',
+  const [postDetails, setPostdetails] = useState(null);
+  const [likedPosts, setLikedPosts] = useState<string[]>([]);
+
+  const dispatch = useDispatch();
+
+  const Like_post = async (item) => {
+    const params = {
+      user_id: user_data?.id,
+      post_id: item.id,
+    };
+
+    await dispatch(add_like_unlike_posts(params));
+    get_Post();
+
+    setLikedPosts(prevLikedPosts => {
+      if (prevLikedPosts.includes(item.id)) {
+        return prevLikedPosts.filter(postId => postId !== item.id);
+      } else {
+        return [...prevLikedPosts, item.id];
+      }
+    });
+  };
+
+  const RecentListItem = ({ item }: { item: PostItem }) => {
+    const isLiked = likedPosts.includes(item.id);
+
+    return (
+      <View style={[styles.shadow, styles.recentListItem]}>
+        <View style={styles.stickyPostContainer}>
+          <Text style={styles.stickyPostText}>STICKY POST</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setDotModalVisible(true);
+              setDotMdata(item.id);
+              setPostdetails(item);
             }}
-          />
-          <View
             style={{
-              height: 5,
-              width: 5,
-              borderRadius: 2.5,
-              backgroundColor: 'grey',
-            }}
+              flexDirection: 'row',
+              width: '5%',
+              height: 20,
+              justifyContent: 'space-between',
+              marginHorizontal: 5,
+            }}>
+            <View
+              style={{
+                height: 5,
+                width: 5,
+                borderRadius: 2.5,
+                backgroundColor: 'grey',
+              }}
+            />
+            <View
+              style={{
+                height: 5,
+                width: 5,
+                borderRadius: 2.5,
+                backgroundColor: 'grey',
+              }}
+            />
+            <View
+              style={{
+                height: 5,
+                width: 5,
+                borderRadius: 2.5,
+                backgroundColor: 'grey',
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.postContent}>
+          <Image
+            source={{ uri: item.user_details?.img }}
+            style={styles.profileImage}
           />
-          <View
-            style={{
-              height: 5,
-              width: 5,
-              borderRadius: 2.5,
-              backgroundColor: 'grey',
-            }}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.postContent}>
+          <View style={styles.postDetails}>
+            <Text style={styles.postTitle}>
+              {item.user_details?.first_name} {item.user_details?.last_name}
+            </Text>
+            <Text style={styles.postDateTime}>time: {item.date_time}</Text>
+          </View>
+        </View>
+        <Text
+          style={[
+            styles.postDetails,
+            { fontWeight: '600', color: '#000', marginTop: 10, height: 20 },
+          ]}>
+          {item.title}
+        </Text>
+        <Text
+          style={[
+            styles.postDetails,
+            { marginTop: 0, color: '#777777', height: 20 },
+          ]}>
+          {item.description}
+        </Text>
         <Image
-          source={{uri: item.user_details?.img}}
-          style={styles.profileImage}
+          source={{ uri: item.image }}
+          style={styles.postImage}
+          resizeMode="stretch"
         />
-        <View style={styles.postDetails}>
-          <Text style={styles.postTitle}>
-            {item.user_details?.first_name} {item.user_details?.last_name}
-          </Text>
-          <Text style={styles.postDateTime}>time: {item.date_time}</Text>
+        <View style={styles.interactionContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              Like_post(item);
+            }}
+            style={styles.interactionItem}>
+            
+            <Image
+              source={isLiked?require('../../../assets/Cropping/Likea2x.png'):require('../../../assets/Cropping/Like2x.png')}
+              style={styles.interactionIcon}
+              resizeMode="contain"
+            />
+       
+            <Text style={[styles.interactionText, {color: isLiked ? '#147ec9' : '#292D32' }]}>{item.like_unlike_posts.length}</Text>
+     
+            <Text style={[
+              styles.interactionText,
+              { marginLeft: 5, color: isLiked ? '#147ec9' : '#292D32' }
+            ]}>
+              Like
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.interactionItem}>
+            <Image
+              source={require('../../../assets/Cropping/Comment2x.png')}
+              style={styles.interactionIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.interactionText}>{item.post_comment.length}</Text>
+            <Text style={[styles.interactionText, { marginLeft: 5 }]}>Comments</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      <Text
-        style={[
-          styles.postDetails,
-          {fontWeight: '600', color: '#000', marginTop: 10, height: 20},
-        ]}>
-        {item.title}
-      </Text>
-      <Text
-        style={[
-          styles.postDetails,
-          {marginTop: 0, color: '#777777', height: 20},
-        ]}>
-        {item.description}
-      </Text>
-      <Image
-        source={{uri: item.image}}
-        style={styles.postImage}
-        resizeMode="stretch"
-      />
-      <View style={styles.interactionContainer}>
-        <View style={styles.interactionItem}>
-          <Image
-            source={require('../../../assets/Cropping/Like2x.png')}
-            style={styles.interactionIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.interactionText}>Like</Text>
-        </View>
-        <View style={styles.interactionItem}>
-          <Image
-            source={require('../../../assets/Cropping/Comment2x.png')}
-            style={styles.interactionIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.interactionText}>Comments</Text>
-        </View>
-      </View>
-    </View>
-  );
+    );
+  };
 
   const isFocuse = useIsFocused();
   useEffect(() => {
     get_Post();
   }, [isFocuse, DotmodalVisible, modalVisible, user_data]);
-  const dispatch = useDispatch();
+
   const get_Post = async () => {
     const params = {
       user_id: user_data?.id,
@@ -146,7 +188,6 @@ export default function coachWall() {
   };
 
   const after_delete = async () => {
-    console.log('==================after_delete==================');
     get_Post();
     const timeoutId = setTimeout(() => {
       get_Post();
@@ -154,6 +195,7 @@ export default function coachWall() {
 
     return () => clearTimeout(timeoutId);
   };
+
   return (
     <View style={styles.container}>
       {isLoading ? <Loading /> : null}
@@ -194,8 +236,8 @@ export default function coachWall() {
       )}
 
       {get_PostList == null && (
-        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-          <Text style={{color: '#777777', fontSize: 12}}>No Post Found</Text>
+        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+          <Text style={{ color: '#777777', fontSize: 12 }}>No Post Found</Text>
         </View>
       )}
       <PostModal
@@ -211,7 +253,7 @@ export default function coachWall() {
           setDotModalVisible(false);
           after_delete();
         }}
-        data={DotMdata}
+        data={{ id: DotMdata, details: postDetails }}
       />
     </View>
   );
@@ -287,7 +329,6 @@ const styles = StyleSheet.create({
   },
   postDetails: {
     marginLeft: 10,
-
     justifyContent: 'center',
   },
   postTitle: {

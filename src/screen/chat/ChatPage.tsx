@@ -8,81 +8,106 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import SearchIcon from '../../assets/svg/search.svg';
-import { useNavigation } from '@react-navigation/native';
+import BackBtn from '../../assets/svg/BackBtn.svg';
+import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
+import NewChat from '../coach/modal/NewChat';
 
 export default function ChatPage() {
-
-    const navigation = useNavigation()
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
   const RecentListItem = ({item}) => (
     <TouchableOpacity
-
-    onPress={()=>{
-        navigation.navigate(ScreenNameEnum.CHAT_SCREEN,{item:item})
-    }}
+      onPress={() => {
+        navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {item: item});
+      }}
       style={[
-       
         {
           height: hp(10),
           padding: 10,
           marginHorizontal: 15,
           backgroundColor: '#FFF',
-          borderRadius:15,
-          marginVertical:5,
+          borderRadius: 15,
+          marginVertical: 5,
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent:'space-between'
+          justifyContent: 'space-between',
         },
       ]}>
-      
-        <View style={{}}>
-          <Image
-            source={item.img}
-            style={{height: 50, width: 50, borderRadius: 25}}
-          />
-        </View>
-        <View style={{width:'65%'}}>
-          <Text style={{
-            fontSize:17,fontWeight:'600',lineHeight:25,color:'#000'
-          }}>{item.name}</Text>
-         {item.status == 'Typing...'?<Text style={{
-            color:'#874BE9',
-            fontSize:14,
-            fontWeight:'700'
-          }}>{item.status}</Text>:<Text style={{
-            color:'#000',
-            fontSize:13,
-            fontWeight:'400'
-          }}>{item.status}</Text>}
-        </View>
-        <View style={{}}>
-          <Text style={{
+      <View style={{}}>
+        <Image
+          source={item.img}
+          style={{height: 50, width: 50, borderRadius: 25}}
+        />
+      </View>
+      <View style={{width: '65%'}}>
+        <Text
+          style={{
+            fontSize: 17,
+            fontWeight: '600',
+            lineHeight: 25,
+            color: '#000',
+          }}>
+          {item.name}
+        </Text>
+        {item.status == 'Typing...' ? (
+          <Text
+            style={{
+              color: '#874BE9',
+              fontSize: 14,
+              fontWeight: '700',
+            }}>
+            {item.status}
+          </Text>
+        ) : (
+          <Text
+            style={{
+              color: '#000',
+              fontSize: 13,
+              fontWeight: '400',
+            }}>
+            {item.status}
+          </Text>
+        )}
+      </View>
+      <View style={{}}>
+        <Text
+          style={{
+            fontSize: 12,
+            fontWeight: '400',
+            color: '#B6B6B6',
+            lineHeight: 18,
+          }}>
+          {item.time}
+        </Text>
+        <View
+          style={{
+            backgroundColor: '#874be9',
 
-            fontSize:12,fontWeight:'400',color:'#B6B6B6',lineHeight:18
-          }}>{item.time}</Text>
-          <View style={{backgroundColor:'#874be9',
-          
-          height:item.count.length  < 2?20:25,
-          width:item.count.length<2?20:25,
-          borderRadius:item.count.length<2?10:12.5,
-        alignItems:'center',
-        justifyContent:'center',
-        alignSelf:'center',
-        marginTop:10
-        }}>
-
-          <Text style={{fontWeight:'700',fontSize:item.count.length < 2 ? 12 : 8,color:'#FFF'}}>{item.count}</Text>
-          </View>
+            height: item.count.length < 2 ? 20 : 25,
+            width: item.count.length < 2 ? 20 : 25,
+            borderRadius: item.count.length < 2 ? 10 : 12.5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            alignSelf: 'center',
+            marginTop: 10,
+          }}>
+          <Text
+            style={{
+              fontWeight: '700',
+              fontSize: item.count.length < 2 ? 12 : 8,
+              color: '#FFF',
+            }}>
+            {item.count}
+          </Text>
         </View>
-
-    
-    
+      </View>
     </TouchableOpacity>
   );
 
@@ -90,16 +115,27 @@ export default function ChatPage() {
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
-          <View style={{alignSelf: 'center', position: 'absolute', bottom: 20}}>
-            <Text
-              style={{
-                fontWeight: '700',
-                fontSize: 22,
-                lineHeight: 32,
-                color: '#FFF',
-              }}>
-              Chat
-            </Text>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}>
+              <BackBtn />
+            </TouchableOpacity>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Chat</Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(true);
+              }}
+              style={styles.addButton}>
+              <Image
+                source={require('../../assets/Cropping/WhiteAdd.png')}
+                style={styles.addButtonIcon}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
@@ -122,17 +158,40 @@ export default function ChatPage() {
             data={data}
             renderItem={RecentListItem}
             keyExtractor={item => item.id}
-            ListFooterComponent={({})=>(
-            <View  style={{height:hp(6)}} />
-            )}
+            ListFooterComponent={({}) => <View style={{height: hp(6)}} />}
           />
         </View>
       </ScrollView>
+
+      <NewChat visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  backButton: {
+    width: '25%',
+  },
+  titleContainer: {
+    width: '20%',
+  },
+  title: {
+    fontWeight: '700',
+    fontSize: 22,
+    lineHeight: 32,
+    color: '#FFF',
+  },
+  addButton: {},
+  addButtonIcon: {
+    height: 50,
+    width: 50,
+  },
   txt: {
     fontSize: 12,
     fontWeight: '700',
@@ -154,7 +213,7 @@ const styles = StyleSheet.create({
 
   colorDiv: {
     backgroundColor: '#874be9',
-    height: hp(12),
+    height: hp(10),
     borderBottomRightRadius: 50,
     borderBottomLeftRadius: 50,
   },

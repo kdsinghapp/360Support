@@ -79,6 +79,9 @@ import cocheVideo from "../screen/coach/features/coachVideo";
 import coachProfile from "../screen/coach/features/coachProfile";
 import PersnalInfo from "../screen/commanScreen/PersnalInfo";
 import EventDetilas from "../screen/commanScreen/EventDetilas";
+import cocheTraning from "../screen/coach/features/cocheTraning";
+import coachMatches from "../screen/coach/features/coachMatches";
+import cochRegistration from "../screen/coach/features/cochRegistration";
 
 
 const _routes = {
@@ -264,6 +267,18 @@ const _routes = {
     {
       name: ScreenNameEnum.EventDetilas,
       Component: EventDetilas,
+    },
+    {
+      name: ScreenNameEnum.cocheTraning,
+      Component: cocheTraning,
+    },
+    {
+      name: ScreenNameEnum.coachMatches,
+      Component: coachMatches,
+    },
+    {
+      name: ScreenNameEnum.cochRegistration,
+      Component: cochRegistration,
     },
 
 

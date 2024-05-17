@@ -59,9 +59,6 @@ const UpdateEventModal = ({visible, onClose, data}) => {
     setDiscription(eventdetails?.event_description);
   }, [isFocuse]);
 
-  console.log('====================================');
-  console.log(new Date(eventdetails?.event_date));
-  console.log('====================================');
   const openModal = () => {
     Animated.timing(translateY, {
       toValue: 0,
@@ -102,7 +99,7 @@ const UpdateEventModal = ({visible, onClose, data}) => {
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
         <ScrollView>
-          <Animated.View
+        {eventdetails != null&&  <Animated.View
             style={[
               styles.modal,
               {
@@ -211,6 +208,14 @@ const UpdateEventModal = ({visible, onClose, data}) => {
               <Text style={styles.publishButtonText}>Update</Text>
             </TouchableOpacity>
           </Animated.View>
+
+                  }
+                  {eventdetails == null &&
+                  
+                  <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+<Text>No Details Found Please try after some time</Text>
+                    </View>
+                  }
         </ScrollView>
       </View>
       {/* Date and Time pickers */}

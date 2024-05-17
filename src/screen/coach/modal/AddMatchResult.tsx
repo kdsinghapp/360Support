@@ -23,7 +23,7 @@ import Close from '../../../assets/svg/Close.svg';
 import {Calendar} from 'react-native-calendars';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
-import { errorToast } from '../../../configs/customToast';
+import {errorToast} from '../../../configs/customToast';
 
 const AddMatchResult = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
@@ -70,43 +70,42 @@ const AddMatchResult = ({visible, onClose, data}) => {
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
       
-        <Animated.View
-          style={[
-            styles.modal,
-            {
-              transform: [{translateY: translateY}],
-            },
-          ]}>
+          <Animated.View
+            style={[
+              styles.modal,
+              {
+                transform: [{translateY: translateY}],
+              },
+            ]}>
             <View
               style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingHorizontal: 10,
-                  marginTop: 10,
-                }}>
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                paddingHorizontal: 10,
+                marginTop: 10,
+              }}>
               <View style={{marginLeft: 20}} />
 
               <Text
                 style={{
-                    fontSize: 20,
-                    color: '#000',
-                    fontWeight: '700',
+                  fontSize: 18,
+                  color: '#000',
+                  fontWeight: '700',
                 }}>
-                New Post
+                Add match result
               </Text>
 
               <TouchableOpacity
                 onPress={onClose}
                 style={{
-                    flexDirection: 'row',
-                    
-                    justifyContent: 'space-between',
+                  flexDirection: 'row',
+
+                  justifyContent: 'space-between',
                 }}>
                 <Close />
               </TouchableOpacity>
             </View>
-                <ScrollView showsVerticalScrollIndicator={false}>
-         
+            <ScrollView showsVerticalScrollIndicator={false}>
             <View style={{marginTop: 20, marginHorizontal: 10}}>
               <Text
                 style={{
@@ -114,7 +113,7 @@ const AddMatchResult = ({visible, onClose, data}) => {
                   color: '#000',
                   fontWeight: '500',
                 }}>
-               Select Match
+                Select Match
               </Text>
             </View>
             <View
@@ -156,7 +155,7 @@ const AddMatchResult = ({visible, onClose, data}) => {
               <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Event Name"
+                  placeholder="enter name"
                   value={name}
                   onChangeText={txt => setName(txt)}
                 />
@@ -167,13 +166,13 @@ const AddMatchResult = ({visible, onClose, data}) => {
               <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Event Name"
+                  placeholder="enter name"
                   value={name}
                   onChangeText={txt => setName(txt)}
                 />
               </View>
             </View>
-           
+
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Team 1 score</Text>
               <View style={styles.inputWrapper}>
@@ -181,7 +180,7 @@ const AddMatchResult = ({visible, onClose, data}) => {
                   value={Location}
                   onChangeText={txt => setLocation(txt)}
                   style={styles.input}
-                  placeholder="Event Location"
+                  placeholder="enter score"
                 />
               </View>
             </View>
@@ -192,7 +191,7 @@ const AddMatchResult = ({visible, onClose, data}) => {
                   value={Location}
                   onChangeText={txt => setLocation(txt)}
                   style={styles.input}
-                  placeholder="Event Location"
+                  placeholder="enter score"
                 />
               </View>
             </View>
@@ -203,7 +202,7 @@ const AddMatchResult = ({visible, onClose, data}) => {
                   value={description}
                   onChangeText={txt => setDiscription(txt)}
                   style={styles.input}
-                  placeholder="Event Description"
+                  placeholder="enter name"
                 />
               </View>
             </View>
@@ -214,41 +213,42 @@ const AddMatchResult = ({visible, onClose, data}) => {
                   value={description}
                   onChangeText={txt => setDiscription(txt)}
                   style={styles.input}
-                  placeholder="Event Description"
+                  placeholder="enter details"
                 />
               </View>
             </View>
-        
-        <View  style={{height:hp(5)}} />
-         </ScrollView>
-         <TouchableOpacity
-            onPress={() => {
-           errorToast('this feature coming soon')
-           onClose()
 
-            }}
-            style={{
-              backgroundColor: '#294247',
-              height: 55,
-              width: '100%',
-              marginTop: 20,
-              borderRadius: 15,
-              alignItems: 'center',
-              justifyContent: 'center',
-             
-              alignSelf: 'center',
-            }}>
-            <Text
+            <View  style={{height:hp(5)}} />
+            </ScrollView>
+            <TouchableOpacity
+              onPress={() => {
+                errorToast('this feature coming soon');
+                onClose();
+              }}
               style={{
-                fontSize: 18,
-                fontWeight: '600',
-                color: '#FFF',
+                backgroundColor: '#294247',
+                height: 55,
+                width: '100%',
+                marginTop: 20,
+                borderRadius: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+
+                alignSelf: 'center',
               }}>
-              Add training
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-  
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: '600',
+                  color: '#FFF',
+                }}>
+                Add Result
+              </Text>
+            </TouchableOpacity>
+
+          
+          </Animated.View>
+   
       </View>
     </Modal>
   );
@@ -272,7 +272,7 @@ const btnData = [
 const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 15,
-    marginHorizontal: 15,
+    marginHorizontal: 10,
   },
   label: {
     fontSize: 16,
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop:hp(10),
+    marginTop: hp(10),
     height: hp(90),
     elevation: 5, // Add this for Android shadow
   },

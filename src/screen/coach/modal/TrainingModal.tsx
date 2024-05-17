@@ -24,7 +24,7 @@ import {Calendar} from 'react-native-calendars';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
 import { errorToast } from '../../../configs/customToast';
-
+import DatePicker from 'react-native-date-picker';
 const TrainingModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
@@ -69,7 +69,7 @@ const TrainingModal = ({visible, onClose, data}) => {
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
-       <ScrollView showsVerticalScrollIndicator={false}>
+     
         <Animated.View
           style={[
             styles.modal,
@@ -105,7 +105,7 @@ const TrainingModal = ({visible, onClose, data}) => {
               <Close />
             </TouchableOpacity>
           </View>
-         
+          <ScrollView showsVerticalScrollIndicator={false}>
             <View style={{marginTop: 20, marginHorizontal: 10}}>
               <Text
                 style={{
@@ -116,6 +116,8 @@ const TrainingModal = ({visible, onClose, data}) => {
                 What did you training?
               </Text>
             </View>
+           
+           
             <View
               onPress={() => {}}
               style={[
@@ -123,6 +125,7 @@ const TrainingModal = ({visible, onClose, data}) => {
                 {
                   backgroundColor: '#FFF',
                   height: 55,
+                  marginTop:10,
                   marginVertical: 6,
                   width: '95%',
 
@@ -155,14 +158,14 @@ const TrainingModal = ({visible, onClose, data}) => {
               <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Event Name"
+                  placeholder="enter name"
                   value={name}
                   onChangeText={txt => setName(txt)}
                 />
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <View style={[styles.inputContainer, {width: '40%'}]}>
+              <View style={[styles.inputContainer, {width: '45%'}]}>
                 <Text style={styles.label}>Training Date</Text>
                 <View
                   style={[
@@ -189,7 +192,7 @@ const TrainingModal = ({visible, onClose, data}) => {
                 </View>
               </View>
 
-              <View style={[styles.inputContainer, {width: '40%'}]}>
+              <View style={[styles.inputContainer, {width: '45%'}]}>
                 <Text style={styles.label}>Training Time</Text>
                 <View
                   style={[
@@ -217,13 +220,25 @@ const TrainingModal = ({visible, onClose, data}) => {
               </View>
             </View>
             <View style={styles.inputContainer}>
+              <Text style={styles.label}>Training Duration (hrs)</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  value={Location}
+                  keyboardType='decimal-pad'
+                  onChangeText={txt => setLocation(txt)}
+                  style={styles.input}
+                  placeholder="enter duration"
+                />
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
               <Text style={styles.label}>Training Location</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
                   value={Location}
                   onChangeText={txt => setLocation(txt)}
                   style={styles.input}
-                  placeholder="Event Location"
+                  placeholder="enter location"
                 />
               </View>
             </View>
@@ -234,11 +249,13 @@ const TrainingModal = ({visible, onClose, data}) => {
                   value={description}
                   onChangeText={txt => setDiscription(txt)}
                   style={styles.input}
-                  placeholder="Event Description"
+                  placeholder="enter description"
                 />
               </View>
             </View>
-        
+    <View style={{height:hp(10)}}  />
+       
+          </ScrollView>
           <TouchableOpacity
              onPress={() => {
               errorToast('this feature coming soon')
@@ -253,8 +270,9 @@ const TrainingModal = ({visible, onClose, data}) => {
               borderRadius: 15,
               alignItems: 'center',
               justifyContent: 'center',
-             
+             position:'absolute',
               alignSelf: 'center',
+              bottom:10
             }}>
             <Text
               style={{
@@ -265,33 +283,50 @@ const TrainingModal = ({visible, onClose, data}) => {
               Add training
             </Text>
           </TouchableOpacity>
-         
         </Animated.View>
-      </ScrollView>
+     
+  
+      {/* Date and Time pickers */}
+      <DatePicker
+        mode="date"
+        modal
+        open={open}
+        date={date}
+        onConfirm={date => {
+          setOpen(false);
+          setDate(date);
+        }}
+        onCancel={() => {
+          setOpen(false);
+        }}
+        locale="en"
+      />
+      <DatePicker
+        mode="time"
+        modal
+        open={Timeopen}
+        date={time}
+        onConfirm={time => {
+          setTimeOpen(false);
+          setTime(time);
+        }}
+        onCancel={() => {
+          setTimeOpen(false);
+        }}
+        locale="en"
+      />
       </View>
+
+    
     </Modal>
   );
 };
 
-const btnData = [
-  {
-    name: 'Team training',
-  },
-  {
-    name: 'Individual training',
-  },
-  {
-    name: 'Match',
-  },
-  {
-    name: 'Other activity',
-  },
-];
 
 const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 15,
-    marginHorizontal: 15,
+    marginHorizontal: 10,
   },
   label: {
     fontSize: 16,
@@ -353,6 +388,12 @@ const DropData = [
   },
   {
     name: 'Match',
+  },
+  {
+    name: 'Player',
+  },
+  {
+    name: 'Coche',
   },
   {
     name: 'Other activity',

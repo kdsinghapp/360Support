@@ -16,10 +16,11 @@ import {
   import SearchIcon from '../../../assets/svg/search.svg';
 import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
+import CreateTeam from '../modal/CreateTeam';
 
 
   export default function CocheTeamScreen() {
-
+    const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation()
     const RecentListItem = ({item}) => {
       let nameParts = item.name.split(' ')
@@ -109,8 +110,7 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
                 <TouchableOpacity
 
                 onPress={()=>{
-                  setModalVisiblePost(true)
-                  setOpenModal(item.name)
+                 setModalVisible(true)
                 }}
                   style={{
                     flexDirection: 'row',
@@ -171,6 +171,10 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
               />
             </View>
           </View>
+          <CreateTeam
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+          />
         </ScrollView>
       </View>
     );
@@ -206,7 +210,7 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
       backgroundColor: '#FFF',
       height: 50,
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center', 
       paddingHorizontal: 15,
       marginHorizontal: 20,
       borderRadius: 15,

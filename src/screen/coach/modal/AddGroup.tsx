@@ -241,6 +241,10 @@ const AddGroup = ({visible, onClose, data}) => {
                   onPress={() => {
                     errorToast('this feature coming soon')
                     onClose()
+                    setAddGroupDetails(false)
+                    setAddnewGroup(false)
+                    setGroup(true)
+                    setGroupcode(false)
          
                      }}
                

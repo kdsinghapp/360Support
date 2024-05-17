@@ -127,6 +127,9 @@ export default function EventDetilas({route}) {
               />
             </TouchableOpacity>
             <Text style={styles.headerText}>Match Vs South</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+             
+            </TouchableOpacity>
           </View>
 
           <View style={styles.matchTypeContainer}>
@@ -231,7 +234,7 @@ export default function EventDetilas({route}) {
                 source={require('../../assets/Cropping/appointment.png')}
                 style={styles.sectionIcon}
               />
-              <Text style={styles.sectionText}>{eventdetails?.event_date}</Text>
+              <Text style={styles.sectionText}> Created time ({eventdetails?.event_date})</Text>
             </View>
             <View style={[styles.userDetailsContainer,{marginTop:0}]}>
               <Image
@@ -257,7 +260,7 @@ export default function EventDetilas({route}) {
               navigation.goBack();
             }}
             style={{}}>
-            <Text>Go Back</Text>
+            <Text>Click Go Back</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -278,6 +281,7 @@ const styles = StyleSheet.create({
     height: hp(8),
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:'space-between',
     paddingHorizontal: 20,
     borderBottomRightRadius: 30,
     borderBottomLeftRadius: 30,
@@ -287,7 +291,7 @@ const styles = StyleSheet.create({
     width: 30,
   },
   headerText: {
-    marginLeft: wp(27),
+  
     fontWeight: '600',
     fontSize: 16,
     color: '#fff',

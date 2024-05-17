@@ -21,13 +21,14 @@ import {add_post, delete_posts} from '../../../redux/feature/featuresSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {errorToast} from '../../../configs/customToast';
 import {useNavigation} from '@react-navigation/native';
+import UpdatePost from './updatePost';
 
 const DotModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const user_data = useSelector(state => state.auth.userData);
   const dispatch = useDispatch();
-
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -56,7 +57,7 @@ const DotModal = ({visible, onClose, data}) => {
 
   const Delete_post = async () => {
     const params = {
-      post_id: data,
+      post_id: data.id,
       user_id: user_data?.id,
       group_code: user_data?.group_code,
       navigation: navigation,
@@ -112,8 +113,7 @@ const DotModal = ({visible, onClose, data}) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                errorToast('this feature coming soon');
-                onClose();
+                setModalVisible(true)
               }}
               style={styles.option}>
               <Image
@@ -136,6 +136,13 @@ const DotModal = ({visible, onClose, data}) => {
             </TouchableOpacity>
           </Animated.View>
         </ScrollView>
+
+        <UpdatePost  visible={modalVisible}
+            onClose={() => { setModalVisible(false)
+            onClose()
+            }}
+            data={data.details}
+          />
       </TouchableOpacity>
     </Modal>
   );

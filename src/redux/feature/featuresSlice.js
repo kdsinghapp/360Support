@@ -151,7 +151,6 @@ export const update_event = createAsyncThunk(
       formData.append('event_description', params.event_description);
       formData.append('group_code', params.group_code);
 
-
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -219,6 +218,78 @@ export const add_post = createAsyncThunk(
     } catch (error) {
       console.log('🚀 ~ file: add_event .js:16 ~  ~ error:', error);
       errorToast('Network error');
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const update_post = createAsyncThunk(
+  'update_post',
+  async (params, thunkApi) => {
+    try {
+
+
+      const formData = new FormData();
+
+    
+      formData.append('user_id', params.user_id);
+      formData.append('title', params.title);
+      formData.append('description', params.description);
+      formData.append('group_code', params.group_code);
+      formData.append('post_id', params.post_id);
+      formData.append('image', params.image);
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      };
+
+      const response = await API.post('/update_posts', formData, config);
+
+      
+      if (response.data.status == '1') {
+        successToast('Post Update Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: add_event .js:16 ~  ~ error:', error);
+      errorToast('Network error');
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const add_like_unlike_posts = createAsyncThunk(
+  'add_like_unlike_posts',
+  async (params, thunkApi) => {
+    try {
+
+
+      const formData = new FormData();
+
+      console.log('==============Post Like ======================',params);
+      formData.append('user_id', params.user_id);
+      formData.append('post_id', params.post_id);
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      };
+
+      const response = await API.post('/add_like_unlike_posts', formData, config);
+
+      
+      if (response.data.status == '1') {
+        //successToast('Post Update Successfully');
+        console.log('==============Post Like ======================');
+       
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: add_event .js:16 ~  ~ error:', error);
+   //   errorToast('Network error');
       return thunkApi.rejectWithValue(error);
     }
   },
@@ -392,6 +463,31 @@ const FeatureSlice = createSlice({
       state.isError = false;
     });
     builder.addCase(add_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(update_post.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(update_post.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+    });
+    builder.addCase(update_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(add_like_unlike_posts.pending, state => {
+      //state.isLoading = true;
+    });
+    builder.addCase(add_like_unlike_posts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isError = false;
+    });
+    builder.addCase(add_like_unlike_posts.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

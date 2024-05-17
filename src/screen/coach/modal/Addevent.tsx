@@ -115,7 +115,7 @@ const EventModal = ({ visible, onClose, data }) => {
               </View>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <View style={[styles.inputContainer, { width: '40%' }]}>
+              <View style={[styles.inputContainer, { width: '45%' }]}>
                 <Text style={styles.label}>Event Date</Text>
                 <View
                   style={[
@@ -142,7 +142,7 @@ const EventModal = ({ visible, onClose, data }) => {
                 </View>
               </View>
 
-              <View style={[styles.inputContainer, { width: '40%' }]}>
+              <View style={[styles.inputContainer, { width: '45%' }]}>
                 <Text style={styles.label}>Event Time</Text>
                 <View
                   style={[
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginTop: 15,
-    marginHorizontal: 15,
+    marginHorizontal: 10,
   },
   label: {
     fontSize: 16,
@@ -348,17 +348,3 @@ const styles = StyleSheet.create({
 export default EventModal;
 
 
-const sportList = [
-  {
-    name:'soccer'
-  },
-  {
-    name:'basketball'
-  },
-  {
-    name:'volleyball'
-  },
-  {
-    name:'hockey'
-  },
-]

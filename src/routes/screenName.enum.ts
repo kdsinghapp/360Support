@@ -27,6 +27,9 @@ enum ScreenNameEnum {
   coachProfile ='coachProfile',
   PersnalInfo ='PersnalInfo',
   EventDetilas ='EventDetilas',
+  cocheTraning='cocheTraning',
+  coachMatches='coachMatches',
+  cochRegistration = 'cochRegistration',
 
   //TAb
   BOTTOM_TAB ='BOTTOM_TAB',

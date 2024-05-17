@@ -40,29 +40,180 @@ import {successToast} from '../../../configs/customToast';
 import AddMatchResult from '../modal/AddMatchResult';
 import AddGroup from '../modal/AddGroup';
 export default function coachHome() {
+  // const navigation = useNavigation();
+  // const user_data = useSelector(state => state.auth.userData);
+  // const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  // const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
+  // const My_Profile = useSelector(state => state.auth.GetUserProfile);
+  // const get_PostList = useSelector(state => state.feature.get_PostList);
+  // const [OpenModal, setOpenModal] = useState('');
+  // const [modalVisible, setModalVisible] = useState(false);
+  // const [ModalVisiblePost, setModalVisiblePost] = useState(false);
+  // const [ModalVisibleVideo, setModalVisibleVideo] = useState(false);
+  // const [AddGroupModal, setAddGroupModal] = useState(false);
+  // const [TrainingVisible, setTrainingVisible] = useState(false);
+  // const [AddMatchResultModal, setAddMatchResultModal] = useState(false);
+  // const [eventVisible, setEventVisible] = useState(false);
+  // const isFocuse = useIsFocused();
+  // const GroupDetails = useSelector(state => state.auth.Group_Details);
+  // const Video_list = useSelector(state => state.feature.Video_list);
+  // const dispatch = useDispatch();
+  // const [playing, setPlaying] = useState(false);
+
+
+  // useEffect(() => {
+  //   get_profileDetails();
+  //   get_Post();
+  //   get_eventList();
+  //   getGroupDetails();
+  //   get_videoList();
+  // }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
+
+  // function getYouTubeVideoId(url) {
+  //   var regExp =
+  //     /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  //   var match = url.match(regExp);
+
+  //   if (match && match[2].length === 11) {
+  //     // If match is found and it's a valid YouTube video ID
+  //     return match[2];
+  //   } else {
+  //     return null;
+  //   }
+  // }
+  // const onStateChange = useCallback(state => {
+  //   if (state === 'ended') {
+  //     setPlaying(false);
+  //     successToast('video has finished playing!');
+  //   }
+  // }, []);
+
+  // const Event_List = useSelector(state => state.feature.Event_list);
+
+  // const get_monthName = dateStr => {
+  //   const dateParts = dateStr.split('/');
+  //   const year = parseInt(dateParts[2]);
+  //   const month = parseInt(dateParts[0]) - 1; // Month is zero-based
+  //   const day = parseInt(dateParts[1]);
+
+  //   const dateObject = new Date(year, month, day);
+
+  //   const monthName = dateObject.toLocaleString('default', {month: 'long'});
+  //   return monthName;
+  // };
+
+  // const get_DayName = dateStr => {
+  //   const dateParts = dateStr.split('/');
+  //   const year = parseInt(dateParts[2]);
+  //   const month = parseInt(dateParts[0]) - 1; // Month is zero-based
+  //   const day = parseInt(dateParts[1]);
+  //   const dayOfWeekIndex = new Date(year, month, day).getDay();
+
+  //   // Convert day of week index to string representation
+  //   let dayOfWeek;
+  //   switch (dayOfWeekIndex) {
+  //     case 0:
+  //       dayOfWeek = 'Sunday';
+  //       break;
+  //     case 1:
+  //       dayOfWeek = 'Monday';
+  //       break;
+  //     case 2:
+  //       dayOfWeek = 'Tuesday';
+  //       break;
+  //     case 3:
+  //       dayOfWeek = 'Wednesday';
+  //       break;
+  //     case 4:
+  //       dayOfWeek = 'Thursday';
+  //       break;
+  //     case 5:
+  //       dayOfWeek = 'Friday';
+  //       break;
+  //     case 6:
+  //       dayOfWeek = 'Saturday';
+  //       break;
+  //     default:
+  //       dayOfWeek = 'Invalid day';
+  //   }
+
+  //   return dayOfWeek;
+  // };
+
+  // const get_dayDate = dateStr => {
+  //   const parts = dateStr.split('/');
+  //   const month = parseInt(parts[0], 10);
+  //   const day = parseInt(parts[1], 10);
+  //   const year = parseInt(parts[2], 10);
+
+  //   const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
+
+  //   const dayOfMonth = date.getDate(); // This will give you the day of the month
+
+  //   return dayOfMonth;
+  // };
+
+  // const get_Post = async () => {
+  //   const params = {
+  //     user_id: user_data?.id,
+  //     group_code: user_data?.group_code,
+  //   };
+  //   await dispatch(get_post(params));
+  // };
+
+  // const get_profileDetails = async () => {
+  //   const params = {
+  //     user_id: user_data?.id,
+  //   };
+
+  //   await dispatch(get_profile(params));
+  // };
+
+  // const getGroupDetails = async () => {
+  //   const params = {
+  //     group_code: user_data?.group_code,
+  //     profile: true,
+  //     //GroupDetails?.group_code,
+  //   };
+
+  //   dispatch(Get_Group(params));
+  // };
+  // const get_eventList = async () => {
+  //   const id = await AsyncStorage.getItem('user_id');
+  //   const params = {
+  //     user_id: id,
+  //     group_code: user_data?.group_code,
+  //   };
+  //   await dispatch(get_event(params));
+  // };
+
+  // const get_videoList = async () => {
+  //   const params = {
+  //     user_id: user_data?.id,
+  //     group_code: user_data?.group_code,
+  //   };
+  //   await dispatch(get_video(params));
+  // };
   const navigation = useNavigation();
-  const user_data = useSelector(state => state.auth.userData);
+  const user_data = useSelector((state: RootState) => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
-  const My_Profile = useSelector(state => state.auth.GetUserProfile);
-  const get_PostList = useSelector(state => state.feature.get_PostList);
-  const [OpenModal, setOpenModal] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [ModalVisiblePost, setModalVisiblePost] = useState(false);
-  const [ModalVisibleVideo, setModalVisibleVideo] = useState(false);
-  const [AddGroupModal, setAddGroupModal] = useState(false);
-  const [TrainingVisible, setTrainingVisible] = useState(false);
-  const [AddMatchResultModal, setAddMatchResultModal] = useState(false);
-  const [eventVisible, seteventVisible] = useState(false);
+  const My_Profile = useSelector((state: RootState) => state.auth.GetUserProfile);
+  const get_PostList = useSelector((state: RootState) => state.feature.get_PostList);
+  const [OpenModal, setOpenModal] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [ModalVisiblePost, setModalVisiblePost] = useState<boolean>(false);
+  const [ModalVisibleVideo, setModalVisibleVideo] = useState<boolean>(false);
+  const [AddGroupModal, setAddGroupModal] = useState<boolean>(false);
+  const [TrainingVisible, setTrainingVisible] = useState<boolean>(false);
+  const [AddMatchResultModal, setAddMatchResultModal] = useState<boolean>(false);
+  const [eventVisible, setEventVisible] = useState<boolean>(false);
   const isFocuse = useIsFocused();
-  const GroupDetails = useSelector(state => state.auth.Group_Details);
-  const Video_list = useSelector(state => state.feature.Video_list);
+  const GroupDetails = useSelector((state: RootState) => state.auth.Group_Details);
+  const Video_list = useSelector((state: RootState) => state.feature.Video_list);
   const dispatch = useDispatch();
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState<boolean>(false);
 
-  console.log('====================================');
-  console.log(get_PostList.length);
-  console.log('====================================');
   useEffect(() => {
     get_profileDetails();
     get_Post();
@@ -71,10 +222,10 @@ export default function coachHome() {
     get_videoList();
   }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
 
-  function getYouTubeVideoId(url) {
-    var regExp =
+  function getYouTubeVideoId(url: string): string | null {
+    const regExp =
       /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    var match = url.match(regExp);
+    const match = url.match(regExp);
 
     if (match && match[2].length === 11) {
       // If match is found and it's a valid YouTube video ID
@@ -83,16 +234,17 @@ export default function coachHome() {
       return null;
     }
   }
-  const onStateChange = useCallback(state => {
+
+  const onStateChange = useCallback((state: string) => {
     if (state === 'ended') {
       setPlaying(false);
       successToast('video has finished playing!');
     }
   }, []);
 
-  const Event_List = useSelector(state => state.feature.Event_list);
+  const Event_List = useSelector((state: RootState) => state.feature.Event_list);
 
-  const get_monthName = dateStr => {
+  const get_monthName = (dateStr: string): string => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
     const month = parseInt(dateParts[0]) - 1; // Month is zero-based
@@ -100,11 +252,11 @@ export default function coachHome() {
 
     const dateObject = new Date(year, month, day);
 
-    const monthName = dateObject.toLocaleString('default', {month: 'long'});
+    const monthName = dateObject.toLocaleString('default', { month: 'long' });
     return monthName;
   };
 
-  const get_DayName = dateStr => {
+  const get_DayName = (dateStr: string): string => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
     const month = parseInt(dateParts[0]) - 1; // Month is zero-based
@@ -142,7 +294,7 @@ export default function coachHome() {
     return dayOfWeek;
   };
 
-  const get_dayDate = dateStr => {
+  const get_dayDate = (dateStr: string): number => {
     const parts = dateStr.split('/');
     const month = parseInt(parts[0], 10);
     const day = parseInt(parts[1], 10);
@@ -155,7 +307,7 @@ export default function coachHome() {
     return dayOfMonth;
   };
 
-  const get_Post = async () => {
+  const get_Post = async (): Promise<void> => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
@@ -163,7 +315,7 @@ export default function coachHome() {
     await dispatch(get_post(params));
   };
 
-  const get_profileDetails = async () => {
+  const get_profileDetails = async (): Promise<void> => {
     const params = {
       user_id: user_data?.id,
     };
@@ -171,7 +323,7 @@ export default function coachHome() {
     await dispatch(get_profile(params));
   };
 
-  const getGroupDetails = async () => {
+  const getGroupDetails = async (): Promise<void> => {
     const params = {
       group_code: user_data?.group_code,
       profile: true,
@@ -180,7 +332,7 @@ export default function coachHome() {
 
     dispatch(Get_Group(params));
   };
-  const get_eventList = async () => {
+  const get_eventList = async (): Promise<void> => {
     const id = await AsyncStorage.getItem('user_id');
     const params = {
       user_id: id,
@@ -189,14 +341,13 @@ export default function coachHome() {
     await dispatch(get_event(params));
   };
 
-  const get_videoList = async () => {
+  const get_videoList = async (): Promise<void> => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
     };
     await dispatch(get_video(params));
   };
-
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
       {isLoading ? <Loading /> : null}
@@ -283,7 +434,7 @@ export default function coachHome() {
               <TouchableOpacity
                 onPress={() => {
                   setModalVisiblePost(true);
-                  seteventVisible(true);
+                  setEventVisible(true);
                   setModalVisibleVideo(true);
                   setTrainingVisible(true);
                   setAddMatchResultModal(true);
@@ -806,7 +957,14 @@ export default function coachHome() {
             No Video Found
           </Text>
         )}
-        <View style={{marginHorizontal: 15, marginTop: 30}}>
+        <View
+          style={{
+            marginHorizontal: 15,
+            marginTop: 30,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
           <Text
             style={[
               styles.txt,
@@ -817,8 +975,97 @@ export default function coachHome() {
                 lineHeight: 24,
               },
             ]}>
-            Registrations
+            Recent Match Result
           </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenNameEnum.coachMatches);
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#874BE9',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              See all
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {Video_list.length > 0 && (
+          <View style={[styles.shadow, styles.recentListItem]}>
+            <View style={styles.interactionContainer}>
+              <YoutubePlayer
+                height={300}
+                play={playing}
+                videoId={getYouTubeVideoId(
+                  Video_list[Video_list.length - 1]?.video_url,
+                )}
+                onChangeState={onStateChange}
+              />
+            </View>
+            <View style={styles.postContent}>
+              <Text style={styles.postTitle}>
+                {Video_list[Video_list.length - 1].title}
+              </Text>
+              <Text style={styles.postDescription}>
+                {Video_list[Video_list.length - 1].description}
+              </Text>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={styles.postTitle}>
+                  {Video_list[Video_list.length - 1].title}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+        {Video_list.length == 0 && (
+          <Text
+            style={{
+              fontSize: 14,
+              color: '#777777',
+              fontWeight: '500',
+              alignSelf: 'center',
+              marginTop: 10,
+            }}>
+            No Video Found
+          </Text>
+        )}
+    
+        <View
+          style={{
+            marginHorizontal: 15,
+            marginTop: 30,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
+             Registration
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenNameEnum.cochRegistration);
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#874BE9',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              See all
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
@@ -845,7 +1092,7 @@ export default function coachHome() {
                   styles.shdow,
                   {
                     marginHorizontal: 20,
-                    height: hp(20),
+                    height: hp(18),
                     backgroundColor: '#FFF',
                     marginVertical: 5,
                     borderRadius: 15,
@@ -862,10 +1109,10 @@ export default function coachHome() {
                       }}
                     />
                   </View>
-                  <View style={{marginLeft: 10}}>
+                  <View style={{marginLeft: 15, width: '75%'}}>
                     <Text
                       style={{
-                        fontSize: 18,
+                        fontSize: 16,
                         color: '#000',
                         fontWeight: '700',
                       }}>
@@ -873,7 +1120,7 @@ export default function coachHome() {
                     </Text>
                     <Text
                       style={{
-                        fontSize: 15,
+                        fontSize: 12,
                         color: '#000',
                         fontWeight: '500',
                       }}>
@@ -886,7 +1133,7 @@ export default function coachHome() {
                   onPress={() => setModalVisible(true)}
                   style={{
                     backgroundColor: '#e7dbfb',
-                    height: 55,
+                    height: 45,
                     width: '100%',
                     marginTop: 20,
                     borderRadius: 15,
@@ -923,7 +1170,7 @@ export default function coachHome() {
         />
         <EventModal
           visible={OpenModal == 'Add Event' && eventVisible ? true : false}
-          onClose={() => seteventVisible(false)}
+          onClose={() => setEventVisible(false)}
         />
         <TrainingModal
           visible={
@@ -1095,13 +1342,13 @@ const styles = StyleSheet.create({
 });
 const RegisterList = [
   {
-    titile: 'Test',
+    titile: 'Summer Camp 2024',
     description: 'test',
     img: require('../../../assets/Cropping/img1.png'),
   },
   {
-    titile: 'Test',
-    description: 'test',
+    titile: 'Spring camp 2024',
+    description: 'Apply for our Spring Camp before 10th of jun 2024!',
     img: require('../../../assets/Cropping/img1.png'),
   },
 ];

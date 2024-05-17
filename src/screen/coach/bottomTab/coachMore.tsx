@@ -252,7 +252,7 @@ const data = [
     id: '2',
     titile: 'Training Schedule',
     logo: require('../../../assets/Cropping/user-octagon.png'),
-    screen: ScreenNameEnum.REGISTRATION_SCREEN,
+    screen: ScreenNameEnum.cocheTraning,
   },
   {
     id: '3',
@@ -263,16 +263,23 @@ const data = [
   {
     id: '4',
     titile: 'Event Management',
-    logo: require('../../../assets/Cropping/user-octagon.png'),
+    logo: require('../../../assets/Cropping/event.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
     screen: ScreenNameEnum.cocheEvent,
   },
   {
     id: '5',
-    titile: 'Registration',
-    logo: require('../../../assets/Cropping/user-octagon.png'),
+    titile: 'Matche Result Management',
+    logo: require('../../../assets/Cropping/results.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
-    screen: ScreenNameEnum.REGISTRATION_SCREEN,
+    screen: ScreenNameEnum.coachMatches,
+  },
+  {
+    id: '5',
+    titile: 'Registration',
+    logo: require('../../../assets/Cropping/online-registration.png'),
+    // screen: ScreenNameEnum.REGISTRATION_SCREEN,
+    screen: ScreenNameEnum.cochRegistration,
   },
 ];
 const data2 = [
