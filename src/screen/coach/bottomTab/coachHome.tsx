@@ -60,7 +60,6 @@ export default function coachHome() {
   // const dispatch = useDispatch();
   // const [playing, setPlaying] = useState(false);
 
-
   // useEffect(() => {
   //   get_profileDetails();
   //   get_Post();
@@ -198,19 +197,28 @@ export default function coachHome() {
   const user_data = useSelector((state: RootState) => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
-  const My_Profile = useSelector((state: RootState) => state.auth.GetUserProfile);
-  const get_PostList = useSelector((state: RootState) => state.feature.get_PostList);
+  const My_Profile = useSelector(
+    (state: RootState) => state.auth.GetUserProfile,
+  );
+  const get_PostList = useSelector(
+    (state: RootState) => state.feature.get_PostList,
+  );
   const [OpenModal, setOpenModal] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [ModalVisiblePost, setModalVisiblePost] = useState<boolean>(false);
   const [ModalVisibleVideo, setModalVisibleVideo] = useState<boolean>(false);
   const [AddGroupModal, setAddGroupModal] = useState<boolean>(false);
   const [TrainingVisible, setTrainingVisible] = useState<boolean>(false);
-  const [AddMatchResultModal, setAddMatchResultModal] = useState<boolean>(false);
+  const [AddMatchResultModal, setAddMatchResultModal] =
+    useState<boolean>(false);
   const [eventVisible, setEventVisible] = useState<boolean>(false);
   const isFocuse = useIsFocused();
-  const GroupDetails = useSelector((state: RootState) => state.auth.Group_Details);
-  const Video_list = useSelector((state: RootState) => state.feature.Video_list);
+  const GroupDetails = useSelector(
+    (state: RootState) => state.auth.Group_Details,
+  );
+  const Video_list = useSelector(
+    (state: RootState) => state.feature.Video_list,
+  );
   const dispatch = useDispatch();
   const [playing, setPlaying] = useState<boolean>(false);
 
@@ -242,7 +250,9 @@ export default function coachHome() {
     }
   }, []);
 
-  const Event_List = useSelector((state: RootState) => state.feature.Event_list);
+  const Event_List = useSelector(
+    (state: RootState) => state.feature.Event_list,
+  );
 
   const get_monthName = (dateStr: string): string => {
     const dateParts = dateStr.split('/');
@@ -252,7 +262,7 @@ export default function coachHome() {
 
     const dateObject = new Date(year, month, day);
 
-    const monthName = dateObject.toLocaleString('default', { month: 'long' });
+    const monthName = dateObject.toLocaleString('default', {month: 'long'});
     return monthName;
   };
 
@@ -993,31 +1003,42 @@ export default function coachHome() {
           </TouchableOpacity>
         </View>
         {Video_list.length > 0 && (
-          <View style={[styles.shadow, styles.recentListItem]}>
-            <View style={styles.interactionContainer}>
-              <YoutubePlayer
-                height={300}
-                play={playing}
-                videoId={getYouTubeVideoId(
-                  Video_list[Video_list.length - 1]?.video_url,
-                )}
-                onChangeState={onStateChange}
-              />
-            </View>
-            <View style={styles.postContent}>
-              <Text style={styles.postTitle}>
-                {Video_list[Video_list.length - 1].title}
-              </Text>
-              <Text style={styles.postDescription}>
-                {Video_list[Video_list.length - 1].description}
-              </Text>
-              <View style={{flexDirection: 'row'}}>
-                <Text style={styles.postTitle}>
-                  {Video_list[Video_list.length - 1].title}
-                </Text>
-              </View>
-            </View>
-          </View>
+         <View style={[styles.shadow, styles.matchResultContainer]}>
+         <View style={styles.header}>
+           <Text style={styles.dateText}>Wed May 22 2024 00:40:00 GMT+0530</Text>
+         </View>
+         <View style={styles.content}>
+           <View style={styles.team}>
+             <Image
+               source={require('../../../assets/Cropping/img1.png')}
+               style={styles.teamImage}
+             />
+             <Text style={styles.teamLabel}>F17</Text>
+           </View>
+           <View style={styles.scoreContainer}>
+             <View style={styles.scoreRow}>
+               <Text style={styles.scoreText}>0</Text>
+               <Text style={styles.dashText}>-</Text>
+               <Text style={styles.scoreText}>0</Text>
+             </View>
+             <View style={styles.subScoreRow}>
+               <Text style={styles.subScoreText}>0</Text>
+               <Text style={styles.dashText}>-</Text>
+               <Text style={styles.subScoreText}>0</Text>
+             </View>
+           </View>
+           <View style={styles.team}>
+             <Image
+               source={require('../../../assets/Cropping/img2.png')}
+               style={styles.teamImage}
+             />
+             <Text style={styles.teamLabel}>F16</Text>
+           </View>
+         </View>
+         <View>
+           <Text style={styles.resultText}>F16 Win by 2-0</Text>
+         </View>
+       </View>
         )}
         {Video_list.length == 0 && (
           <Text
@@ -1028,10 +1049,10 @@ export default function coachHome() {
               alignSelf: 'center',
               marginTop: 10,
             }}>
-            No Video Found
+            No Match Result Found
           </Text>
         )}
-    
+
         <View
           style={{
             marginHorizontal: 15,
@@ -1050,7 +1071,7 @@ export default function coachHome() {
                 lineHeight: 24,
               },
             ]}>
-             Registration
+            Registration
           </Text>
           <TouchableOpacity
             onPress={() => {
@@ -1338,6 +1359,83 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginHorizontal: 20,
     borderRadius: 15,
+  },
+  
+  matchResultContainer: {
+    backgroundColor: '#fff',
+    height: hp(25),
+    marginHorizontal: 20,
+    borderRadius: 20,
+    marginTop: 20,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    borderBottomWidth: 1,
+    width: '100%',
+    alignItems: 'center',
+    borderColor: '#f0f0f0',
+  },
+  dateText: {
+    color: '#777777',
+    fontWeight: '500',
+    marginVertical: 15,
+    fontSize: 16, // Assuming default size is needed, add if necessary
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  team: {
+    alignItems: 'center',
+  },
+  teamImage: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+  },
+  teamLabel: {
+    fontSize: 16,
+    marginTop: 20,
+    fontWeight: '500', // Assuming this is consistent with other text styles, add if necessary
+  },
+  scoreContainer: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  scoreRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '60%',
+  },
+  scoreText: {
+    fontSize: 20,
+    lineHeight: 25,
+  },
+  dashText: {
+    fontSize: 22,
+    lineHeight: 25,
+  },
+  subScoreRow: {
+    flexDirection: 'row',
+    marginTop: 20,
+    justifyContent: 'space-between',
+    width: '40%',
+  },
+  subScoreText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#777777',
+  },
+  resultText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#82b590',
+    marginTop: 10, // Adding margin to avoid overlapping or alignment issues
   },
 });
 const RegisterList = [

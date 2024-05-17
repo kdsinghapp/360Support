@@ -160,98 +160,12 @@ import AddMatchResult from '../modal/AddMatchResult';
           </View>
     
          
-          {Event_List.length > 0 && (
-            <View style={styles.content}>
-              <FlatList
-                data={Event_List}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate(ScreenNameEnum.EventDetilas, {
-                        event_id: item.id,
-                      });
-                    }}
-                    style={[
-                      styles.shdow,
-                      styles.Event,
-                      {marginVertical: 10, alignSelf: 'center'},
-                    ]}>
-                    <View>
-                      <Line />
-                    </View>
-                    <View>
-                      <Text
-                        style={[
-                          styles.txt,
-                          {
-                            fontSize: 22,
-                            fontWeight: '700',
-                            lineHeight: 33,
-                          },
-                        ]}>
-                        {item?.event_date != null &&
-                          get_dayDate(
-                            new Date(item?.event_date).toLocaleDateString(),
-                          )}
-                      </Text>
-                      <Text style={styles.txt}>
-                        {get_monthName(
-                          new Date(item?.event_date).toLocaleDateString(),
-                        )}
-                      </Text>
-                    </View>
-    
-                    <View style={{width: '65%'}}>
-                      <Text
-                        style={[
-                          styles.txt,
-                          {
-                            fontSize: 18,
-                            fontWeight: '700',
-                            lineHeight: 24,
-                          },
-                        ]}>
-                        {item?.event_name}
-                      </Text>
-                      <Text style={[styles.txt, {fontSize: 10}]}>
-                        {item?.event_description}
-                      </Text>
-                      <Text style={styles.txt}>
-                        {get_DayName(
-                          new Date(item?.event_date).toLocaleDateString(),
-                        )}{' '}
-                        {new Date(item?.event_time).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </Text>
-                      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Image
-                          source={require('../../../assets/Cropping/pin.png')}
-                          style={{height: 12, width: 12}}
-                        />
-                        <Text style={[styles.txt, {marginLeft: 5}]}>
-                          {item?.event_location}
-                        </Text>
-                      </View>
-                    </View>
-                    <View>
-                      <Text
-                        style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
-                        Match
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-          {Event_List.length == 0 && Event_List !== null && (
+  
+        
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <Text>No events available</Text>
+              <Text>coming soon</Text>
             </View>
-          )}
+ 
           <AddMatchResult
             visible={modalVisible}
             onClose={() => setModalVisible(false)}
