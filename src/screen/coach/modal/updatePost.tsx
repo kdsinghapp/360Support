@@ -63,9 +63,6 @@ const UpdatePost = ({visible, onClose, data}) => {
     }).start();
   };
 
-console.log('====================================');
-console.log(mediaUri);
-console.log('====================================');
   useEffect(() => {
     setTitle(data?.title);
     setDescription(data?.description);

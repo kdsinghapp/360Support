@@ -98,6 +98,7 @@ export default function MyProfile() {
     };
     dispatch(get_profile(params));
   };
+
   useEffect(() => {
     setLastName(My_Profile?.last_name);
     setFirstName(My_Profile?.first_name);
@@ -230,9 +231,13 @@ export default function MyProfile() {
                 alignItems: 'center',
               }}>
               <TouchableOpacity
-                disabled={!isEditing}
+               disabled={!isEditing}
+                
                 onPress={() => {
-                  openImageLibrary();
+                 
+
+                    openImageLibrary();
+                  
                 }}
                 style={{
                   alignItems: 'center',

@@ -32,167 +32,15 @@ import {Get_Group, get_profile} from '../../../redux/feature/authSlice';
 import {
   get_event,
   get_post,
+  get_training,
   get_video,
 } from '../../../redux/feature/featuresSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import {successToast} from '../../../configs/customToast';
+import {errorToast, successToast} from '../../../configs/customToast';
 import AddMatchResult from '../modal/AddMatchResult';
 import AddGroup from '../modal/AddGroup';
 export default function coachHome() {
-  // const navigation = useNavigation();
-  // const user_data = useSelector(state => state.auth.userData);
-  // const isLoading = useSelector((state: RootState) => state.feature.isLoading);
-  // const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
-  // const My_Profile = useSelector(state => state.auth.GetUserProfile);
-  // const get_PostList = useSelector(state => state.feature.get_PostList);
-  // const [OpenModal, setOpenModal] = useState('');
-  // const [modalVisible, setModalVisible] = useState(false);
-  // const [ModalVisiblePost, setModalVisiblePost] = useState(false);
-  // const [ModalVisibleVideo, setModalVisibleVideo] = useState(false);
-  // const [AddGroupModal, setAddGroupModal] = useState(false);
-  // const [TrainingVisible, setTrainingVisible] = useState(false);
-  // const [AddMatchResultModal, setAddMatchResultModal] = useState(false);
-  // const [eventVisible, setEventVisible] = useState(false);
-  // const isFocuse = useIsFocused();
-  // const GroupDetails = useSelector(state => state.auth.Group_Details);
-  // const Video_list = useSelector(state => state.feature.Video_list);
-  // const dispatch = useDispatch();
-  // const [playing, setPlaying] = useState(false);
-
-  // useEffect(() => {
-  //   get_profileDetails();
-  //   get_Post();
-  //   get_eventList();
-  //   getGroupDetails();
-  //   get_videoList();
-  // }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
-
-  // function getYouTubeVideoId(url) {
-  //   var regExp =
-  //     /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  //   var match = url.match(regExp);
-
-  //   if (match && match[2].length === 11) {
-  //     // If match is found and it's a valid YouTube video ID
-  //     return match[2];
-  //   } else {
-  //     return null;
-  //   }
-  // }
-  // const onStateChange = useCallback(state => {
-  //   if (state === 'ended') {
-  //     setPlaying(false);
-  //     successToast('video has finished playing!');
-  //   }
-  // }, []);
-
-  // const Event_List = useSelector(state => state.feature.Event_list);
-
-  // const get_monthName = dateStr => {
-  //   const dateParts = dateStr.split('/');
-  //   const year = parseInt(dateParts[2]);
-  //   const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-  //   const day = parseInt(dateParts[1]);
-
-  //   const dateObject = new Date(year, month, day);
-
-  //   const monthName = dateObject.toLocaleString('default', {month: 'long'});
-  //   return monthName;
-  // };
-
-  // const get_DayName = dateStr => {
-  //   const dateParts = dateStr.split('/');
-  //   const year = parseInt(dateParts[2]);
-  //   const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-  //   const day = parseInt(dateParts[1]);
-  //   const dayOfWeekIndex = new Date(year, month, day).getDay();
-
-  //   // Convert day of week index to string representation
-  //   let dayOfWeek;
-  //   switch (dayOfWeekIndex) {
-  //     case 0:
-  //       dayOfWeek = 'Sunday';
-  //       break;
-  //     case 1:
-  //       dayOfWeek = 'Monday';
-  //       break;
-  //     case 2:
-  //       dayOfWeek = 'Tuesday';
-  //       break;
-  //     case 3:
-  //       dayOfWeek = 'Wednesday';
-  //       break;
-  //     case 4:
-  //       dayOfWeek = 'Thursday';
-  //       break;
-  //     case 5:
-  //       dayOfWeek = 'Friday';
-  //       break;
-  //     case 6:
-  //       dayOfWeek = 'Saturday';
-  //       break;
-  //     default:
-  //       dayOfWeek = 'Invalid day';
-  //   }
-
-  //   return dayOfWeek;
-  // };
-
-  // const get_dayDate = dateStr => {
-  //   const parts = dateStr.split('/');
-  //   const month = parseInt(parts[0], 10);
-  //   const day = parseInt(parts[1], 10);
-  //   const year = parseInt(parts[2], 10);
-
-  //   const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-
-  //   const dayOfMonth = date.getDate(); // This will give you the day of the month
-
-  //   return dayOfMonth;
-  // };
-
-  // const get_Post = async () => {
-  //   const params = {
-  //     user_id: user_data?.id,
-  //     group_code: user_data?.group_code,
-  //   };
-  //   await dispatch(get_post(params));
-  // };
-
-  // const get_profileDetails = async () => {
-  //   const params = {
-  //     user_id: user_data?.id,
-  //   };
-
-  //   await dispatch(get_profile(params));
-  // };
-
-  // const getGroupDetails = async () => {
-  //   const params = {
-  //     group_code: user_data?.group_code,
-  //     profile: true,
-  //     //GroupDetails?.group_code,
-  //   };
-
-  //   dispatch(Get_Group(params));
-  // };
-  // const get_eventList = async () => {
-  //   const id = await AsyncStorage.getItem('user_id');
-  //   const params = {
-  //     user_id: id,
-  //     group_code: user_data?.group_code,
-  //   };
-  //   await dispatch(get_event(params));
-  // };
-
-  // const get_videoList = async () => {
-  //   const params = {
-  //     user_id: user_data?.id,
-  //     group_code: user_data?.group_code,
-  //   };
-  //   await dispatch(get_video(params));
-  // };
   const navigation = useNavigation();
   const user_data = useSelector((state: RootState) => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
@@ -202,6 +50,9 @@ export default function coachHome() {
   );
   const get_PostList = useSelector(
     (state: RootState) => state.feature.get_PostList,
+  );
+  const Traininglist: EventList[] = useSelector(
+    (state: RootState) => state.feature.Training_list,
   );
   const [OpenModal, setOpenModal] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -227,7 +78,8 @@ export default function coachHome() {
     get_Post();
     get_eventList();
     getGroupDetails();
-    get_videoList();
+    get_videoList('all');
+    Get_Training('all');
   }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
 
   function getYouTubeVideoId(url: string): string | null {
@@ -316,11 +168,21 @@ export default function coachHome() {
 
     return dayOfMonth;
   };
+  const Get_Training = async (type): Promise<void> => {
+    const id = await AsyncStorage.getItem('user_id');
+    const params = {
+      user_id: id,
+      group_code: user_data?.group_code,
+      type: type,
+    };
+    await dispatch(get_training(params));
+  };
 
   const get_Post = async (): Promise<void> => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
+      type: 'all',
     };
     await dispatch(get_post(params));
   };
@@ -351,10 +213,11 @@ export default function coachHome() {
     await dispatch(get_event(params));
   };
 
-  const get_videoList = async (): Promise<void> => {
+  const get_videoList = async (type): Promise<void> => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
+      type: type,
     };
     await dispatch(get_video(params));
   };
@@ -365,9 +228,9 @@ export default function coachHome() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.Div1}>
-            <TouchableOpacity
+            <View
               onPress={() => {
-                setAddGroupModal(true);
+                // setAddGroupModal(true);
               }}
               style={{
                 flexDirection: 'row',
@@ -394,7 +257,7 @@ export default function coachHome() {
                 {GroupDetails?.group_name}
               </Text>
               <Down />
-            </TouchableOpacity>
+            </View>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate(ScreenNameEnum.NOTIFICATION_SCREEN);
@@ -480,120 +343,6 @@ export default function coachHome() {
           />
         </View>
 
-        {/* <View
-            onPress={() => {
-              navigation.navigate(ScreenNameEnum.UPCOMING_EVENT);
-            }}
-            style={[styles.Event, {}]}>
-            <View
-              style={{
-                height: '70%',
-                width: 4,
-                backgroundColor: '#874BE9',
-                borderRadius: 10,
-              }}
-            />
-
-            <View style={{width: '95%'}}>
-              <Text
-                style={[
-                  styles.txt,
-                  {
-                    fontSize: 20,
-                    fontWeight: '700',
-                    lineHeight: 24,
-                    color: '#000000',
-                  },
-                ]}>
-                Welcome
-              </Text>
-              <Text
-                style={[
-                  styles.txt,
-                  {
-                    color: '#000000',
-                    fontSize: 20,
-                    fontWeight: '700',
-                    lineHeight: 24,
-                  },
-                ]}>
-                Mira Donin
-              </Text>
-            </View>
-          </View> */}
-
-        <View style={{marginHorizontal: 15, marginTop: 30}}>
-          <Text
-            style={[
-              styles.txt,
-              {
-                color: '#000000',
-                fontSize: 20,
-                fontWeight: '700',
-                lineHeight: 24,
-              },
-            ]}>
-            Your Pending Request
-          </Text>
-        </View>
-        <View style={{paddingTop: 20}}>
-          <View
-            style={[
-              styles.shdow,
-              {
-                paddingVertical: 15,
-                padding: 10,
-                marginHorizontal: 15,
-                backgroundColor: '#FFF',
-                borderRadius: 20,
-                marginVertical: 10,
-              },
-            ]}>
-            <View
-              style={{
-                flexDirection: 'row',
-
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{}}>
-                <Image
-                  source={require('../../../assets/Cropping/dp.jpeg')}
-                  style={{height: 40, width: 40, borderRadius: 20}}
-                />
-              </View>
-              <View
-                style={{
-                  marginLeft: 10,
-                  width: '65%',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: '#000000',
-                    fontSize: 14,
-                    fontWeight: '800',
-                    lineHeight: 18,
-                  }}>
-                  sdsd
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  backgroundColor: '#F8F8F8',
-                  borderRadius: 20,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                }}>
-                <Text
-                  style={{fontSize: 10, fontWeight: '400', color: '#B0B0B0'}}>
-                  Pending
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
         <View
           style={{
             marginHorizontal: 15,
@@ -681,10 +430,15 @@ export default function coachHome() {
                       lineHeight: 24,
                     },
                   ]}>
-                  {Event_List[Event_List?.length - 1]?.event_name}
+                  {Event_List[Event_List?.length - 1]?.event_name.substring(
+                    0,
+                    30,
+                  )}
                 </Text>
                 <Text style={[styles.txt, {fontSize: 10}]}>
-                  {Event_List[Event_List?.length - 1]?.event_description}
+                  {Event_List[
+                    Event_List?.length - 1
+                  ]?.event_description.substring(0, 40)}
                 </Text>
                 <Text style={styles.txt}>
                   {get_DayName(
@@ -734,7 +488,7 @@ export default function coachHome() {
         <View
           style={{
             marginHorizontal: 15,
-            marginTop: 30,
+
             flexDirection: 'row',
             alignContent: 'center',
             justifyContent: 'space-between',
@@ -911,10 +665,209 @@ export default function coachHome() {
                 lineHeight: 24,
               },
             ]}>
+            Recent Training
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              Get_Training('all');
+              navigation.navigate(ScreenNameEnum.cocheTraning);
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#874BE9',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
+              See all
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {Traininglist.length > 0 && (
+           <View
+           style={[
+             styles.shdow,
+             {
+               backgroundColor: '#fff',
+               marginHorizontal: 10,
+               borderRadius: 20,
+               marginVertical: 10,
+               padding:10
+             },
+           ]}>
+             <View style={{height:50,flexDirection:'row',paddingHorizontal:10}}>
+           <Image 
+           source={{uri:Traininglist[Traininglist.length -1]?.user_details?.image}}
+           style={{height:45,width:45,borderRadius:22.5}}
+           />
+           <View style={{marginLeft:5}}>
+             <Text style={{fontSize:14,color:"#000",fontWeight:'600'}}>{Traininglist[Traininglist.length -1]?.user_details.first_name} {Traininglist[Traininglist.length -1]?.user_details.last_name}</Text>
+             <Text style={{fontSize:14,color:"#777777",fontWeight:'600'}}>{Traininglist[Traininglist.length -1]?.user_details.type}</Text>
+             </View>
+            
+             </View>
+
+           <View
+           
+             style={[
+               styles.Event,
+               {marginVertical: 10, alignSelf: 'center'},
+             ]}>
+            
+             <View>
+               <Line />
+             </View>
+             <View>
+               <Text
+                 style={[
+                   styles.txt,
+                   {
+                     fontSize: 22,
+                     fontWeight: '700',
+                     lineHeight: 33,
+                   },
+                 ]}>
+                 {Traininglist[Traininglist.length -1]?.training_date != null &&
+                   get_dayDate(
+                     new Date(Traininglist[Traininglist.length -1]?.training_date).toLocaleDateString(),
+                   )}
+               </Text>
+               <Text style={styles.txt}>
+                 {get_monthName(
+                   new Date(Traininglist[Traininglist.length -1]?.training_date).toLocaleDateString(),
+                 )}
+               </Text>
+             </View>
+
+             <View style={{width: '50%'}}>
+               <Text
+                 style={[
+                   styles.txt,
+                   {
+                     fontSize: 18,
+                     fontWeight: '700',
+                     lineHeight: 24,
+                   },
+                 ]}>
+                 {Traininglist[Traininglist.length -1]?.name}
+               </Text>
+               <Text style={[styles.txt, {fontSize: 10}]}>
+                 {Traininglist[Traininglist.length -1]?.training_description}
+               </Text>
+               <Text style={styles.txt}>
+                 {get_DayName(
+                   new Date(Traininglist[Traininglist.length -1]?.training_date).toLocaleDateString(),
+                 )}
+               </Text>
+               <View
+                 style={{flexDirection: 'row', alignItems: 'center'}}>
+                 <Text style={[styles.txt, {}]}>
+                   start time :{' '}
+                   {new Date(Traininglist[Traininglist.length -1]?.training_time).toLocaleTimeString(
+                     [],
+                     {
+                       hour: '2-digit',
+                       minute: '2-digit',
+                     },
+                   )}
+                 </Text>
+               </View>
+               <View
+                 style={{flexDirection: 'row', alignItems: 'center'}}>
+                 <Text style={[styles.txt, {}]}>
+                   end time :{' '}
+                   {new Date(Traininglist[Traininglist.length -1]?.training_duration).toLocaleTimeString(
+                     [],
+                     {
+                       hour: '2-digit',
+                       minute: '2-digit',
+                     },
+                   )}
+                 </Text>
+               </View>
+               <View
+                 style={{flexDirection: 'row', alignItems: 'center'}}>
+                 <Image
+                   source={require('../../../assets/Cropping/pin.png')}
+                   style={{height: 12, width: 12}}
+                 />
+                 <Text style={[styles.txt, {marginLeft: 5}]}>
+                   {Traininglist[Traininglist.length -1]?.training_location}
+                 </Text>
+               </View>
+               {Traininglist[Traininglist.length -1]?.user_id != user_data?.id && (
+                 <TouchableOpacity
+                   onPress={() => {
+                     errorToast('coming soon');
+                   }}
+                   style={{
+                     backgroundColor: '#7cc2a2',
+
+                     marginTop: 30,
+                     borderRadius: 30,
+                     height: 30,
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                   }}>
+                   <Text
+                     style={{
+                       fontSize: 16,
+                       color: '#fff',
+                       fontWeight: '700',
+                     }}>
+                     Join
+                   </Text>
+                 </TouchableOpacity>
+               )}
+             </View>
+             <View>
+               <Text
+                 style={[
+                   styles.txt,
+                   {alignSelf: 'flex-end', fontSize: 10},
+                 ]}>
+                 {Traininglist[Traininglist.length -1]?.training_type}
+               </Text>
+             </View>
+           </View>
+         </View>
+        )}
+        {Traininglist.length == 0 && (
+          <Text
+            style={{
+              fontSize: 14,
+              color: '#777777',
+              fontWeight: '500',
+              alignSelf: 'center',
+              marginTop: 10,
+            }}>
+            No training Found
+          </Text>
+        )}
+        <View
+          style={{
+            marginHorizontal: 15,
+            marginTop: 30,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={[
+              styles.txt,
+              {
+                color: '#000000',
+                fontSize: 20,
+                fontWeight: '700',
+                lineHeight: 24,
+              },
+            ]}>
             Recent Video
           </Text>
           <TouchableOpacity
             onPress={() => {
+              get_videoList('all');
               navigation.navigate(ScreenNameEnum.cocheVideo);
             }}>
             <Text
@@ -1003,42 +956,44 @@ export default function coachHome() {
           </TouchableOpacity>
         </View>
         {Video_list.length > 0 && (
-         <View style={[styles.shadow, styles.matchResultContainer]}>
-         <View style={styles.header}>
-           <Text style={styles.dateText}>Wed May 22 2024 00:40:00 GMT+0530</Text>
-         </View>
-         <View style={styles.content}>
-           <View style={styles.team}>
-             <Image
-               source={require('../../../assets/Cropping/img1.png')}
-               style={styles.teamImage}
-             />
-             <Text style={styles.teamLabel}>F17</Text>
-           </View>
-           <View style={styles.scoreContainer}>
-             <View style={styles.scoreRow}>
-               <Text style={styles.scoreText}>0</Text>
-               <Text style={styles.dashText}>-</Text>
-               <Text style={styles.scoreText}>0</Text>
-             </View>
-             <View style={styles.subScoreRow}>
-               <Text style={styles.subScoreText}>0</Text>
-               <Text style={styles.dashText}>-</Text>
-               <Text style={styles.subScoreText}>0</Text>
-             </View>
-           </View>
-           <View style={styles.team}>
-             <Image
-               source={require('../../../assets/Cropping/img2.png')}
-               style={styles.teamImage}
-             />
-             <Text style={styles.teamLabel}>F16</Text>
-           </View>
-         </View>
-         <View>
-           <Text style={styles.resultText}>F16 Win by 2-0</Text>
-         </View>
-       </View>
+          <View style={[styles.shadow, styles.matchResultContainer]}>
+            <View style={styles.header}>
+              <Text style={styles.dateText}>
+                Wed May 22 2024 00:40:00 GMT+0530
+              </Text>
+            </View>
+            <View style={styles.content}>
+              <View style={styles.team}>
+                <Image
+                  source={require('../../../assets/Cropping/img1.png')}
+                  style={styles.teamImage}
+                />
+                <Text style={styles.teamLabel}>F17</Text>
+              </View>
+              <View style={styles.scoreContainer}>
+                <View style={styles.scoreRow}>
+                  <Text style={styles.scoreText}>0</Text>
+                  <Text style={styles.dashText}>-</Text>
+                  <Text style={styles.scoreText}>0</Text>
+                </View>
+                <View style={styles.subScoreRow}>
+                  <Text style={styles.subScoreText}>0</Text>
+                  <Text style={styles.dashText}>-</Text>
+                  <Text style={styles.subScoreText}>0</Text>
+                </View>
+              </View>
+              <View style={styles.team}>
+                <Image
+                  source={require('../../../assets/Cropping/img2.png')}
+                  style={styles.teamImage}
+                />
+                <Text style={styles.teamLabel}>F16</Text>
+              </View>
+            </View>
+            <View>
+              <Text style={styles.resultText}>F16 Win by 2-0</Text>
+            </View>
+          </View>
         )}
         {Video_list.length == 0 && (
           <Text
@@ -1217,6 +1172,18 @@ export default function coachHome() {
 }
 
 const styles = StyleSheet.create({
+  Traing: {
+    justifyContent: 'space-between',
+    height: hp(25),
+    backgroundColor: '#DDFBE8',
+    marginTop: 20,
+    marginHorizontal: 10,
+    width: wp(90),
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
   postTitle: {
     color: '#000000',
     fontSize: 14,
@@ -1360,7 +1327,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 15,
   },
-  
+
   matchResultContainer: {
     backgroundColor: '#fff',
     height: hp(25),

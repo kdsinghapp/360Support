@@ -23,7 +23,9 @@ import {get_video} from '../../../redux/feature/featuresSlice';
 import Loading from '../../../configs/Loader';
 import Video from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { successToast } from '../../../configs/customToast';
+import {successToast} from '../../../configs/customToast';
+import DeleteVideo from '../modal/VideoDeleteModal';
+import DeleteVideoModal from '../modal/VideoDeleteModal';
 
 interface PostItem {
   id: string;
@@ -36,23 +38,26 @@ interface PostItem {
 
 export default function cocheVideo() {
   const My_Profile = useSelector(state => state.auth.GetUserProfile);
-  const get_PostList: PostItem[] = useSelector(
-    state => state.feature.get_PostList,
-  );
   const Video_list: PostItem[] = useSelector(state => state.feature.Video_list);
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const user_data = useSelector(state => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const [Videotype, setVideotype] = useState('all');
+  const [ClickData, setClickData] = useState(null);
+
+  const [DotmodalVisible, setDotmodalVisible] = useState(false);
   const isFocuse = useIsFocused();
-  useEffect(() => {
-    get_videoList();
-  }, [isFocuse, modalVisible]);
   const dispatch = useDispatch();
-  const get_videoList = async () => {
+  useEffect(() => {
+    get_videoList('all');
+  }, [isFocuse, modalVisible, DotmodalVisible]);
+
+  const get_videoList = async type => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
+      type: type,
     };
     await dispatch(get_video(params));
   };
@@ -66,12 +71,7 @@ export default function cocheVideo() {
     }
   }, []);
 
-  const togglePlaying = useCallback(() => {
-    setPlaying(prev => !prev);
-  }, []);
-
   function getYouTubeVideoId(url) {
-    
     var regExp =
       /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     var match = url.match(regExp);
@@ -84,11 +84,18 @@ export default function cocheVideo() {
     }
   }
 
+  const after_delete = async () => {
+    const timeoutId = setTimeout(() => {
+      get_videoList('all');
+    }, 1500); 
+
+    return () => clearTimeout(timeoutId);
+  };
   const RecentListItem = ({item}: {item: PostItem}) => (
     <View style={[styles.shadow, styles.recentListItem]}>
+      <View></View>
       <View style={styles.interactionContainer}>
         <YoutubePlayer
-  
           height={300}
           play={playing}
           videoId={getYouTubeVideoId(item?.video_url)}
@@ -102,6 +109,48 @@ export default function cocheVideo() {
           <Text style={styles.postTitle}>{item.title}</Text>
         </View>
       </View>
+      <TouchableOpacity
+        onPress={() => {
+          setDotmodalVisible(true);
+
+          setClickData(item);
+        }}
+        style={{
+          flexDirection: 'row',
+          width: '5%',
+          height: 20,
+          position: 'absolute',
+          justifyContent: 'space-between',
+          top: 0,
+          right: 5,
+          alignItems: 'flex-end',
+          marginHorizontal: 5,
+        }}>
+        <View
+          style={{
+            height: 5,
+            width: 5,
+            borderRadius: 2.5,
+            backgroundColor: 'grey',
+          }}
+        />
+        <View
+          style={{
+            height: 5,
+            width: 5,
+            borderRadius: 2.5,
+            backgroundColor: 'grey',
+          }}
+        />
+        <View
+          style={{
+            height: 5,
+            width: 5,
+            borderRadius: 2.5,
+            backgroundColor: 'grey',
+          }}
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -132,16 +181,74 @@ export default function cocheVideo() {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.content}>
-        <FlatList
-          data={Video_list}
-          renderItem={RecentListItem}
-          keyExtractor={item => item.id}
-        />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          marginTop: 20,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            setVideotype('all');
+            get_videoList('all');
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+
+            borderWidth: Videotype == 'all' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: Videotype == 'all' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            All Video
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setVideotype('user');
+            get_videoList('user');
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            marginLeft: 20,
+            borderWidth: Videotype == 'user' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: Videotype == 'user' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            My Video
+          </Text>
+        </TouchableOpacity>
       </View>
+      {Video_list.length > 0 && (
+        <View style={styles.content}>
+          <FlatList
+            data={Video_list}
+            renderItem={RecentListItem}
+            keyExtractor={item => item.id}
+          />
+        </View>
+      )}
+      {Video_list.length == 0 && (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text>No Video found</Text>
+        </View>
+      )}
       <VideoModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+      />
+      <DeleteVideoModal
+        visible={DotmodalVisible}
+        onClose={() => {
+          setDotmodalVisible(false);
+          after_delete();
+        }}
+        data={{item: ClickData}}
       />
     </View>
   );

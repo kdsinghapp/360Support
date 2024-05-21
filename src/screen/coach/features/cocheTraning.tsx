@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,21 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import BackBtn from '../../../assets/svg/BackBtn.svg';
 import AddIcon from '../../../assets/svg/AddIcon.svg';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import PostModal from '../modal/PostModal';
 import EventModal from '../modal/Addevent';
 import Loading from '../../../configs/Loader';
-import { get_event } from '../../../redux/feature/featuresSlice';
+import {get_event, get_training} from '../../../redux/feature/featuresSlice';
 import Line from '../../../assets/svg/Line.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import TrainingModal from '../modal/TrainingModal';
+import {errorToast} from '../../../configs/customToast';
+import DeleteTraining from '../modal/TrainingDeleteModal';
+import UpdateTraining from '../modal/UpdateTraining';
 
 interface PostItem {
   id: string;
@@ -46,15 +49,17 @@ interface EventList {
 }
 
 export default function CocheTraining() {
-  const Event_List: EventList[] = useSelector((state: RootState) => state.feature.Event_list);
+  const Traininglist: EventList[] = useSelector(
+    (state: RootState) => state.feature.Training_list,
+  );
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const user_data = useSelector((state: RootState) => state.auth.userData);
-
-  const [Eventtype, setEventtype] = useState<string>('user');
-
+  const [TrainingTyep, setTrainingTyep] = useState('all');
+  const [DotmodalVisible, setDotModalVisible] = useState(false);
+  const [DotMdata, setDotMdata] = useState('');
   const get_monthName = (dateStr: string): string => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
@@ -62,7 +67,7 @@ export default function CocheTraining() {
     const day = parseInt(dateParts[1]);
 
     const dateObject = new Date(year, month, day);
-    const monthName = dateObject.toLocaleString('default', { month: 'long' });
+    const monthName = dateObject.toLocaleString('default', {month: 'long'});
     return monthName;
   };
 
@@ -119,19 +124,25 @@ export default function CocheTraining() {
   const isFocuse = useIsFocused();
 
   useEffect(() => {
-    get_eventList('user');
-  }, [isFocuse, modalVisible]);
+    Get_Training('all');
+  }, [isFocuse, modalVisible, DotmodalVisible]);
 
-  const get_eventList = async (Eventtype: string): Promise<void> => {
-    const id = await AsyncStorage.getItem('user_id');
+  const Get_Training = async (Eventtype: string): Promise<void> => {
     const params = {
-      user_id: id,
+      user_id: user_data?.id,
       group_code: user_data?.group_code,
       type: Eventtype,
     };
-    await dispatch(get_event(params));
+    await dispatch(get_training(params));
   };
 
+  const after_delete = async () => {
+    const timeoutId = setTimeout(() => {
+      Get_Training('all');
+    }, 1500);
+
+    return () => clearTimeout(timeoutId);
+  };
   return (
     <View style={styles.container}>
       {isLoading ? <Loading /> : null}
@@ -169,45 +180,256 @@ export default function CocheTraining() {
         }}>
         <TouchableOpacity
           onPress={() => {
-            setEventtype('user');
-            get_eventList('user');
+            setTrainingTyep('all');
+            Get_Training('all');
           }}
           style={{
             paddingHorizontal: 20,
             paddingVertical: 5,
-            borderWidth: Eventtype === 'user' ? 0 : 1,
+
+            borderWidth: TrainingTyep === 'all' ? 0 : 1,
             borderRadius: 30,
-            backgroundColor: Eventtype === 'user' ? '#DDFBE8' : '#fff',
+            backgroundColor: TrainingTyep === 'all' ? '#DDFBE8' : '#fff',
           }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: '#000' }}>
-            My Training
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            All Training
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            setEventtype('all');
-            get_eventList('all');
+            setTrainingTyep('user');
+            Get_Training('user');
           }}
           style={{
             paddingHorizontal: 20,
             paddingVertical: 5,
             marginLeft: 20,
-            borderWidth: Eventtype === 'all' ? 0 : 1,
+            borderWidth: TrainingTyep === 'user' ? 0 : 1,
             borderRadius: 30,
-            backgroundColor: Eventtype === 'all' ? '#DDFBE8' : '#fff',
+            backgroundColor: TrainingTyep === 'user' ? '#DDFBE8' : '#fff',
           }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: '#000' }}>
-            All Training
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            My Training
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <Text>coming soon</Text>
-            </View>
+      {Traininglist.length > 0 && (
+        <View style={styles.content}>
+          {!isLoading && (
+            <FlatList
+              data={Traininglist}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({item}) => (
+                <View
+                  style={[
+                    styles.shdow,
+                    {
+                      backgroundColor: '#fff',
+                      marginHorizontal: 10,
+                      borderRadius: 20,
+                      marginVertical: 10,
+                      padding:10
+                    },
+                  ]}>
+                    <View style={{height:50,flexDirection:'row',paddingHorizontal:10}}>
+                  <Image 
+                  source={{uri:item?.user_details?.image}}
+                  style={{height:45,width:45,borderRadius:22.5}}
+                  />
+                  <View style={{marginLeft:5}}>
+                    <Text style={{fontSize:14,color:"#000",fontWeight:'600'}}>{item.user_details.first_name} {item.user_details.last_name}</Text>
+                    <Text style={{fontSize:14,color:"#777777",fontWeight:'600'}}>{item.user_details.type}</Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setDotModalVisible(true);
+                        setDotMdata(item);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        flexDirection: 'row',
+                        width: '5%',
+                        height: 20,
+                        justifyContent: 'space-between',
+                        marginHorizontal: 5,
+                      }}>
+                      <View
+                        style={{
+                          height: 5,
+                          width: 5,
+                          borderRadius: 2.5,
+                          backgroundColor: 'grey',
+                        }}
+                      />
+                      <View
+                        style={{
+                          height: 5,
+                          width: 5,
+                          borderRadius: 2.5,
+                          backgroundColor: 'grey',
+                        }}
+                      />
+                      <View
+                        style={{
+                          height: 5,
+                          width: 5,
+                          borderRadius: 2.5,
+                          backgroundColor: 'grey',
+                        }}
+                      />
+                    </TouchableOpacity>
+                    </View>
+
+                  <View
+                  
+                    style={[
+                      styles.Event,
+                      {marginVertical: 10, alignSelf: 'center'},
+                    ]}>
+                    
+                    <View>
+                      <Line />
+                    </View>
+                    <View>
+                      <Text
+                        style={[
+                          styles.txt,
+                          {
+                            fontSize: 22,
+                            fontWeight: '700',
+                            lineHeight: 33,
+                          },
+                        ]}>
+                        {item?.training_date != null &&
+                          get_dayDate(
+                            new Date(item?.training_date).toLocaleDateString(),
+                          )}
+                      </Text>
+                      <Text style={styles.txt}>
+                        {get_monthName(
+                          new Date(item?.training_date).toLocaleDateString(),
+                        )}
+                      </Text>
+                    </View>
+
+                    <View style={{width: '50%'}}>
+                      <Text
+                        style={[
+                          styles.txt,
+                          {
+                            fontSize: 18,
+                            fontWeight: '700',
+                            lineHeight: 24,
+                          },
+                        ]}>
+                        {item?.name}
+                      </Text>
+                      <Text style={[styles.txt, {fontSize: 10}]}>
+                        {item?.training_description}
+                      </Text>
+                      <Text style={styles.txt}>
+                        {get_DayName(
+                          new Date(item?.training_date).toLocaleDateString(),
+                        )}
+                      </Text>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={[styles.txt, {}]}>
+                          start time :{' '}
+                          {new Date(item?.training_time).toLocaleTimeString(
+                            [],
+                            {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            },
+                          )}
+                        </Text>
+                      </View>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={[styles.txt, {}]}>
+                          end time :{' '}
+                          {new Date(item?.training_duration).toLocaleTimeString(
+                            [],
+                            {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            },
+                          )}
+                        </Text>
+                      </View>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Image
+                          source={require('../../../assets/Cropping/pin.png')}
+                          style={{height: 12, width: 12}}
+                        />
+                        <Text style={[styles.txt, {marginLeft: 5}]}>
+                          {item?.training_location}
+                        </Text>
+                      </View>
+                      {item?.user_id != user_data?.id && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            errorToast('coming soon');
+                          }}
+                          style={{
+                            backgroundColor: '#7cc2a2',
+
+                            marginTop: 30,
+                            borderRadius: 30,
+                            height: 30,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              color: '#fff',
+                              fontWeight: '700',
+                            }}>
+                            Join
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    <View>
+                      <Text
+                        style={[
+                          styles.txt,
+                          {alignSelf: 'flex-end', fontSize: 10},
+                        ]}>
+                        {item?.training_type}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+            />
+          )}
+        </View>
+      )}
+
+      {Traininglist.length == 0 && (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text>No training found</Text>
+        </View>
+      )}
       <TrainingModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
+      <DeleteTraining
+        visible={DotmodalVisible}
+        onClose={() => {
+          after_delete();
+          setDotModalVisible(false);
+        }}
+        data={DotMdata}
+      />
+    
     </View>
   );
 }
@@ -221,8 +443,7 @@ const styles = StyleSheet.create({
   },
   Event: {
     justifyContent: 'space-between',
-    height: hp(12),
-    backgroundColor: '#DDFBE8',
+
     marginTop: 20,
     marginHorizontal: 10,
     width: wp(90),
@@ -247,7 +468,7 @@ const styles = StyleSheet.create({
   },
   colorDiv: {
     backgroundColor: '#874be9',
-    height: hp(12),
+    height: hp(10),
     borderBottomRightRadius: 50,
     borderBottomLeftRadius: 50,
   },

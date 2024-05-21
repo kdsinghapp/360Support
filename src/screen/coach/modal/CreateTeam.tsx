@@ -118,51 +118,19 @@
                     />
                   </View>
                 </View>
-                <View style={{marginTop: 20, marginHorizontal: 10}}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: '#000',
-                      fontWeight: '500',
-                    }}>
-                    Select Category
-                  </Text>
+               
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>Description</Text>
+                  <View style={styles.inputWrapper}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="enter description"
+                      value={name}
+                      onChangeText={txt => setName(txt)}
+                    />
+                  </View>
                 </View>
-                <View
-                  onPress={() => {}}
-                  style={[
-                    styles.shadow,
-                    {
-                      backgroundColor: '#FFF',
-                      height: 55,
-                      marginVertical: 6,
-                      width: '95%',
-    
-                      borderRadius: 10,
-                      alignItems: 'center',
-                      paddingHorizontal: 10,
-                      flexDirection: 'row',
-                      alignSelf: 'center',
-                      marginHorizontal: 15,
-                    },
-                  ]}>
-                  <Dropdown
-                    data={DropData}
-                    placeholder="Select Match"
-                    style={{width: '100%'}}
-                    maxHeight={200}
-                    labelField="name"
-                    itemContainerStyle={{marginTop: 10}}
-                    containerStyle={{marginTop: 30, borderRadius: 10}}
-                    showsVerticalScrollIndicator={false}
-                    valueField="name"
-                    onChange={item => {
-                      setValue(item.name);
-                      setIsFocus(false);
-                    }}
-                  />
-                </View>
-            
+               
              
              
     

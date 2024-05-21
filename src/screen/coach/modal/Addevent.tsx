@@ -32,10 +32,7 @@ const EventModal = ({ visible, onClose, data }) => {
   const user_data = useSelector(state => state.auth.userData);
   const [name, setName] = useState('');
   const [Location, setLocation] = useState('');
-  const [eventType, setEventType] = useState('');
   const [description, setDiscription] = useState('');
-  const [value, setValue] = useState<string | null>(null);
-  const [isFocus, setIsFocus] = useState(false);
   // Function to format time
   const formatTime = () => {
     return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

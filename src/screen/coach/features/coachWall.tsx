@@ -35,6 +35,7 @@ export default function CoachWall() {
   );
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [Posttype,setPosttype] = useState('user')
   const [DotmodalVisible, setDotModalVisible] = useState(false);
   const [DotMdata, setDotMdata] = useState('');
   const user_data = useSelector(state => state.auth.userData);
@@ -109,7 +110,7 @@ export default function CoachWall() {
         </View>
         <View style={styles.postContent}>
           <Image
-            source={{ uri: item.user_details?.img }}
+            source={{ uri: item.user_details?.image }}
             style={styles.profileImage}
           />
           <View style={styles.postDetails}>
@@ -183,6 +184,7 @@ export default function CoachWall() {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
+      type:Posttype
     };
     await dispatch(get_post(params));
   };
@@ -223,6 +225,48 @@ export default function CoachWall() {
             />
           </TouchableOpacity>
         </View>
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          marginTop: 20,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            setPosttype('user');
+            get_Post('user');
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            borderWidth: Posttype == 'user' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: Posttype == 'user' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            My Post
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setPosttype('all');
+            //get_eventList('all');
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            marginLeft: 20,
+            borderWidth: Posttype == 'all' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: Posttype == 'all' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            All Post
+          </Text>
+        </TouchableOpacity>
       </View>
       {get_PostList != null && (
         <View style={styles.content}>

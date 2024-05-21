@@ -28,15 +28,16 @@ import {errorToast} from '../../../configs/customToast';
 const AddMatchResult = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
-  const [selectedCalendar, setSelectedCalendar] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
+
   const [time, setTime] = useState(new Date());
-  const [Timeopen, setTimeOpen] = useState(false);
+
   const user_data = useSelector(state => state.auth.userData);
-  const [name, setName] = useState('');
-  const [Location, setLocation] = useState('');
-  const [eventType, setEventType] = useState('');
+
+  const [SScore, setSScore] = useState('');
+  const [FScore, setFScore] = useState('');
+  const [moreDetails,setMoreDetails] =useState('')
+const [Fname,setFname] =useState('')
+const [Sname,setSname] =useState('')
   const [description, setDiscription] = useState('');
   const [value, setValue] = useState<string | null>(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -69,7 +70,7 @@ const AddMatchResult = ({visible, onClose, data}) => {
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
-      
+        <ScrollView showsVerticalScrollIndicator={false}>
           <Animated.View
             style={[
               styles.modal,
@@ -106,119 +107,154 @@ const AddMatchResult = ({visible, onClose, data}) => {
               </TouchableOpacity>
             </View>
             <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={{marginTop: 20, marginHorizontal: 10}}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: '#000',
-                  fontWeight: '500',
-                }}>
-                Select Match
-              </Text>
-            </View>
-            <View
-              onPress={() => {}}
-              style={[
-                styles.shadow,
-                {
-                  backgroundColor: '#FFF',
-                  height: 55,
-                  marginVertical: 6,
-                  width: '95%',
+              <View style={{marginTop: 20, marginHorizontal: 10}}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: '#000',
+                    fontWeight: '500',
+                  }}>
+                  Select Match
+                </Text>
+              </View>
+              <View
+                onPress={() => {}}
+                style={[
+                  styles.shadow,
+                  {
+                    backgroundColor: '#FFF',
+                    height: 55,
+                    marginVertical: 6,
+                    width: '95%',
 
-                  borderRadius: 10,
-                  alignItems: 'center',
-                  paddingHorizontal: 10,
-                  flexDirection: 'row',
-                  alignSelf: 'center',
-                  marginHorizontal: 15,
-                },
-              ]}>
-              <Dropdown
-                data={DropData}
-                placeholder="Select Match"
-                style={{width: '100%'}}
-                maxHeight={200}
-                labelField="name"
-                itemContainerStyle={{marginTop: 10}}
-                containerStyle={{marginTop: 30, borderRadius: 10}}
-                showsVerticalScrollIndicator={false}
-                valueField="name"
-                onChange={item => {
-                  setValue(item.name);
-                  setIsFocus(false);
-                }}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Team 1 name</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="enter name"
-                  value={name}
-                  onChangeText={txt => setName(txt)}
+                    borderRadius: 10,
+                    alignItems: 'center',
+                    paddingHorizontal: 10,
+                    flexDirection: 'row',
+                    alignSelf: 'center',
+                    marginHorizontal: 15,
+                  },
+                ]}>
+                <Dropdown
+                  data={btnData}
+                  placeholder="Select Match"
+                  style={{width: '100%'}}
+                  maxHeight={200}
+                  labelField="name"
+                  itemContainerStyle={{marginTop: 10}}
+                  containerStyle={{marginTop: 30, borderRadius: 10}}
+                  showsVerticalScrollIndicator={false}
+                  valueField="name"
+                  value={value}
+                  onChange={item => {
+                    setValue(item.name);
+                    setIsFocus(false);
+                    setFname('F16')
+                    setSname('F18')
+                  }}
                 />
               </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Team 2 name</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="enter name"
-                  value={name}
-                  onChangeText={txt => setName(txt)}
-                />
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>First team name</Text>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    {justifyContent: 'center', paddingHorizontal: 20},
+                  ]}>
+                  <Text style={[styles.label, {color: '#777777'}]}>{Fname}</Text>
+                </View>
               </View>
-            </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>First team score</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    value={FScore}
+                    onChangeText={txt => setFScore(txt)}
+                    style={styles.input}
+                    placeholder="enter score"
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Second team name</Text>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    {justifyContent: 'center', paddingHorizontal: 20},
+                  ]}>
+                  <Text style={[styles.label, {color: '#777777'}]}>{Sname}</Text>
+                </View>
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Team 1 score</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  value={Location}
-                  onChangeText={txt => setLocation(txt)}
-                  style={styles.input}
-                  placeholder="enter score"
-                />
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Second team score</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    value={SScore}
+                    onChangeText={txt => setSScore(txt)}
+                    style={styles.input}
+                    placeholder="enter score"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Team 2 score</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  value={Location}
-                  onChangeText={txt => setLocation(txt)}
-                  style={styles.input}
-                  placeholder="enter score"
-                />
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Winner Team name</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  value={description}
-                  onChangeText={txt => setDiscription(txt)}
-                  style={styles.input}
-                  placeholder="enter name"
-                />
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Match Details</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  value={description}
-                  onChangeText={txt => setDiscription(txt)}
-                  style={styles.input}
-                  placeholder="enter details"
-                />
-              </View>
-            </View>
 
-            <View  style={{height:hp(5)}} />
+              <View style={{marginTop: 20, marginHorizontal: 10}}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: '#000',
+                    fontWeight: '500',
+                  }}>
+                  Select Winner Team
+                </Text>
+              </View>
+              <View
+                onPress={() => {}}
+                style={[
+                  styles.shadow,
+                  {
+                    backgroundColor: '#FFF',
+                    height: 55,
+                    marginVertical: 6,
+                    width: '95%',
+
+                    borderRadius: 10,
+                    alignItems: 'center',
+                    paddingHorizontal: 10,
+                    flexDirection: 'row',
+                    alignSelf: 'center',
+                    marginHorizontal: 15,
+                  },
+                ]}>
+                <Dropdown
+                  data={DropData}
+                  placeholder="select winer team"
+                  style={{width: '100%'}}
+                  maxHeight={200}
+                  labelField="name"
+                  itemContainerStyle={{marginTop: 10}}
+                  containerStyle={{marginTop: 30, borderRadius: 10}}
+                  showsVerticalScrollIndicator={false}
+                  valueField="name"
+                  onChange={item => {
+                    setValue(item.name);
+                    setIsFocus(false);
+                  }}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Match Details</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    value={moreDetails}
+                    onChangeText={txt => setMoreDetails(txt)}
+                    style={styles.input}
+                    placeholder="enter details"
+                  />
+                </View>
+              </View>
+
+              <View style={{height: hp(5)}} />
             </ScrollView>
             <TouchableOpacity
               onPress={() => {
@@ -245,10 +281,8 @@ const AddMatchResult = ({visible, onClose, data}) => {
                 Add Result
               </Text>
             </TouchableOpacity>
-
-          
           </Animated.View>
-   
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -256,17 +290,9 @@ const AddMatchResult = ({visible, onClose, data}) => {
 
 const btnData = [
   {
-    name: 'Team training',
+    name: 'F16 vs 18',
   },
-  {
-    name: 'Individual training',
-  },
-  {
-    name: 'Match',
-  },
-  {
-    name: 'Other activity',
-  },
+ 
 ];
 
 const styles = StyleSheet.create({
@@ -327,17 +353,12 @@ const styles = StyleSheet.create({
 });
 const DropData = [
   {
-    name: 'Team training',
+    name: 'F16',
   },
   {
-    name: 'Individual training',
+    name: 'F18',
   },
-  {
-    name: 'Match',
-  },
-  {
-    name: 'Other activity',
-  },
+  
 ];
 
 export default AddMatchResult;
