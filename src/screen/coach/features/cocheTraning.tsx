@@ -237,8 +237,8 @@ export default function CocheTraining() {
                   style={{height:45,width:45,borderRadius:22.5}}
                   />
                   <View style={{marginLeft:5}}>
-                    <Text style={{fontSize:14,color:"#000",fontWeight:'600'}}>{item.user_details.first_name} {item.user_details.last_name}</Text>
-                    <Text style={{fontSize:14,color:"#777777",fontWeight:'600'}}>{item.user_details.type}</Text>
+                    <Text style={{fontSize:12,color:"#000",fontWeight:'600'}}>{item.user_details.first_name} {item.user_details.last_name}</Text>
+                    <Text style={{fontSize:11,color:"#777777",fontWeight:'600'}}>{item.user_details.type}</Text>
                     </View>
                     <TouchableOpacity
                       onPress={() => {
@@ -297,7 +297,7 @@ export default function CocheTraining() {
                         style={[
                           styles.txt,
                           {
-                            fontSize: 22,
+                            fontSize:18,
                             fontWeight: '700',
                             lineHeight: 33,
                           },
@@ -324,10 +324,10 @@ export default function CocheTraining() {
                             lineHeight: 24,
                           },
                         ]}>
-                        {item?.name}
+                        {item?.name.substring(0,20)}
                       </Text>
                       <Text style={[styles.txt, {fontSize: 10}]}>
-                        {item?.training_description}
+                        {item?.training_description.substring(0,20)}
                       </Text>
                       <Text style={styles.txt}>
                         {get_DayName(
@@ -367,7 +367,7 @@ export default function CocheTraining() {
                           style={{height: 12, width: 12}}
                         />
                         <Text style={[styles.txt, {marginLeft: 5}]}>
-                          {item?.training_location}
+                          {item?.training_location.substring(0,20)}
                         </Text>
                       </View>
                       {item?.user_id != user_data?.id && (

@@ -22,21 +22,21 @@ import {
   get_registration_form,
 } from '../../../redux/feature/featuresSlice';
 import {errorToast} from '../../../configs/customToast';
+import RegistrationForm from '../modal/RegistrationForm';
+import BottomToTopModal from '../../Modal/Modal';
 
 export default function CochRegistration() {
   const [RegistrationType, setRegistrationType] = useState('Open');
   const RegistraionList = useSelector(state => state.feature.Registration_list);
   const submissionsList = useSelector(state => state.feature.registration_form);
   const navigation = useNavigation();
-  const [modalVisible, setModalVisible] = useState(false);
+
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const user_data = useSelector(state => state.auth.userData);
+const [registerId,setregisterId]=useState('')
 
-
-console.log('====================================');
-console.log(submissionsList != [] || RegistraionList != []);
-console.log('====================================');
+const [ModalVisible,setModalVisible]= useState(false)
 
   useEffect(() => {
     get_Registration();
@@ -150,7 +150,10 @@ console.log('====================================');
                   </View>
 
                   <TouchableOpacity
-                    onPress={() => errorToast('coming soon')}
+                    onPress={() => {
+                      setModalVisible(true)
+                      setregisterId(item)
+                    }}
                     style={styles.registerButton}>
                     <Text style={styles.registerButtonText}>Register</Text>
                   </TouchableOpacity>
@@ -165,6 +168,12 @@ console.log('====================================');
               <Text>No Form found</Text>
             </View>
           )}
+<BottomToTopModal
+                  visible={ModalVisible}
+                  data={registerId}
+                  onClose={() => setModalVisible(false)}
+                />
+
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import {
   Modal,
   View,
@@ -13,10 +13,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import RegistrationForm from '../coach/modal/RegistrationForm';
 const BottomToTopModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
-
+  const [RegistrationModal, setRegistrationModal] = useState(false);
   useEffect(() => {
     if (visible) {
       openModal();
@@ -80,7 +81,7 @@ const BottomToTopModal = ({visible, onClose, data}) => {
                 color: '#000',
                 fontWeight: '800',
               }}>
-              {data.titile}
+              {data.name}
             </Text>
             <Text
               style={{
@@ -92,7 +93,7 @@ const BottomToTopModal = ({visible, onClose, data}) => {
             </Text>
           </View>
           <TouchableOpacity
-                onPress={() =>{} }
+                onPress={() =>{ setRegistrationModal(true)} }
                 style={{
                 backgroundColor:'#294247',
                 height:55,
@@ -110,6 +111,15 @@ const BottomToTopModal = ({visible, onClose, data}) => {
                     fontWeight:'700',color:'#FFF'
                   }}>Register</Text>
                 </TouchableOpacity>
+
+                <RegistrationForm
+        visible={RegistrationModal}
+        onClose={() => {
+      onClose()
+          setRegistrationModal(false);
+        }}
+     data={data}
+      />
         </Animated.View>
       </TouchableOpacity>
     </Modal>

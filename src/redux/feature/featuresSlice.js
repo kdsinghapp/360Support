@@ -15,7 +15,7 @@ const initialState = {
   Training_list: [],
   Registration_list: [],
   event_details: null,
-  registration_form:[]
+  registration_form: [],
 };
 
 export const get_post = createAsyncThunk(
@@ -110,12 +110,16 @@ export const delete_training = createAsyncThunk(
   'delete_training',
   async (params, thunkApi) => {
     try {
-      const response = await API.get(`/delete_training?training_id=${params.training_id}`);
- 
-     console.log('==============params.post_id======================',params.training_id);
+      const response = await API.get(
+        `/delete_training?training_id=${params.training_id}`,
+      );
+
+      console.log(
+        '==============params.post_id======================',
+        params.training_id,
+      );
       if (response.data.status == '1') {
         successToast('Training Deleted Successfully');
-      
       }
       return response.data.result;
     } catch (error) {
@@ -128,7 +132,6 @@ export const delete_training = createAsyncThunk(
 export const delete_video = createAsyncThunk(
   'delete_video',
   async (params, thunkApi) => {
-
     console.log('================params.video_id====================');
     console.log(params.video_id);
 
@@ -136,7 +139,7 @@ export const delete_video = createAsyncThunk(
       const response = await API.get(
         `/delete_video?video_id=${params.video_id}`,
       );
-      console.log('====================================',response.data.status);
+      console.log('====================================', response.data.status);
       if (response.data.status == '1') {
         successToast('Video Deleted Successfully');
       }
@@ -233,6 +236,66 @@ export const add_training = createAsyncThunk(
       return response.data.result;
     } catch (error) {
       console.log('🚀 ~ file: add_training .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const add_Registration_form = createAsyncThunk(
+  'add_Registration_form',
+  async (params, thunkApi) => {
+    try {
+console.log('==============add_Registration_form========params==============');
+console.log(params);
+console.log('====================================');
+
+      const formData = new FormData();
+
+      formData.append('user_id', params.user_id);
+      formData.append(
+        'registration_category_id',
+        params.registration_category_id,
+      );
+      formData.append('first_name', params.firstName);
+      formData.append('last_name', params.lastName);
+      formData.append('identity_card', params.identityCardNumber);
+      formData.append('gender', params.gender);
+      formData.append('address', params.address);
+      formData.append('city', params.city);
+      formData.append('postal_code', params.postalCode);
+      formData.append('mobile', params.mobile);
+      formData.append('"dob"', params.dob);
+      formData.append('school', params.school);
+      formData.append('authorize', params.authorize);
+      formData.append(
+        'health_Insurance_card_number',
+        params.healthInsuranceCardNumber,
+      );
+      formData.append('bank_account_number', params.bankAccountNumber);
+      formData.append('legal_guardian_id', params.legalGuardianId);
+      formData.append('legal_guardian_mobile', params.legalGuardianMobile);
+      formData.append('legal_guardian_email', params.legalGuardianEmail);
+      formData.append('group_code', params.group_code);
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      };
+
+      const response = await API.post(
+        '/add_registration_form',
+        formData,
+        config,
+      );
+
+      if (response.data.status == '1') {
+        successToast('Your Registration Request Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: add_Registration_form .js:16 ~  ~ error:', error);
 
       return thunkApi.rejectWithValue(error);
     }
@@ -611,6 +674,20 @@ const FeatureSlice = createSlice({
       state.registration_form = action.payload;
     });
     builder.addCase(get_registration_form.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(add_Registration_form.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(add_Registration_form.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      //state.registration_form = action.payload;
+    });
+    builder.addCase(add_Registration_form.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

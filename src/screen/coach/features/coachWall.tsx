@@ -114,25 +114,25 @@ export default function CoachWall() {
             style={styles.profileImage}
           />
           <View style={styles.postDetails}>
-            <Text style={styles.postTitle}>
+            <Text style={[styles.postTitle,{fontSize:13}]}>
               {item.user_details?.first_name} {item.user_details?.last_name}
             </Text>
-            <Text style={styles.postDateTime}>time: {item.date_time}</Text>
+            <Text style={[styles.postDateTime,{fontSize:11}]}>time: {item.date_time}</Text>
           </View>
         </View>
         <Text
           style={[
             styles.postDetails,
-            { fontWeight: '600', color: '#000', marginTop: 10, height: 20 },
+            { fontWeight: '600', color: '#000', marginTop: 10, height: 20,fontSize:12 },
           ]}>
-          {item.title}
+          {item.title.substring(0,30)}
         </Text>
         <Text
           style={[
             styles.postDetails,
-            { marginTop: 0, color: '#777777', height: 20 },
+            { marginTop: 0, color: '#777777', height: 20,fontSize:11 },
           ]}>
-          {item.description}
+          {item.description.substring(0,30)}
         </Text>
         <Image
           source={{ uri: item.image }}
