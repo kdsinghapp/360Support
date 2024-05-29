@@ -60,16 +60,18 @@ export default function CocheTraining() {
   const [TrainingTyep, setTrainingTyep] = useState('all');
   const [DotmodalVisible, setDotModalVisible] = useState(false);
   const [DotMdata, setDotMdata] = useState('');
+  
   const get_monthName = (dateStr: string): string => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
     const month = parseInt(dateParts[0]) - 1; // Month is zero-based
     const day = parseInt(dateParts[1]);
-
+  
     const dateObject = new Date(year, month, day);
-    const monthName = dateObject.toLocaleString('default', {month: 'long'});
+    const monthName = dateObject.toLocaleString('default', {month: 'long'}).substring(0, 3); // Extract first three letters
     return monthName;
   };
+  
 
   const get_DayName = (dateStr: string): string => {
     const dateParts = dateStr.split('/');
@@ -237,8 +239,8 @@ export default function CocheTraining() {
                   style={{height:45,width:45,borderRadius:22.5}}
                   />
                   <View style={{marginLeft:5}}>
-                    <Text style={{fontSize:12,color:"#000",fontWeight:'600'}}>{item.user_details.first_name} {item.user_details.last_name}</Text>
-                    <Text style={{fontSize:11,color:"#777777",fontWeight:'600'}}>{item.user_details.type}</Text>
+                    <Text style={{fontSize:12,color:"#000",fontWeight:'600'}}>{item.user_details.first_name.substring(0,7)} {item.user_details.last_name.substring(0,7)}</Text>
+                    <Text style={{fontSize:11,color:"#777777",fontWeight:'600'}}>{item.user_details.type.substring(0,10)}</Text>
                     </View>
                     <TouchableOpacity
                       onPress={() => {
@@ -304,7 +306,7 @@ export default function CocheTraining() {
                         ]}>
                         {item?.training_date != null &&
                           get_dayDate(
-                            new Date(item?.training_date).toLocaleDateString(),
+                            new Date(item?.training_date).toLocaleDateString()
                           )}
                       </Text>
                       <Text style={styles.txt}>

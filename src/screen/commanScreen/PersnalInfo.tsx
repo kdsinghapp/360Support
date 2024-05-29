@@ -19,7 +19,7 @@ import {
   get_profile,
   update_parent_profile,
 } from '../../redux/feature/authSlice';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
 import BackBtn from '../../assets/svg/BackBtn.svg';
 import PickPhoto from '../../assets/svg/PickPhoto.svg';
@@ -32,9 +32,17 @@ import Loading from '../../configs/Loader';
 
 export default function PersnalInfo() {
     const navigation = useNavigation()
+    const GroupDetails = useSelector(state => state.auth.Group_Details);
+    const isLoading: GroupDetails | undefined = useSelector((state: any) => state.auth.isLoading);
+    const routes = useRoute()
+    const {item} = routes.params
+const dispatch = useDispatch();
+
+
+
   return (
     <View style={styles.container}>
-      {/* {isLoading ? <Loading /> : null} */}
+      {isLoading ? <Loading /> : null}
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
@@ -70,7 +78,7 @@ export default function PersnalInfo() {
                   justifyContent: 'center',
                 }}>
                 <Image
-                  source={require('../../assets/Cropping/img2.png')}
+                  source={{uri:item.image}}
                   style={{height: 80, width: 80, borderRadius: 40}}
                 />
               </TouchableOpacity>
@@ -82,7 +90,7 @@ export default function PersnalInfo() {
                 color: '#ffff',
                 marginTop: 10,
               }}>
-              Andy johnson
+            {item.first_name} {item.last_name}
             </Text>
           </View>
 
@@ -94,7 +102,7 @@ export default function PersnalInfo() {
               alignSelf: 'center',
             }}>
             <Image
-              source={require('../../assets/Cropping/img2.png')}
+              source={{uri:GroupDetails?.image}}
               style={{height: 35, width: 35, borderRadius: 17.5}}
             />
             <View style={{}}>
@@ -105,7 +113,16 @@ export default function PersnalInfo() {
                   fontWeight: '500',
                   color: '#FFF',
                 }}>
-                Hawaks
+             {GroupDetails?.group_name}
+              </Text>
+              <Text
+                style={{
+                  marginLeft: 10,
+                  fontSize: 14,
+                  fontWeight: '500',
+                  color: '#FFF',
+                }}>
+             {GroupDetails?.details}
               </Text>
             </View>
           </View>
@@ -145,7 +162,22 @@ export default function PersnalInfo() {
                   fontWeight: '400',
                   marginTop: 10,
                 }}>
-                Name
+                {item.first_name} {item.last_name}
+              </Text>
+            </View>
+            <View style={[styles.inputContainer, {marginTop: 20}]}>
+              <Text
+                style={[styles.inputLabel, {fontWeight: '500', fontSize: 16}]}>
+                Post
+              </Text>
+              <Text
+                style={{
+                  color: '#777777',
+                  fontSize: 14,
+                  fontWeight: '400',
+                  marginTop: 10,
+                }}>
+                {item.type}
               </Text>
             </View>
             <View style={[styles.inputContainer, {marginTop: 0}]}>
@@ -157,7 +189,7 @@ export default function PersnalInfo() {
                   fontWeight: '400',
                   marginTop: 10,
                 }}>
-                Name
+              {item.gender}
               </Text>
             </View>
 
@@ -178,7 +210,7 @@ export default function PersnalInfo() {
                   fontWeight: '400',
                   marginTop: 10,
                 }}>
-                Name
+               {item.email}
               </Text>
             </View>
             <View

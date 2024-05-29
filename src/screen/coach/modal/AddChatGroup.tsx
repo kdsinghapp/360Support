@@ -18,17 +18,51 @@ import {
 } from 'react-native-responsive-screen';
 import Close from '../../../assets/svg/Close.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { add_event } from '../../../redux/feature/featuresSlice';
+import { create_chat_group, get_club_users } from '../../../redux/feature/featuresSlice';
+import { useIsFocused } from '@react-navigation/native';
+import Loading from '../../../configs/Loader';
+import { errorToast } from '../../../configs/customToast';
 
-const AddChatGroup = ({ visible, onClose, data }) => {
+const AddChatGroup = ({ visible, onClose }) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
-  const user_data = useSelector(state => state.auth.userData);
   const [name, setName] = useState('');
-  const [selectedIndices, setSelectedIndices] = useState([]);
+  const [selectedParentIndices, setSelectedParentIndices] = useState([]);
+  const [selectedPlayerIndices, setSelectedPlayerIndices] = useState([]);
+  const [selectedCoachIndices, setSelectedCoachIndices] = useState([]);
+  const [selectedTab, setSelectedTab] = useState('Parent');
+  const user = useSelector(state => state.auth.userData);
+  const isLoading = useSelector(state => state.feature.isLoading);
+  const isFocused = useIsFocused();
+  const ClubMember = useSelector(state => state.feature.clubUsers);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (user && isFocused) {
+      const params = {
+        group_code: user?.group_code,
+      };
+      dispatch(get_club_users(params));
+    }
+  }, [user, isFocused]);
 
   const toggleSelection = index => {
-    setSelectedIndices(prevSelectedIndices =>
+    let updateFunction;
+    let selectedIndices;
+
+    if (selectedTab === 'Parent') {
+      updateFunction = setSelectedParentIndices;
+      selectedIndices = selectedParentIndices;
+    } else if (selectedTab === 'Player') {
+      updateFunction = setSelectedPlayerIndices;
+      selectedIndices = selectedPlayerIndices;
+    } else if (selectedTab === 'Coach') {
+      updateFunction = setSelectedCoachIndices;
+      selectedIndices = selectedCoachIndices;
+    }
+
+    updateFunction(prevSelectedIndices =>
       prevSelectedIndices.includes(index)
         ? prevSelectedIndices.filter(selectedIndex => selectedIndex !== index)
         : [...prevSelectedIndices, index]
@@ -41,30 +75,42 @@ const AddChatGroup = ({ visible, onClose, data }) => {
       style={[
         styles.listItem,
         {
-          backgroundColor:  '#FFF',
+          backgroundColor: '#FFF',
         },
       ]}
     >
       <View>
-        <Image
-          source={item.img}
-          style={{ height: 50, width: 50, borderRadius: 25 }}
-        />
+        {item.image ? (
+          <Image
+            source={{ uri: item.image }}
+            style={{ height: 50, width: 50, borderRadius: 25 }}
+          />
+        ) : (
+          <Text>{item.first_name[0]} {item.last_name[0]}</Text>
+        )}
       </View>
       <View style={{ width: '65%' }}>
-        <Text style={styles.listItemText}>{item.name}</Text>
+        <Text style={styles.listItemText}>{item.first_name} {item.last_name}</Text>
+        <Text style={styles.listItemText}>{item.email}</Text>
       </View>
       <View
         style={[
           styles.selectionIndicator,
           {
-            borderColor: selectedIndices.includes(index) ? '#549be3' : '#a3a3a3',
+            borderColor: 
+              selectedTab === 'Parent' && selectedParentIndices.includes(index) ||
+              selectedTab === 'Player' && selectedPlayerIndices.includes(index) ||
+              selectedTab === 'Coach' && selectedCoachIndices.includes(index)
+                ? '#549be3'
+                : '#a3a3a3',
           },
         ]}
       >
-        {selectedIndices.includes(index) && (
+        {selectedTab === 'Parent' && selectedParentIndices.includes(index) ||
+        selectedTab === 'Player' && selectedPlayerIndices.includes(index) ||
+        selectedTab === 'Coach' && selectedCoachIndices.includes(index) ? (
           <View style={styles.selectedCircle} />
-        )}
+        ) : null}
       </View>
     </TouchableOpacity>
   );
@@ -93,11 +139,46 @@ const AddChatGroup = ({ visible, onClose, data }) => {
     }).start();
   };
 
-  const dispatch = useDispatch();
+  const sections = {
+    Parent: ClubMember.filter(member => member.type?.toLowerCase() === 'parent'),
+    Player: ClubMember.filter(member => member.type?.toLowerCase() === 'player'),
+    Coach: ClubMember.filter(member => member.type?.toLowerCase() === 'coach'),
+  };
+
+  const tabs = ['Parent', 'Player', 'Coach'];
+
+  const handleSubmit = () => {
+    const selectedMembers = [
+      ...selectedParentIndices.map(index => ClubMember[index]),
+      ...selectedPlayerIndices.map(index => ClubMember[index]),
+      ...selectedCoachIndices.map(index => ClubMember[index]),
+    ];
+
+  
+
+    console.log('===============selectedMembers=====================');
+    console.log(selectedMembers);
+
+   const params ={
+    selectedMembers:selectedMembers,
+    user_id:user?.id,
+    name:name,
+    group_code:user?.group_code
+
+
+   }
+  
+     dispatch(create_chat_group(params))
+      onClose()
+      setSelectedParentIndices([]);
+      setSelectedPlayerIndices([]);
+      setSelectedCoachIndices([]);
+  };
 
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Animated.View
           style={[
             styles.modal,
@@ -106,13 +187,15 @@ const AddChatGroup = ({ visible, onClose, data }) => {
             },
           ]}
         >
+ 
+          {isLoading ? <Loading /> : null}
           <View style={styles.header}>
             <Text style={styles.headerText}>Create chat group</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Close />
             </TouchableOpacity>
           </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
+       
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Group Name</Text>
               <View style={styles.inputWrapper}>
@@ -124,47 +207,57 @@ const AddChatGroup = ({ visible, onClose, data }) => {
                 />
               </View>
             </View>
+           
+            <View style={styles.tabContainer}>
+              <FlatList
+                data={tabs}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.tab,
+                      item === selectedTab && styles.selectedTab,
+                    ]}
+                    onPress={() => setSelectedTab(item)}
+                  >
+                    <Text
+                      style={[
+                        styles.tabText,
+                        item === selectedTab && styles.selectedTabText,
+                      ]}
+                    >
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={item => item}
+              />
+            </View>
+           
             <View style={styles.listContainer}>
               <FlatList
-                data={ListMember}
+                data={sections[selectedTab]}
                 renderItem={RecentListItem}
                 keyExtractor={item => item.id}
                 ListFooterComponent={<View style={{ height: hp(2) }} />}
-                ListHeaderComponent={
-                  <View style={styles.listHeader}>
-                    <Text style={styles.listHeaderText}>Player</Text>
-                  </View>
-                }
               />
             </View>
-            <View style={styles.listContainer}>
-              <FlatList
-                data={ListMember}
-                renderItem={RecentListItem}
-                keyExtractor={item => item.id}
-                ListFooterComponent={<View style={{ height: hp(2) }} />}
-                ListHeaderComponent={
-                  <View style={styles.listHeader}>
-                    <Text style={styles.listHeaderText}>Coach</Text>
-                  </View>
-                }
-              />
-            </View>
-            <View style={styles.listContainer}>
-              <FlatList
-                data={ListMember}
-                renderItem={RecentListItem}
-                keyExtractor={item => item.id}
-                ListFooterComponent={<View style={{ height: hp(2) }} />}
-                ListHeaderComponent={
-                  <View style={styles.listHeader}>
-                    <Text style={styles.listHeaderText}>Parent</Text>
-                  </View>
-                }
-              />
-            </View>
-          </ScrollView>
+  
+            <TouchableOpacity style={styles.submitButton} 
+            
+            // onPress={()=>{
+            //   errorToast('Coming soon')
+            // }}
+          onPress={handleSubmit}
+            
+            
+            >
+              <Text style={styles.submitButtonText}>Create Group</Text>
+            </TouchableOpacity>
+           
         </Animated.View>
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -182,7 +275,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: hp(15),
-    minHeight: hp(85),
+    height: hp(85),
     elevation: 5,
   },
   header: {
@@ -227,6 +320,28 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
   },
+  tabContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 15,
+    marginTop: 20,
+  },
+  tab: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  selectedTab: {
+    backgroundColor: '#549be3',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  selectedTabText: {
+    color: '#FFF',
+  },
   listContainer: {
     backgroundColor: '#FFF',
     marginTop: 10,
@@ -262,33 +377,24 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     backgroundColor: '#549be3',
   },
-  listHeader: {
-    paddingHorizontal: 15,
+  submitButton: {
+    backgroundColor: '#549be3',
+    marginHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom:10,
+    height: 50,
+    marginTop: 20,
+    width:'100%',
+    alignSelf:'center'
   },
-  listHeaderText: {
+  submitButtonText: {
+    color: '#FFF',
     fontSize: 18,
-    color: '#000',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
 
 export default AddChatGroup;
-
-const ListMember = [
-  {
-    id: '1',
-    name: 'Jenny Wilson',
-    time: '08.00pm',
-    img: require('../../../assets/Cropping/img1.png'),
-    status: 'Typing...',
-    count: '2',
-  },
-  {
-    id: '2',
-    name: 'Emerson',
-    time: '08.00pm',
-    img: require('../../../assets/Cropping/img2.png'),
-    status: 'Have you spoken to the delivery...',
-    count: '2',
-  },
-];

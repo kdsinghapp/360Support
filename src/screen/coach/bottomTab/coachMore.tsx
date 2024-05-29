@@ -302,7 +302,7 @@ const data2 = [
     titile: 'Account settings',
 
     logo: require('../../../assets/Cropping/user-octagon.png'),
-    screen: ScreenNameEnum.MY_CHILDREN,
+    screen: ScreenNameEnum.coachAccountSetting,
   },
   // {
   //   id: '4',

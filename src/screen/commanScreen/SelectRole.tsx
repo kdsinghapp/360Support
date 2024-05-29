@@ -19,6 +19,7 @@ import GoBack from '../../assets/svg/GoBack.svg';
 import PickPhoto from '../../assets/svg/PickPhoto.svg';
 import { useDispatch, useSelector } from 'react-redux';
 import {  Get_Country, updateSelectedRole } from '../../redux/feature/authSlice';
+import { errorToast } from '../../configs/customToast';
 type SelectDataItem = {
   titile: string;
   describe: string;
@@ -39,7 +40,7 @@ export default function SelectRole() {
       dispatch(updateSelectedRole(selectedRole));
       navigation.navigate(ScreenNameEnum.USER_DETAILS,);
     } else {
-      Alert.alert('Please', 'Select Role');
+      errorToast('Please Select Role');
     }
   };
 

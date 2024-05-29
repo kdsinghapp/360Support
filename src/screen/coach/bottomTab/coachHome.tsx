@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   Alert,
+  StatusBar,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
@@ -31,6 +32,7 @@ import Loading from '../../../configs/Loader';
 import {Get_Group, get_profile} from '../../../redux/feature/authSlice';
 import {
   get_event,
+  get_game_result,
   get_post,
   get_training,
   get_video,
@@ -44,6 +46,7 @@ export default function coachHome() {
   const navigation = useNavigation();
   const user_data = useSelector((state: RootState) => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const LastGameresult = useSelector((state: RootState) => state.feature.LastGameresult);
   const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
   const My_Profile = useSelector(
     (state: RootState) => state.auth.GetUserProfile,
@@ -80,6 +83,7 @@ export default function coachHome() {
     getGroupDetails();
     get_videoList('all');
     Get_Training('all');
+    LastGame_result()
   }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
 
   function getYouTubeVideoId(url: string): string | null {
@@ -177,6 +181,13 @@ export default function coachHome() {
     };
     await dispatch(get_training(params));
   };
+  const LastGame_result = async (type): Promise<void> => {
+   
+    const params = {  
+      Group_code: user_data?.group_code,    
+    };
+    await dispatch(get_game_result(params));
+  };
 
   const get_Post = async (): Promise<void> => {
     const params = {
@@ -221,10 +232,16 @@ export default function coachHome() {
     };
     await dispatch(get_video(params));
   };
+
+
+  console.log('===========LastGameresult=========================');
+  console.log(LastGameresult);
+  console.log('====================================');
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
       {isLoading ? <Loading /> : null}
       {isLoading2 ? <Loading /> : null}
+      <StatusBar barStyle="dark-content" backgroundColor="#874be9" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.Div1}>
@@ -430,7 +447,7 @@ export default function coachHome() {
                       lineHeight: 24,
                     },
                   ]}>
-                  {Event_List[Event_List?.length - 1]?.event_name.substring(
+                  {Event_List[Event_List?.length - 1]?.event_name?.substring(
                     0,
                     20,
                   )}
@@ -438,7 +455,7 @@ export default function coachHome() {
                 <Text style={[styles.txt, {fontSize: 10}]}>
                   {Event_List[
                     Event_List?.length - 1
-                  ]?.event_description.substring(0, 30)}
+                  ]?.event_description?.substring(0, 30)}
                 </Text>
                 <Text style={styles.txt}>
                   {get_DayName(
@@ -461,7 +478,7 @@ export default function coachHome() {
                   <Text style={[styles.txt, {marginLeft: 5}]}>
                     {Event_List[
                       Event_List?.length - 1
-                    ]?.event_location.substring(0, 15)}
+                    ]?.event_location?.substring(0, 15)}
                   </Text>
                 </View>
               </View>
@@ -972,11 +989,11 @@ export default function coachHome() {
             </Text>
           </TouchableOpacity>
         </View>
-        {Video_list.length > 0 && (
+        {LastGameresult.length > 0 && (
           <View style={[styles.shadow, styles.matchResultContainer]}>
             <View style={styles.header}>
               <Text style={styles.dateText}>
-                Wed May 22 2024 00:40:00 GMT+0530
+                {LastGameresult[LastGameresult?.length - 1]?.date_time}
               </Text>
             </View>
             <View style={styles.content}>
@@ -985,34 +1002,30 @@ export default function coachHome() {
                   source={require('../../../assets/Cropping/img1.png')}
                   style={styles.teamImage}
                 />
-                <Text style={styles.teamLabel}>F17</Text>
+                <Text style={styles.teamLabel}>{LastGameresult[LastGameresult?.length - 1]?.team_1_data?.team_name}</Text>
               </View>
               <View style={styles.scoreContainer}>
                 <View style={styles.scoreRow}>
-                  <Text style={styles.scoreText}>0</Text>
+                  <Text style={styles.scoreText}>{LastGameresult[LastGameresult?.length - 1].team_1_score}</Text>
                   <Text style={styles.dashText}>-</Text>
-                  <Text style={styles.scoreText}>0</Text>
+                  <Text style={styles.scoreText}>{LastGameresult[LastGameresult?.length - 1].team_2_score}</Text>
                 </View>
-                <View style={styles.subScoreRow}>
-                  <Text style={styles.subScoreText}>0</Text>
-                  <Text style={styles.dashText}>-</Text>
-                  <Text style={styles.subScoreText}>0</Text>
-                </View>
+               
               </View>
               <View style={styles.team}>
                 <Image
                   source={require('../../../assets/Cropping/img2.png')}
                   style={styles.teamImage}
                 />
-                <Text style={styles.teamLabel}>F16</Text>
+                <Text style={styles.teamLabel}>{LastGameresult[LastGameresult?.length - 1]?.team_2_data?.team_name}</Text>
               </View>
             </View>
             <View>
-              <Text style={styles.resultText}>F16 Win by 2-0</Text>
+              <Text style={styles.resultText}>{LastGameresult[LastGameresult?.length - 1]?.result}</Text>
             </View>
           </View>
         )}
-        {Video_list.length == 0 && (
+        {LastGameresult.length == 0 && (
           <Text
             style={{
               fontSize: 14,
@@ -1452,8 +1465,8 @@ const Create = [
     name: 'Add Match Video',
     logo: require('../../../assets/Cropping/video.png'),
   },
-  {
-    name: 'Add match result',
-    logo: require('../../../assets/Cropping/perform.png'),
-  },
+  // {
+  //   name: 'Add match result',
+  //   logo: require('../../../assets/Cropping/perform.png'),
+  // },
 ];

@@ -28,8 +28,10 @@ const UpdateEventModal = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
   const [time, setTime] = useState(new Date());
+  
+  const [open, setOpen] = useState(false);
+
   const [Timeopen, setTimeOpen] = useState(false);
   const user_data = useSelector(state => state.auth.userData);
   const [name, setName] = useState('');
@@ -81,16 +83,16 @@ const UpdateEventModal = ({visible, onClose, data}) => {
     if (name === '' && Location === '' && description === '')
       // Changed comparison operator
       return errorToast('Please Enter all fields');
-    const params = {
-      event_id: eventdetails?.id,
-      event_name: name,
-      event_location: Location,
-      event_description: description,
-      event_date: date.toString(),
-      event_time: date.toString(),
-      group_code: user_data?.group_code,
+      const params = {
+        event_id: eventdetails?.id,
+        event_name: name,
+        event_location: Location,
+        event_description: description,
+        event_date: date.toString(),
+        event_time: date.toString(), // Same value as event_date
+        group_code: user_data?.group_code,
+      };
       
-    };
     onClose();
     dispatch(update_event(params));
   };

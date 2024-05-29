@@ -16,6 +16,10 @@ const initialState = {
   Registration_list: [],
   event_details: null,
   registration_form: [],
+  clubUsers: [],
+  ChatGroupList:[],
+  LastGameresult:[],
+  teamList:[]
 };
 
 export const get_post = createAsyncThunk(
@@ -245,9 +249,11 @@ export const add_Registration_form = createAsyncThunk(
   'add_Registration_form',
   async (params, thunkApi) => {
     try {
-console.log('==============add_Registration_form========params==============');
-console.log(params);
-console.log('====================================');
+      console.log(
+        '==============add_Registration_form========params==============',
+      );
+      console.log(params);
+      console.log('====================================');
 
       const formData = new FormData();
 
@@ -431,6 +437,152 @@ export const get_training = createAsyncThunk(
     }
   },
 );
+export const get_club_users = createAsyncThunk(
+  'get_club_users',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('group_code', params.group_code);
+      const response = await API.post('/get_club_users', data, config);
+
+      if (response.data.status == '1') {
+        console.log('get get_club_users Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_club_users .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_chat_groups_by_code = createAsyncThunk(
+  'get_chat_groups_by_code',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('group_code', params.group_code);
+      const response = await API.post('/get_chat_groups_by_code', data, config);
+console.log('==============get_chat_groups_by_code======================');
+console.log(response.data);
+console.log('====================================');
+      if (response.data.status == '1') {
+        console.log('get get_chat_groups_by_code Successfully');
+       
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_chat_groups_by_code .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_game_result = createAsyncThunk(
+  'get_game_result',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('group_code', params.Group_code);
+      const response = await API.post('/get_game_result', data, config);
+console.log('==============get_game_result======================');
+console.log(response.data);
+console.log('====================================');
+      if (response.data.status == '1') {
+        console.log('get get_game_result Successfully');
+       
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_game_result .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_team_list = createAsyncThunk(
+  'get_team_list',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('group_code', params.Group_code);
+      const response = await API.post('/get_team_list', data, config);
+console.log('==============get_team_list======================');
+console.log(response.data);
+console.log('====================================');
+      if (response.data.status == '1') {
+        console.log('get get_team_list Successfully');
+       
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_team_list .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const create_chat_group = createAsyncThunk(
+  'create_chat_group',
+  async (params, thunkApi) => {
+    try {
+      let data = new FormData();
+      data.append('chat_group_name',params.name);
+      data.append('user_id', params.user_id);
+      data.append('group_code', params.group_code);
+     params.selectedMembers.forEach((member, index) => {
+       
+      data.append(`members[${index}]`, JSON.stringify(member));
+      })
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
+        },
+      };
+    console.log('===============create_chat_group=====================',data);
+  
+      
+      const response = await API.post('/create_chat_group',data, config);
+
+
+      console.log('================response====================');
+      console.log(response.data);
+      console.log('====================================');
+      if (response.data.result) {
+        successToast('Group Create Successfully');
+      }
+      else{
+        errorToast('Group Create faild');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: create_chat_group .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 export const add_post = createAsyncThunk(
   'add_post',
   async (params, thunkApi) => {
@@ -582,6 +734,7 @@ export const get_video = createAsyncThunk(
     }
   },
 );
+
 export const get_event_details = createAsyncThunk(
   'get_event_details',
   async (params, thunkApi) => {
@@ -653,6 +806,51 @@ const FeatureSlice = createSlice({
     builder.addCase(get_training.pending, state => {
       state.isLoading = true;
     });
+    builder.addCase(get_chat_groups_by_code.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.ChatGroupList=action.payload
+    });
+    builder.addCase(get_chat_groups_by_code.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+  
+    });
+    builder.addCase(get_chat_groups_by_code.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_team_list.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.teamList=action.payload
+    });
+    builder.addCase(get_team_list.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+  
+    });
+    builder.addCase(get_team_list.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_game_result.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.LastGameresult=action.payload
+    });
+    builder.addCase(get_game_result.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+  
+    });
+    builder.addCase(get_game_result.pending, state => {
+      state.isLoading = true;
+    });
     builder.addCase(get_training.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isSuccess = true;
@@ -720,6 +918,20 @@ const FeatureSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
     });
+    builder.addCase(get_club_users.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_club_users.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.clubUsers = action.payload;
+    });
+    builder.addCase(get_club_users.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
     builder.addCase(get_registration_category.pending, state => {
       state.isLoading = true;
     });
@@ -730,6 +942,20 @@ const FeatureSlice = createSlice({
       state.Registration_list = action.payload;
     });
     builder.addCase(get_registration_category.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(create_chat_group.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(create_chat_group.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+    
+    });
+    builder.addCase(create_chat_group.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

@@ -8,31 +8,40 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import SearchIcon from '../../assets/svg/search.svg';
 import BackBtn from '../../assets/svg/BackBtn.svg';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
 import NewChat from '../coach/modal/NewChat';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_chat_groups_by_code, get_club_users } from '../../redux/feature/featuresSlice';
+import Loading from '../../configs/Loader';
 
 export default function ChatPage() {
   const [modalVisible, setModalVisible] = useState(false);
+
+  const user = useSelector(state => state.auth.userData);
+  
+  const isLoading  = useSelector(state => state.feature.isLoading);
+  const ChatGroupList  = useSelector(state => state.feature.ChatGroupList);
+
   const navigation = useNavigation();
   const RecentListItem = ({item}) => (
     <TouchableOpacity
       onPress={() => {
         navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {item: item});
       }}
-      style={[
+      style={[styles.shdow,
         {
           height: hp(10),
           padding: 10,
           marginHorizontal: 15,
-          backgroundColor: '#FFF',
+          backgroundColor: '#fff',
           borderRadius: 15,
           marginVertical: 5,
           flexDirection: 'row',
@@ -40,11 +49,11 @@ export default function ChatPage() {
           justifyContent: 'space-between',
         },
       ]}>
-      <View style={{}}>
-        <Image
-          source={item.img}
+      <View style={{height: 50, width: 50, borderRadius: 25,borderWidth:1,alignItems:'center',justifyContent:'center'}}>
+        {item.chat_group_image ?<Image
+          source={item.chat_group_image}
           style={{height: 50, width: 50, borderRadius: 25}}
-        />
+        />:<Text style={{fontSize:18,color:'#000',fontWeight:'600'}}>{item.chat_group_name[0]?.toUpperCase()}</Text>}
       </View>
       <View style={{width: '65%'}}>
         <Text
@@ -54,7 +63,7 @@ export default function ChatPage() {
             lineHeight: 25,
             color: '#000',
           }}>
-          {item.name}
+          {item.chat_group_name}
         </Text>
         {item.status == 'Typing...' ? (
           <Text
@@ -86,7 +95,7 @@ export default function ChatPage() {
           }}>
           {item.time}
         </Text>
-        <View
+        {/* <View
           style={{
             backgroundColor: '#874be9',
 
@@ -106,13 +115,30 @@ export default function ChatPage() {
             }}>
             {item.count}
           </Text>
-        </View>
+        </View> */}
       </View>
     </TouchableOpacity>
   );
+const dispatch = useDispatch()
+const isFocuse = useIsFocused()
+
+useEffect(()=>{
+getChatGroup()
+},[user])
+
+
+const getChatGroup =()=>{
+  const params ={
+    group_code:user?.group_code
+  }
+  dispatch(get_chat_groups_by_code(params))
+}
+
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
+
+      {isLoading?<Loading />:null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.header}>
@@ -153,9 +179,48 @@ export default function ChatPage() {
             />
           </View>
         </View>
-        <View style={{flex: 1, backgroundColor: '#FFF'}}>
+        <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          marginTop: 20,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            borderWidth: true == 'user' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: true == 'user' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+           Indiviual 
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            
+          }}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            marginLeft: 20,
+            borderWidth: false == 'all' ? 0 : 1,
+            borderRadius: 30,
+            backgroundColor: false == 'all' ? '#DDFBE8' : '#fff',
+          }}>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
+            Groups
+          </Text>
+        </TouchableOpacity>
+      </View>
+        <View style={{flex: 1, backgroundColor: '#FFF',marginTop:20}}>
           <FlatList
-            data={data}
+            data={ChatGroupList}
             renderItem={RecentListItem}
             keyExtractor={item => item.id}
             ListFooterComponent={({}) => <View style={{height: hp(6)}} />}
