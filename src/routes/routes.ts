@@ -84,6 +84,7 @@ import coachMatches from "../screen/coach/features/coachMatches";
 import cochRegistration from "../screen/coach/features/cochRegistration";
 import TeamListScreen from "../screen/coach/features/TeamMemberList";
 import coachAccountSetting from "../screen/coach/features/coachAccountSetting";
+import GroupmemberPage from "../screen/chat/GroupMemberScreen";
 
 
 const _routes = {
@@ -289,6 +290,10 @@ const _routes = {
     {
       name: ScreenNameEnum.coachAccountSetting,
       Component: coachAccountSetting,
+    },
+    {
+      name: ScreenNameEnum.GroupmemberPage,
+      Component: GroupmemberPage,
     },
 
 

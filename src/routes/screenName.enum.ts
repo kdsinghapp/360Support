@@ -32,6 +32,7 @@ enum ScreenNameEnum {
   cochRegistration = 'cochRegistration',
   TeamListScreen='TeamListScreen',
   coachAccountSetting='coachAccountSetting',
+  GroupmemberPage='GroupmemberPage',
 
   //TAb
   BOTTOM_TAB ='BOTTOM_TAB',

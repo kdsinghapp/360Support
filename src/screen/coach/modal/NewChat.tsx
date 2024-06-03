@@ -23,6 +23,7 @@ import {errorToast} from '../../../configs/customToast';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AddChatGroup from './AddChatGroup';
 import Loading from '../../../configs/Loader';
+import SingleChat from './AddSingleChat';
 
 const NewChat = ({visible, onClose, data}) => {
   const screenHeight = Dimensions.get('screen').height;
@@ -30,6 +31,7 @@ const NewChat = ({visible, onClose, data}) => {
   const user_data = useSelector(state => state.auth.userData);
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState(false);
+  const [SinglemodalVisible, setSingleModalVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -56,17 +58,7 @@ const NewChat = ({visible, onClose, data}) => {
     }).start();
   };
 
-  const Delete_post = async () => {
-    const params = {
-      post_id: data,
-      user_id: user_data?.id,
-      group_code: user_data?.group_code,
-      navigation: navigation,
-    };
-
-    onClose();
-    await dispatch(delete_posts(params));
-  };
+  
 
   return (
     <Modal visible={visible} transparent>
@@ -87,7 +79,7 @@ const NewChat = ({visible, onClose, data}) => {
           
             <TouchableOpacity
               onPress={() => {
-                setModalVisible(true);
+                setSingleModalVisible(true);
               }}
               style={styles.option}>
               <Image
@@ -115,6 +107,12 @@ const NewChat = ({visible, onClose, data}) => {
         onClose={() => {
           onClose()
           setModalVisible(false)}}
+      />
+      <SingleChat
+        visible={SinglemodalVisible}
+        onClose={() => {
+          onClose()
+          setSingleModalVisible(false)}}
       />
     </Modal>
   );

@@ -234,9 +234,6 @@ export default function coachHome() {
   };
 
 
-  console.log('===========LastGameresult=========================');
-  console.log(LastGameresult);
-  console.log('====================================');
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
       {isLoading ? <Loading /> : null}

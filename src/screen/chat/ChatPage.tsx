@@ -18,127 +18,129 @@ import BackBtn from '../../assets/svg/BackBtn.svg';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
 import NewChat from '../coach/modal/NewChat';
-import { useDispatch, useSelector } from 'react-redux';
-import { get_chat_groups_by_code, get_club_users } from '../../redux/feature/featuresSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  get_chat_groups_by_code,
+  get_club_users,
+  get_individual_chat,
+} from '../../redux/feature/featuresSlice';
 import Loading from '../../configs/Loader';
 
 export default function ChatPage() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const user = useSelector(state => state.auth.userData);
-  
-  const isLoading  = useSelector(state => state.feature.isLoading);
-  const ChatGroupList  = useSelector(state => state.feature.ChatGroupList);
 
+  const isLoading = useSelector(state => state.feature.isLoading);
+  const ChatGroupList = useSelector(state => state.feature.ChatGroupList);
+  const getIndividualChat = useSelector(
+    state => state.feature.getIndividualChat,
+  );
+  const [isSelected, setIsSelected] = useState('Individual');
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (user) {
+      getChatContact();
+      setIsSelected('Individual')
+    }
+  }, [user,modalVisible]);
+
+  const getChatGroup = () => {
+    const params = {
+      group_code: user?.group_code,
+    };
+    dispatch(get_chat_groups_by_code(params));
+  };
+
+  const getChatContact = () => {
+    const params = {
+      user_id: user?.id,
+    };
+    dispatch(get_individual_chat(params));
+  };
+
   const RecentListItem = ({item}) => (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {item: item});
+        navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {
+          member: item,
+          type: 'Group',
+        });
       }}
-      style={[styles.shdow,
-        {
-          height: hp(10),
-          padding: 10,
-          marginHorizontal: 15,
-          backgroundColor: '#fff',
-          borderRadius: 15,
-          marginVertical: 5,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        },
-      ]}>
-      <View style={{height: 50, width: 50, borderRadius: 25,borderWidth:1,alignItems:'center',justifyContent:'center'}}>
-        {item.chat_group_image ?<Image
-          source={item.chat_group_image}
-          style={{height: 50, width: 50, borderRadius: 25}}
-        />:<Text style={{fontSize:18,color:'#000',fontWeight:'600'}}>{item.chat_group_name[0]?.toUpperCase()}</Text>}
-      </View>
-      <View style={{width: '65%'}}>
-        <Text
-          style={{
-            fontSize: 17,
-            fontWeight: '600',
-            lineHeight: 25,
-            color: '#000',
-          }}>
-          {item.chat_group_name}
-        </Text>
-        {item.status == 'Typing...' ? (
-          <Text
-            style={{
-              color: '#874BE9',
-              fontSize: 14,
-              fontWeight: '700',
-            }}>
-            {item.status}
-          </Text>
+      style={[styles.shadow, styles.listItem]}>
+      <View style={styles.avatarContainer}>
+        {item.chat_group_image ? (
+          <Image source={{uri: item.chat_group_image}} style={styles.avatar} />
         ) : (
-          <Text
-            style={{
-              color: '#000',
-              fontSize: 13,
-              fontWeight: '400',
-            }}>
-            {item.status}
+          <Text style={styles.avatarText}>
+            {item.chat_group_name[0]?.toUpperCase()}
           </Text>
         )}
       </View>
-      <View style={{}}>
+      <View style={styles.listItemTextContainer}>
+        <Text style={styles.listItemTitle}>{item.chat_group_name}</Text>
         <Text
-          style={{
-            fontSize: 12,
-            fontWeight: '400',
-            color: '#B6B6B6',
-            lineHeight: 18,
-          }}>
-          {item.time}
+          style={
+            item.status === 'Typing...'
+              ? styles.typingStatus
+              : styles.listItemSubtitle
+          }>
+          {item.status}
         </Text>
-        {/* <View
-          style={{
-            backgroundColor: '#874be9',
-
-            height: item.count.length < 2 ? 20 : 25,
-            width: item.count.length < 2 ? 20 : 25,
-            borderRadius: item.count.length < 2 ? 10 : 12.5,
-            alignItems: 'center',
-            justifyContent: 'center',
-            alignSelf: 'center',
-            marginTop: 10,
-          }}>
-          <Text
-            style={{
-              fontWeight: '700',
-              fontSize: item.count.length < 2 ? 12 : 8,
-              color: '#FFF',
-            }}>
-            {item.count}
-          </Text>
-        </View> */}
+      </View>
+      <View style={styles.timeContainer}>
+        <Text style={styles.timeText}>{item.time}</Text>
       </View>
     </TouchableOpacity>
   );
-const dispatch = useDispatch()
-const isFocuse = useIsFocused()
 
-useEffect(()=>{
-getChatGroup()
-},[user])
-
-
-const getChatGroup =()=>{
-  const params ={
-    group_code:user?.group_code
-  }
-  dispatch(get_chat_groups_by_code(params))
-}
-
+  const indiListItem = ({item}) => (
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {
+          item: item,
+          type: 'single',
+        });
+      }}
+      style={[styles.shadow, styles.listItem]}>
+      <View style={styles.avatarContainer}>
+        {item.reciver_data ? (
+          <Image
+            source={{uri: item.reciver_data?.image}}
+            style={styles.avatar}
+          />
+        ) : (
+          <Text style={styles.avatarText}>
+            {item.first_name[0]?.toUpperCase()}
+          </Text>
+        )}
+      </View>
+      <View style={styles.listItemTextContainer}>
+        <Text style={styles.listItemTitle}>
+          {item.reciver_data.first_name} {item.reciver_data.last_name}
+        </Text>
+        <Text
+          style={
+            item.status === 'Typing...'
+              ? styles.typingStatus
+              : styles.listItemSubtitle
+          }>
+          {item.reciver_data.type}
+        </Text>
+      </View>
+      <View style={styles.timeContainer}>
+        <Text style={styles.timeText}></Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-
-      {isLoading?<Loading />:null}
+    <View style={styles.container}>
+      {isLoading && <Loading />}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.header}>
@@ -150,7 +152,6 @@ const getChatGroup =()=>{
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Chat</Text>
             </View>
-
             <TouchableOpacity
               onPress={() => {
                 setModalVisible(true);
@@ -164,76 +165,66 @@ const getChatGroup =()=>{
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
-          <View style={[styles.shdow, styles.search]}>
+        <View style={styles.searchContainer}>
+          <View style={[styles.shadow, styles.search]}>
             <SearchIcon />
             <TextInput
               placeholder="Search"
               placeholderTextColor={'#000'}
-              style={{
-                marginLeft: 10,
-                fontSize: 14,
-                color: '#000',
-                lineHeight: 18,
-              }}
+              style={styles.searchInput}
             />
           </View>
         </View>
-        <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 20,
-          marginTop: 20,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            
-          }}
-          style={{
-            paddingHorizontal: 20,
-            paddingVertical: 5,
-            borderWidth: true == 'user' ? 0 : 1,
-            borderRadius: 30,
-            backgroundColor: true == 'user' ? '#DDFBE8' : '#fff',
-          }}>
-          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
-           Indiviual 
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            
-          }}
-          style={{
-            paddingHorizontal: 20,
-            paddingVertical: 5,
-            marginLeft: 20,
-            borderWidth: false == 'all' ? 0 : 1,
-            borderRadius: 30,
-            backgroundColor: false == 'all' ? '#DDFBE8' : '#fff',
-          }}>
-          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
-            Groups
-          </Text>
-        </TouchableOpacity>
-      </View>
-        <View style={{flex: 1, backgroundColor: '#FFF',marginTop:20}}>
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsSelected('Individual');
+              getChatContact();
+            }}
+            style={[
+              styles.tabButton,
+              isSelected === 'Individual' && styles.selectedTabButton,
+            ]}>
+            <Text style={styles.tabText}>Individual</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setIsSelected('Groups');
+              getChatGroup();
+            }}
+            style={[
+              styles.tabButton,
+              isSelected === 'Groups' && styles.selectedTabButton,
+              styles.groupsTabButton,
+            ]}>
+            <Text style={styles.tabText}>Groups</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.listContainer}>
           <FlatList
-            data={ChatGroupList}
-            renderItem={RecentListItem}
+            data={isSelected === 'Groups' ? ChatGroupList : getIndividualChat}
+            renderItem={isSelected === 'Groups' ? RecentListItem : indiListItem}
             keyExtractor={item => item.id}
-            ListFooterComponent={({}) => <View style={{height: hp(6)}} />}
+            ListFooterComponent={<View style={styles.listFooter} />}
           />
         </View>
       </ScrollView>
-
       <NewChat visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFDF5',
+  },
+  colorDiv: {
+    backgroundColor: '#874be9',
+    height: hp(10),
+    borderBottomRightRadius: 50,
+    borderBottomLeftRadius: 50,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -257,30 +248,10 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
   },
-  txt: {
-    fontSize: 12,
-    fontWeight: '700',
-    lineHeight: 18,
-    color: '#000',
-    marginHorizontal: 10,
-  },
-  shdow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-
-    elevation: 7,
-  },
-
-  colorDiv: {
-    backgroundColor: '#874be9',
-    height: hp(10),
-    borderBottomRightRadius: 50,
-    borderBottomLeftRadius: 50,
+  searchContainer: {
+    marginTop: 10,
+    height: hp(8),
+    justifyContent: 'center',
   },
   search: {
     backgroundColor: '#FFF',
@@ -291,47 +262,108 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 15,
   },
+  searchInput: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#000',
+    lineHeight: 18,
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  tabButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+  },
+  selectedTabButton: {
+    borderWidth: 0,
+    backgroundColor: '#DDFBE8',
+  },
+  groupsTabButton: {
+    marginLeft: 20,
+  },
+  tabText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#000',
+  },
+  listContainer: {
+    flex: 1,
+    backgroundColor: '#FFFDF5',
+    marginTop: 20,
+  },
+  listItem: {
+    height: hp(10),
+    padding: 10,
+    marginHorizontal: 15,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    marginVertical: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  avatarContainer: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatar: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+  },
+  avatarText: {
+    fontSize: 18,
+    color: '#000',
+    fontWeight: '600',
+  },
+  listItemTextContainer: {
+    width: '75%',
+  },
+  listItemTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    lineHeight: 25,
+    color: '#000',
+  },
+  typingStatus: {
+    color: '#874BE9',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  listItemSubtitle: {
+    color: '#000',
+    fontSize: 13,
+    fontWeight: '400',
+  },
+  timeContainer: {},
+  timeText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#B6B6B6',
+    lineHeight: 18,
+  },
+  listFooter: {
+    height: hp(6),
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
 });
-
-const data = [
-  {
-    id: '1',
-    name: 'Jenny Wilson',
-    time: '08.00pm',
-    img: require('../../assets/Cropping/img1.png'),
-    status: 'Typing...',
-    count: '2',
-  },
-  {
-    id: '2',
-    name: 'Emerson',
-    time: '08.00pm',
-    img: require('../../assets/Cropping/img2.png'),
-    status: 'Have you spoken to the delivery...',
-    count: '2',
-  },
-  {
-    id: '3',
-    name: 'Ruben George',
-    time: '08.00pm',
-    img: require('../../assets/Cropping/img3.png'),
-    status: 'Have you spoken to the delivery...',
-    count: '999',
-  },
-  {
-    id: '4',
-    name: 'Omar Kenter',
-    time: '08.00pm',
-    img: require('../../assets/Cropping/img4.png'),
-    status: 'Have you spoken to the delivery...',
-    count: '2',
-  },
-  {
-    id: '5',
-    name: 'Martin Botosh',
-    time: '08.00pm',
-    img: require('../../assets/Cropping/img5.png'),
-    status: 'Have you spoken to the delivery...',
-    count: '150',
-  },
-];

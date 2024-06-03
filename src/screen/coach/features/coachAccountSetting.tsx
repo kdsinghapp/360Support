@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     height: hp(7),
     marginTop: 30,
   },
-  tab: {
+  tab: {    
     marginRight: 7,
     height: 35,
     marginVertical: 10,

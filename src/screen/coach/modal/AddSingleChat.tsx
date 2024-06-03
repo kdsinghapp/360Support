@@ -12,7 +12,6 @@ import {
   Image,
   FlatList,
 } from 'react-native';
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,20 +19,18 @@ import {
 import Close from '../../../assets/svg/Close.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import {
+  add_chat_user,
   create_chat_group,
   get_club_users,
 } from '../../../redux/feature/featuresSlice';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import Loading from '../../../configs/Loader';
 import {errorToast} from '../../../configs/customToast';
+import ScreenNameEnum from '../../../routes/screenName.enum';
 import firestore from '@react-native-firebase/firestore';
-const AddChatGroup = ({visible, onClose}) => {
+const SingleChat = ({visible, onClose}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
-  const [name, setName] = useState('');
-  const [selectedParentIndices, setSelectedParentIndices] = useState([]);
-  const [selectedPlayerIndices, setSelectedPlayerIndices] = useState([]);
-  const [selectedCoachIndices, setSelectedCoachIndices] = useState([]);
   const [selectedTab, setSelectedTab] = useState('Parent');
   const user = useSelector(state => state.auth.userData);
   const isLoading = useSelector(state => state.feature.isLoading);
@@ -41,87 +38,7 @@ const AddChatGroup = ({visible, onClose}) => {
   const ClubMember = useSelector(state => state.feature.clubUsers);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (user && isFocused) {
-      const params = {
-        group_code: user?.group_code,
-      };
-      dispatch(get_club_users(params));
-    }
-  }, [user, isFocused]);
-
-  const toggleSelection = index => {
-    let updateFunction;
-    let selectedIndices;
-
-    if (selectedTab === 'Parent') {
-      updateFunction = setSelectedParentIndices;
-      selectedIndices = selectedParentIndices;
-    } else if (selectedTab === 'Player') {
-      updateFunction = setSelectedPlayerIndices;
-      selectedIndices = selectedPlayerIndices;
-    } else if (selectedTab === 'Coach') {
-      updateFunction = setSelectedCoachIndices;
-      selectedIndices = selectedCoachIndices;
-    }
-
-    updateFunction(prevSelectedIndices =>
-      prevSelectedIndices.includes(index)
-        ? prevSelectedIndices.filter(selectedIndex => selectedIndex !== index)
-        : [...prevSelectedIndices, index],
-    );
-  };
-
-  const RecentListItem = ({item, index}) => (
-    <TouchableOpacity
-      onPress={() => toggleSelection(index)}
-      style={[
-        styles.listItem,
-        {
-          backgroundColor: '#FFF',
-        },
-      ]}>
-      <View>
-        {item.image ? (
-          <Image
-            source={{uri: item.image}}
-            style={{height: 50, width: 50, borderRadius: 25}}
-          />
-        ) : (
-          <Text>
-            {item.first_name[0]} {item.last_name[0]}
-          </Text>
-        )}
-      </View>
-      <View style={{width: '65%'}}>
-        <Text style={styles.listItemText}>
-          {item.first_name} {item.last_name}
-        </Text>
-        <Text style={styles.listItemText}>{item.email}</Text>
-      </View>
-      <View
-        style={[
-          styles.selectionIndicator,
-          {
-            borderColor:
-              (selectedTab === 'Parent' &&
-                selectedParentIndices.includes(index)) ||
-              (selectedTab === 'Player' &&
-                selectedPlayerIndices.includes(index)) ||
-              (selectedTab === 'Coach' && selectedCoachIndices.includes(index))
-                ? '#549be3'
-                : '#a3a3a3',
-          },
-        ]}>
-        {(selectedTab === 'Parent' && selectedParentIndices.includes(index)) ||
-        (selectedTab === 'Player' && selectedPlayerIndices.includes(index)) ||
-        (selectedTab === 'Coach' && selectedCoachIndices.includes(index)) ? (
-          <View style={styles.selectedCircle} />
-        ) : null}
-      </View>
-    </TouchableOpacity>
-  );
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (visible) {
@@ -159,39 +76,55 @@ const AddChatGroup = ({visible, onClose}) => {
 
   const tabs = ['Parent', 'Player', 'Coach'];
 
-  const handleSubmit = async () => {
-    const selectedMembers = [
-      ...selectedParentIndices.map(index => ClubMember[index]),
-      ...selectedPlayerIndices.map(index => ClubMember[index]),
-      ...selectedCoachIndices.map(index => ClubMember[index]),
-    ];
-
-    const groupRef = firestore().collection('groups').doc();
+  const handleSubmit = async item => {
+    const groupRef = firestore().collection('Chat_User').doc();
     await groupRef.set({
-      groupId: groupRef.id,
-      group_name: name,
-      members: selectedMembers,
+      firebase_chat_id: groupRef.id,
+      user_id: user?.id,
+      reciver_id: item.id,
       group_group_code: user?.group_code,
       Created_user: user?.id,
       timestamp: firestore.FieldValue.serverTimestamp(),
     });
 
     const params = {
-      selectedMembers: selectedMembers,
+      firebase_chat_id: groupRef.id,
       user_id: user?.id,
-      name: name,
-      group_code: user?.group_code,
-      firebase_group_id: groupRef.id,
+      reciver_id: item.id,
     };
 
-    dispatch(create_chat_group(params)).then(() => {
-      onClose();
-      setSelectedParentIndices([]);
-      setSelectedPlayerIndices([]);
-      setSelectedCoachIndices([]);
-    });
+    dispatch(add_chat_user(params));
+    onClose();
   };
-
+  const RecentListItem = ({item, index}) => (
+    <TouchableOpacity
+      onPress={() => handleSubmit(item)}
+      style={[
+        styles.listItem,
+        {
+          backgroundColor: '#FFF',
+        },
+      ]}>
+      <View>
+        {item.image ? (
+          <Image
+            source={{uri: item.image}}
+            style={{height: 50, width: 50, borderRadius: 25}}
+          />
+        ) : (
+          <Text>
+            {item.first_name[0]} {item.last_name[0]}
+          </Text>
+        )}
+      </View>
+      <View style={{width: '78%'}}>
+        <Text style={styles.listItemText}>
+          {item.first_name} {item.last_name}
+        </Text>
+        <Text style={styles.listItemText}>{item.email}</Text>
+      </View>
+    </TouchableOpacity>
+  );
   return (
     <Modal visible={visible} transparent>
       <View activeOpacity={1} style={styles.container}>
@@ -205,22 +138,10 @@ const AddChatGroup = ({visible, onClose}) => {
             ]}>
             {isLoading ? <Loading /> : null}
             <View style={styles.header}>
-              <Text style={styles.headerText}>Create chat group</Text>
+              <Text style={styles.headerText}>Create chat</Text>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                 <Close />
               </TouchableOpacity>
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Group Name</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Group Name"
-                  value={name}
-                  onChangeText={txt => setName(txt)}
-                />
-              </View>
             </View>
 
             <View style={styles.tabContainer}>
@@ -251,20 +172,12 @@ const AddChatGroup = ({visible, onClose}) => {
             <View style={styles.listContainer}>
               <FlatList
                 data={sections[selectedTab]}
+                showsVerticalScrollIndicator={false}
                 renderItem={RecentListItem}
                 keyExtractor={item => item.id}
                 ListFooterComponent={<View style={{height: hp(2)}} />}
               />
             </View>
-
-            <TouchableOpacity
-              style={styles.submitButton}
-              // onPress={()=>{
-              //   errorToast('Coming soon')
-              // }}
-              onPress={handleSubmit}>
-              <Text style={styles.submitButtonText}>Create Group</Text>
-            </TouchableOpacity>
           </Animated.View>
         </ScrollView>
       </View>
@@ -406,4 +319,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddChatGroup;
+export default SingleChat;
