@@ -43,6 +43,9 @@ export default function Chat({route}) {
     return () => unsubscribe();
   }, [item, member, user, isFocuse]);
 
+
+  console.log(item?.firebase_chat_id);
+  
   const listenForMessages = callback => {
     if (type == 'single') {
       return firestore()
@@ -162,7 +165,7 @@ export default function Chat({route}) {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Back />
           </TouchableOpacity>
-          <View style={styles.headerContent}>
+          <View style={[styles.headerContent,type == 'single'?{width:'90%'}:styles.headerContent,]}>
             <Image
               source={{
                 uri:

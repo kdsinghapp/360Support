@@ -631,7 +631,7 @@ export default function coachHome() {
                 />
               )}
 
-              <View
+              {/* <View
                 style={{
                   flexDirection: 'row',
                   marginTop: 15,
@@ -652,7 +652,7 @@ export default function coachHome() {
                   />
                   <Text style={styles.likeTxt}>Comments</Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           )}
           {get_PostList.length == 0 && (

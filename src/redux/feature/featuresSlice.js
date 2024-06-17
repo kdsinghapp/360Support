@@ -21,12 +21,15 @@ const initialState = {
   LastGameresult: [],
   teamList: [],
   getIndividualChat: [],
+  getEventMembers:[]
 };
 
 export const get_post = createAsyncThunk(
   'get_posts',
   async (params, thunkApi) => {
     try {
+
+      console.log('=>>>get_posts>>>>>>>>>>>>',params);
       const response = await API.get(
         `/get_posts?user_id=${params.user_id}&group_code=${params.group_code}&type=${params.type}`,
       );
@@ -189,26 +192,36 @@ export const add_event = createAsyncThunk(
       formData.append('event_description', params.event_description);
       formData.append('event_time', params.event_time);
       formData.append('group_code', params.group_code);
+      formData.append('type', params.type);
+      params.members.forEach((member, index) => {
+        formData.append(`members[${index}]`, member);
+      });
 
       const config = {
+        method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
           Accept: 'application/json',
         },
+        body: formData,
       };
 
-      const response = await API.post('/add_event', formData, config);
+      console.log('FormData:', formData);
 
-      if (response.data.status == '1') {
+      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/add_event', config);
+      console.log('members=>>>>>>>>',response);
+      const data = await response.json();
+
+      if (data.status === '1') {
         successToast('Add Event Successfully');
       }
-      return response.data.result;
-    } catch (error) {
-      console.log('🚀 ~ file: add_event .js:16 ~  ~ error:', error);
 
+      return data.result;
+    } catch (error) {
+      console.log('Error:', error);
+      errorToast('Failed to add event');
       return thunkApi.rejectWithValue(error);
     }
-  },
+  }
 );
 export const add_training = createAsyncThunk(
   'add_training',
@@ -385,6 +398,8 @@ export const get_event = createAsyncThunk(
   'get_event',
   async (params, thunkApi) => {
     try {
+
+      console.log('=>>>>get_event>>>>>>>>>',params);
       const response = await API.get(
         `/get_event?user_id=${params.user_id}&group_code=${params.group_code}&type=${params.type}`,
       );
@@ -414,6 +429,25 @@ export const get_registration_form = createAsyncThunk(
       return response.data.result;
     } catch (error) {
       console.log('🚀 ~ file: get_registration_form .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_event_details = createAsyncThunk(
+  'get_event_details',
+  async (params, thunkApi) => {
+    try {
+      const response = await API.get(
+        `/get_event_details?event_id=${params.event_id}`,
+      );
+
+      if (response.data.status == '1') {
+        console.log('get get_event_details Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_event_details .js:16 ~  ~ error:', error);
 
       return thunkApi.rejectWithValue(error);
     }
@@ -543,6 +577,63 @@ export const get_team_list = createAsyncThunk(
     }
   },
 );
+export const get_event_members = createAsyncThunk(
+  'get_event_members',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('event_id', params.event_id);
+      const response = await API.post('/get_event_members', data, config);
+      console.log('==============get_event_members======================',response.data);
+
+  
+      if (response.data.status == '1') {
+        console.log('get get_event_members Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_event_members .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const update_event_memeber_data = createAsyncThunk(
+  'update_event_memeber_data',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+  
+      data.append('member_id', params.member_id);
+      data.append('attendence', params.attendence);
+      console.log('==============update_event_memeber_data======================',data);
+
+      const response = await API.post('/update_event_memeber_data', data, config);
+      console.log('==============update_event_memeber_data======================',response.data);
+
+  
+      if (response.data.status == '1') {
+        console.log('get update_event_memeber_data Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: update_event_memeber_data .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+
 export const create_chat_group = createAsyncThunk(
   'create_chat_group',
   async (params, thunkApi) => {
@@ -805,6 +896,20 @@ const FeatureSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
     });
+    builder.addCase(update_event_memeber_data.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(update_event_memeber_data.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+
+    });
+    builder.addCase(update_event_memeber_data.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
     builder.addCase(send_child_request.pending, state => {
       state.isLoading = true;
     });
@@ -846,6 +951,7 @@ const FeatureSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
+      state.getIndividualChat = []
     });
     builder.addCase(get_training.pending, state => {
       state.isLoading = true;
@@ -945,22 +1051,36 @@ const FeatureSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
     });
-    // builder.addCase(get_event_details.pending, state => {
-    //   state.isLoading = true;
-    // });
-    // builder.addCase(get_event_details.fulfilled
+    builder.addCase(get_event_members.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_event_members.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.getEventMembers = action.payload;
+    });
+    builder.addCase(get_event_members.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_event_details.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_event_details.fulfilled
 
-    //   , (state, action) => {
-    //   state.isLoading = false;
-    //   state.isSuccess = true;
-    //   state.isError = false;
-    //   state.event_details = action.payload;
-    // });
-    // builder.addCase(get_event_details.rejected, (state, action) => {
-    //   state.isLoading = false;
-    //   state.isError = true;
-    //   state.isSuccess = false;
-    // });
+      , (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.event_details = action.payload;
+    });
+    builder.addCase(get_event_details.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
     builder.addCase(get_video.pending, state => {
       state.isLoading = true;
     });

@@ -44,23 +44,7 @@ export default function CoachWall() {
 
   const dispatch = useDispatch();
 
-  const Like_post = async (item) => {
-    const params = {
-      user_id: user_data?.id,
-      post_id: item.id,
-    };
 
-    await dispatch(add_like_unlike_posts(params));
-    get_Post();
-
-    setLikedPosts(prevLikedPosts => {
-      if (prevLikedPosts.includes(item.id)) {
-        return prevLikedPosts.filter(postId => postId !== item.id);
-      } else {
-        return [...prevLikedPosts, item.id];
-      }
-    });
-  };
 
   const RecentListItem = ({ item }: { item: PostItem }) => {
     const isLiked = likedPosts.includes(item.id);
@@ -139,7 +123,7 @@ export default function CoachWall() {
           style={styles.postImage}
           resizeMode="stretch"
         />
-        <View style={styles.interactionContainer}>
+        {/* <View style={styles.interactionContainer}>
           <TouchableOpacity
             onPress={() => {
               Like_post(item);
@@ -170,7 +154,7 @@ export default function CoachWall() {
             <Text style={styles.interactionText}>{item.post_comment.length}</Text>
             <Text style={[styles.interactionText, { marginLeft: 5 }]}>Comments</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     );
   };
@@ -181,13 +165,19 @@ export default function CoachWall() {
   }, [isFocuse, DotmodalVisible, modalVisible, user_data]);
 
   const get_Post = async () => {
+
+    try{
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
       type:Posttype
     };
     await dispatch(get_post(params));
-  };
+  }catch(err){
+  console.log('err',err);
+  
+}
+  }
 
   const after_delete = async () => {
     get_Post();
@@ -253,7 +243,7 @@ export default function CoachWall() {
         <TouchableOpacity
           onPress={() => {
             setPosttype('all');
-            //get_eventList('all');
+            get_Post();
           }}
           style={{
             paddingHorizontal: 20,

@@ -198,93 +198,93 @@ export default function cocheEvent() {
           </Text>
         </TouchableOpacity>
       </View>
-      {Event_List.length > 0 && (
-        <View style={styles.content}>
-          <FlatList
-            data={Event_List}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({item}) => (
-              <TouchableOpacity
+      {Event_List?.length > 0 && <FlatList
+          data={Event_List}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+            
                 onPress={() => {
                   navigation.navigate(ScreenNameEnum.EventDetilas, {
                     event_id: item.id,
                   });
                 }}
-                style={[
-                  styles.shdow,
-                  styles.Event,
-                  {marginVertical: 10, alignSelf: 'center'},
-                ]}>
-                <View>
-                  <Line />
-                </View>
-                <View>
-                  <Text
-                    style={[
-                      styles.txt,
-                      {
-                        fontSize: 22,
-                        fontWeight: '700',
-                        lineHeight: 33,
-                      },
-                    ]}>
-                    {item?.event_date != null &&
-                      get_dayDate(
-                        new Date(item?.event_date).toLocaleDateString(),
-                      )}
-                  </Text>
-                  <Text style={styles.txt}>
-                    {get_monthName(
+           
+              style={[
+                styles.shdow,
+                styles.Event,
+                { marginVertical: 10, alignSelf: 'center', backgroundColor: item.type == 'Metting' ? '#e7cbf2' : item.type == 'Match' ? '#DDFBE8' : '#fff9cd' },
+              ]}>
+              <View>
+                <Line />
+              </View>
+              <View>
+                <Text
+                  style={[
+                    styles.txt,
+                    {
+                      fontSize: 22,
+                      fontWeight: '700',
+                      lineHeight: 33,
+                      color: item.type == 'Match' ? '#326A3D' : '#000'
+                    },
+                  ]}>
+                  {item?.event_date != null &&
+                    get_dayDate(
                       new Date(item?.event_date).toLocaleDateString(),
                     )}
-                  </Text>
-                </View>
+                </Text>
+                <Text style={[styles.txt, { color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
+                  {get_monthName(
+                    new Date(item?.event_date).toLocaleDateString(),
+                  )}
+                </Text>
+              </View>
 
-                <View style={{width: '65%'}}>
-                  <Text
-                    style={[
-                      styles.txt,
-                      {
-                        fontSize: 18,
-                        fontWeight: '700',
-                        lineHeight: 24,
-                      },
-                    ]}>
-                    {item?.event_name}
-                  </Text>
-                  <Text style={[styles.txt, {fontSize: 10}]}>
-                    {item?.event_description}
-                  </Text>
-                  <Text style={styles.txt}>
-                    {get_DayName(
-                      new Date(item?.event_date).toLocaleDateString(),
-                    )}{' '}
-                    {new Date(item?.event_time).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </Text>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Image
-                      source={require('../../../assets/Cropping/pin.png')}
-                      style={{height: 12, width: 12}}
-                    />
-                    <Text style={[styles.txt, {marginLeft: 5}]}>
-                      {item?.event_location}
-                    </Text>
-                  </View>
-                </View>
-                <View>
-                  <Text
-                    style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
-                    Match
+              <View style={{ width: '65%' }}>
+                <Text
+                  style={[
+                    styles.txt,
+                    {
+                      fontSize: 18,
+                      fontWeight: '700',
+                      lineHeight: 24,
+                      color: item.type == 'Match' ? '#326A3D' : '#000'
+                    },
+                  ]}>
+                  {item?.event_name}
+                </Text>
+                <Text style={[styles.txt, { fontSize: 10, color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
+                  {item?.event_description}
+                </Text>
+                <Text style={[styles.txt,{    color:item.type=='Match'?'#326A3D':'#000'}]}>
+                  {get_DayName(
+                    new Date(item?.event_date).toLocaleDateString(),
+                  )}{' '}
+                  {new Date(item?.event_time).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image
+                    source={require('../../../assets/Cropping/pin.png')}
+                    style={{ height: 12, width: 12 }}
+                  />
+                  <Text style={[styles.txt, { marginLeft: 5,    color:item.type=='Match'?'#326A3D':'#000' }]}>
+                    {item?.event_location}
                   </Text>
                 </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      )}
+              </View>
+              <View>
+                <Text
+                  style={[styles.txt, { alignSelf: 'flex-end', fontSize: 10,color:item.type=='Match'?'#326A3D':'#000' }]}>
+                  {item.type}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />}
       {Event_List.length == 0 && Event_List !== null && (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Text>No events available</Text>

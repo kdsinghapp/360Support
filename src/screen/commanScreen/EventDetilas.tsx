@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,22 +14,36 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {useDispatch, useSelector} from 'react-redux';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   delete_event,
   get_event_details,
+  get_event_members,
+  update_event_memeber_data,
 } from '../../redux/feature/featuresSlice';
 import Loading from '../../configs/Loader';
 import UpdateEventModal from '../coach/modal/UpdateEventModal';
+import { Dropdown } from 'react-native-element-dropdown';
+import { errorToast } from '../../configs/customToast';
+export default function EventDetilas({ route }) {
+  const [attendanceStatus, setAttendanceStatus] = useState({});
+  const [selectedTab, setSelectedTab] = useState('Parent');
+  const user = useSelector(state => state.auth.userData);
+  const isLoading = useSelector(state => state.feature.isLoading);
+  const isFocused = useIsFocused();
+  const ClubMember = useSelector(state => state.feature.clubUsers);
 
-export default function EventDetilas({route}) {
-  const {event_id} = route.params;
+  const { event_id } = route.params;
   const navigation = useNavigation();
-  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+
   const eventdetails = useSelector(state => state.feature.event_details);
+  const getEventMembers = useSelector(state => state.feature.getEventMembers);
   const user_data = useSelector(state => state.auth.userData);
   const [UpdatedModal, setUpdatedModal] = useState(false);
+  const [Options, setOption] = useState('Event')
+  console.log('eventdetails=>>>>>>', event_id, eventdetails);
+
   const get_monthName = dateStr => {
     const dateParts = dateStr.split('/');
     const year = parseInt(dateParts[2]);
@@ -38,7 +52,7 @@ export default function EventDetilas({route}) {
 
     const dateObject = new Date(year, month, day);
 
-    const monthName = dateObject.toLocaleString('default', {month: 'long'});
+    const monthName = dateObject.toLocaleString('default', { month: 'long' });
     return monthName;
   };
 
@@ -92,11 +106,13 @@ export default function EventDetilas({route}) {
 
     return dayOfMonth;
   };
+  console.log('getEventMembers=>>>>>>>>>>>>', getEventMembers);
 
   const isFocuse = useIsFocused();
   useEffect(() => {
     event_details();
-  }, [isFocuse, event_id,UpdatedModal]);
+    event_members();
+  }, [isFocuse, event_id, UpdatedModal]);
   const dispatch = useDispatch();
 
   const event_details = async () => {
@@ -104,6 +120,12 @@ export default function EventDetilas({route}) {
       event_id: event_id,
     };
     await dispatch(get_event_details(params));
+  };
+  const event_members = async () => {
+    const params = {
+      event_id: event_id,
+    };
+    await dispatch(get_event_members(params));
   };
   const delete_events = async () => {
     const params = {
@@ -113,6 +135,61 @@ export default function EventDetilas({route}) {
     await dispatch(delete_event(params));
   };
 
+const updateEventAttendance =async(id,value)=>{
+  const params = {
+    member_id:id,
+    attendence:value,
+  };
+  await dispatch(update_event_memeber_data(params));
+}
+
+  const RecentListItem = ({ item, index }) => (
+    <TouchableOpacity
+
+      style={[
+        styles.listItem,
+        {
+          backgroundColor: '#FFF',
+
+        },
+      ]}>
+      <View>
+        {item.user_data.image ? (
+          <Image
+            source={{ uri: item.user_data.image }}
+            style={{ height: 50, width: 50, borderRadius: 25 }}
+          />
+        ) : (
+          <Text>
+            {item.user_data.first_name[0]} {item.user_data.last_name[0]}
+          </Text>
+        )}
+      </View>
+      <View style={{ width:Options =='Attendance'?'50%':'80%' }}>
+        <Text style={styles.listItemText}>
+          {item.user_data.first_name} {item.user_data.last_name}
+        </Text>
+        <Text style={styles.listItemText}>{item.user_data.email}</Text>
+      </View>
+      {Options =='Attendance' &&
+      <Dropdown
+          style={styles.dropdown}
+          data={attendanceOptions}
+          labelField="label"
+          valueField="value"
+          placeholder="Select"
+          value={attendanceStatus[item.id] || item.attendence}
+        
+          itemTextStyle={{fontSize:12,color:'#000'}}
+          onChange={selectedItem => {
+            setAttendanceStatus(prev => ({ ...prev, [item.id]: selectedItem.value }));
+            updateEventAttendance(item.id, selectedItem.value);
+          }}
+        />
+}
+    </TouchableOpacity>
+  );
+ 
   return (
     <View style={styles.container}>
       {isLoading ? <Loading /> : null}
@@ -126,20 +203,38 @@ export default function EventDetilas({route}) {
                 style={styles.backButton}
               />
             </TouchableOpacity>
-            <Text style={styles.headerText}>Match Vs South</Text>
+            <Text style={styles.headerText}>{eventdetails?.event_name}</Text>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-             
+
             </TouchableOpacity>
           </View>
 
           <View style={styles.matchTypeContainer}>
-            <View style={styles.matchTypeItem}>
-              <Text style={styles.matchTypeText}>Match</Text>
-            </View>
-
+            <TouchableOpacity
+              onPress={() => {
+                setOption('Event')
+              }}
+              style={[styles.matchTypeItem, { backgroundColor: Options == 'Event' ? '#DDFBE8' : '#fff' }]}>
+              <Text style={styles.matchTypeText}>Event</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setOption('Participants')
+              }}
+              style={[styles.matchTypeItem, { backgroundColor: Options == 'Participants' ? '#DDFBE8' : '#fff' }]}>
+              <Text style={styles.matchTypeText}>Participants</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setOption('Attendance')
+              }}
+              style={[styles.matchTypeItem, { backgroundColor: Options == 'Attendance' ? '#DDFBE8' : '#fff' }]}>
+              <Text style={styles.matchTypeText}>Attendance</Text>
+            </TouchableOpacity>
+            {/* 
             {user_data?.id == eventdetails?.user_details.id && (
               <View style={styles.actionButtonsContainer}>
-                <TouchableOpacity
+               <TouchableOpacity
                   onPress={() => {
                     setUpdatedModal(true);
                   }}
@@ -149,44 +244,41 @@ export default function EventDetilas({route}) {
                     style={styles.actionButtonIcon}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    Alert.alert(
-                      'Delete Event',
-                      'Are you sure you want to delete this event?',
-                      [
-                        {
-                          text: 'Cancel',
-                          style: 'cancel',
-                        },
-                        {
-                          text: 'Delete',
-                          onPress: () => {
-                            delete_events();
-                          },
-                          style: 'destructive',
-                        },
-                      ],
-                      {cancelable: false},
-                    );
-                  }}
-                  style={styles.actionButton}>
-                  <Image
-                    source={require('../../assets/Cropping/delete.png')}
-                    style={styles.actionButtonIcon}
-                  />
-                </TouchableOpacity>
+              
               </View>
             )}
+             */}
           </View>
-          <View style={styles.contentContainer}>
-            <View>
+          {Options == 'Event' && <View style={[styles.contentContainer, {
+            shadowColor: "#000",
+            paddingBottom: 20,
+            backgroundColor: '#fff', borderRadius: 10, margin: 10,
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+
+            elevation: 5,
+          }]}>
+
+            <View style={{
+              borderTopRightRadius: 10, borderTopLeftRadius: 10,
+
+              paddingHorizontal: 10, paddingVertical: 10,
+              backgroundColor: eventdetails.type == 'Metting' ? '#e7cbf2' : eventdetails.type == 'Match' ? '#DDFBE8' : '#fff9cd'
+            }} >
+              <Text style={[styles.sectionDescription, {
+
+                color: eventdetails.type == 'Metting' ? '#ae62bd' : eventdetails.type == 'Match' ? '#62bdab' : '#dec610'
+              }]}>
+                {eventdetails?.type}
+              </Text>
               <Text style={styles.sectionTitle}>
                 {eventdetails?.event_name}
               </Text>
-              <Text style={styles.sectionDescription}>
-                {eventdetails?.event_description}
-              </Text>
+
             </View>
             <View style={styles.sectionContainer}>
               <Image
@@ -213,7 +305,7 @@ export default function EventDetilas({route}) {
                 </Text>
               </View>
             </View>
-            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
+            <View style={[styles.userDetailsContainer, { marginTop: 10, paddingHorizontal: 15 }]}>
               <Image
                 source={require('../../assets/Cropping/location.png')}
                 style={styles.sectionIcon}
@@ -222,23 +314,17 @@ export default function EventDetilas({route}) {
                 {eventdetails?.event_location}
               </Text>
             </View>
-            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
-              <Image
-                source={require('../../assets/Cropping/position.png')}
-                style={styles.sectionIcon}
-              />
-              <Text style={styles.sectionText}>Northside field</Text>
-            </View>
-            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
+
+            <View style={[styles.userDetailsContainer, {}]}>
               <Image
                 source={require('../../assets/Cropping/appointment.png')}
                 style={styles.sectionIcon}
               />
               <Text style={styles.sectionText}> Created time ({eventdetails?.event_date})</Text>
             </View>
-            <View style={[styles.userDetailsContainer,{marginTop:0}]}>
+            <View style={[styles.userDetailsContainer, {}]}>
               <Image
-                source={{uri: eventdetails?.user_details.image}}
+                source={{ uri: eventdetails?.user_details.image }}
                 style={styles.userImage}
                 resizeMode="contain"
               />
@@ -247,12 +333,60 @@ export default function EventDetilas({route}) {
                 {eventdetails?.user_details.last_name}
               </Text>
             </View>
-          </View>
+            <TouchableOpacity
+              onPress={() => {
+                errorToast('This Option Coming soon')
+                // Alert.alert(
+                //   'Delete Event',
+                //   'Are you sure you want to delete this event?',
+                //   [
+                //     {
+                //       text: 'Cancel',
+                //       style: 'cancel',
+                //     },
+                //     {
+                //       text: 'Delete',
+                //       onPress: () => {
+                //         delete_events();
+                //       },
+                //       style: 'destructive',
+                //     },
+                //   ],
+                //   { cancelable: false },
+                // );
+              }}
+              style={styles.actionButton}>
+              <Image
+                source={require('../../assets/Cropping/dots.png')}
+                style={styles.actionButtonIcon}
+              />
+            </TouchableOpacity>
+          </View>}
+          {Options == 'Participants' &&
+
+            <View style={styles.listContainer}>
+              <FlatList
+                data={getEventMembers}
+                renderItem={RecentListItem}
+                keyExtractor={item => item.id}
+                ListFooterComponent={<View style={{ height: hp(2) }} />}
+              />
+            </View>}
+          {Options == 'Attendance' &&
+
+            <View style={styles.listContainer}>
+              <FlatList
+                data={getEventMembers}
+                renderItem={RecentListItem}
+                keyExtractor={item => item.id}
+                ListFooterComponent={<View style={{ height: hp(2) }} />}
+              />
+            </View>}
         </>
       )}
 
       {eventdetails == null && (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text>No Details found</Text>
 
           <TouchableOpacity
@@ -272,6 +406,35 @@ export default function EventDetilas({route}) {
   );
 }
 const styles = StyleSheet.create({
+  listItem: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+    height: hp(8),
+    padding: 10,
+    marginHorizontal: 15,
+    borderRadius: 15,
+    marginVertical: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  listItemText: {
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 25,
+    color: '#000',
+  },
+  listContainer: {
+    backgroundColor: '#FFF',
+    marginTop: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFDF5',
@@ -281,7 +444,7 @@ const styles = StyleSheet.create({
     height: hp(8),
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     borderBottomRightRadius: 30,
     borderBottomLeftRadius: 30,
@@ -291,14 +454,15 @@ const styles = StyleSheet.create({
     width: 30,
   },
   headerText: {
-  
+
     fontWeight: '600',
     fontSize: 16,
     color: '#fff',
   },
   contentContainer: {
-    paddingHorizontal: 20,
-    marginTop:30,
+    marginHorizontal: 20,
+    marginTop: 30,
+    borderRadius: 15,
   },
   sectionTitle: {
     fontSize: 20,
@@ -306,32 +470,40 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   sectionDescription: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#777777',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#000',
   },
   sectionContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: hp(5),
-    height: hp(8),
+    alignItems: 'center', paddingHorizontal: 15, marginTop: 5
   },
   sectionIcon: {
-    height: 25,
-    width: 25,
+    height: 20,
+    width: 20,
   },
   matchTypeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    marginRight: 10,
     marginTop: 10,
     justifyContent: 'space-between',
   },
+  dropdown: {
+    marginTop: 10,
+    width:'30%',
+    backgroundColor: '#fafafa',
+    borderWidth: 1,
+    height:30,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 8,
+  },
   matchTypeItem: {
-    backgroundColor: '#DDFBE8',
-    paddingHorizontal: 10,
+
+    paddingHorizontal: 30,
     borderRadius: 10,
-    paddingVertical: 5,
+    paddingVertical: 10,
     marginLeft: 20,
   },
   matchTypeText: {
@@ -348,6 +520,10 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginHorizontal: 5,
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    right: 5,
+    top: 5
   },
   actionButtonIcon: {
     height: 25,
@@ -362,8 +538,8 @@ const styles = StyleSheet.create({
   userDetailsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp(8),
-    height: hp(8),
+    marginTop: 10,
+    paddingHorizontal: 15
   },
   userImage: {
     height: 25,
@@ -377,3 +553,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 });
+
+
+const attendanceOptions = [
+  { label: 'Present', value: 'present' },
+  { label: 'Absent', value: 'absent' },
+  { label: 'Injured', value: 'Injured' },
+  { label: 'ILlness', value: 'ILlness' },
+  { label: 'Other', value: 'Other' },
+  { label: 'none', value: null },
+];

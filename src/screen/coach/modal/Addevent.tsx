@@ -22,6 +22,7 @@ import { errorToast } from '../../../configs/customToast';
 import { useDispatch, useSelector } from 'react-redux';
 import { add_event } from '../../../redux/feature/featuresSlice';
 import {Dropdown} from 'react-native-element-dropdown';
+import AddEventMember from './AddEventMember';
 const EventModal = ({ visible, onClose, data }) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
@@ -32,6 +33,10 @@ const EventModal = ({ visible, onClose, data }) => {
   const user_data = useSelector(state => state.auth.userData);
   const [name, setName] = useState('');
   const [Location, setLocation] = useState('');
+  const [MemberListData, setMemberListData] = useState([]);
+  const [value, setValue] = useState('');
+  const [isFocus, setIsFocus] = useState(false);
+  const [Members, setMember] = useState(false);
   const [description, setDiscription] = useState('');
   // Function to format time
   const formatTime = () => {
@@ -46,6 +51,11 @@ const EventModal = ({ visible, onClose, data }) => {
     }
   }, [visible]);
 
+
+  const MemberList=(member)=>{
+setMemberListData(member)
+
+  }
   const openModal = () => {
     Animated.timing(translateY, {
       toValue: 0,
@@ -65,8 +75,11 @@ const EventModal = ({ visible, onClose, data }) => {
   const dispatch = useDispatch();
 
   const Publish_Event = () => {
-    if (name === '' && Location === '' && description === '') // Changed comparison operator
-      return errorToast('Please Enter all fields');
+    if (name === '' || Location === '' || description === '') {
+      // Changed to OR operator for correct validation
+      return errorToast('Please enter all fields');
+    }
+  
     const params = {
       user_id: user_data?.id,
       event_name: name,
@@ -75,11 +88,30 @@ const EventModal = ({ visible, onClose, data }) => {
       event_date: date.toString(),
       event_time: time.toString(),
       group_code: user_data?.group_code,
-      
+      type: value,
+      members: MemberListData,
     };
+  
     onClose();
-    dispatch(add_event(params));
+  
+    dispatch(add_event(params)).then((res) => {
+      if (add_event.fulfilled.match(res)) {
+        // Check if the action was successful
+        resetFormState();
+      }
+    });
   };
+  
+  const resetFormState = async() => {
+    setName('');
+    setLocation('');
+    setDiscription('');
+    setDate(new Date()); // Reset to current date or initial date
+    setTime(new Date()); // Reset to current time or initial time
+    setMemberListData([]);
+    setValue(''); // Reset type value
+  };
+  
 
   return (
     <Modal visible={visible} transparent>
@@ -99,7 +131,28 @@ const EventModal = ({ visible, onClose, data }) => {
               <Close />
             </TouchableOpacity>
           </View>
-      
+          <View style={styles.inputContainer}>
+              <Text style={styles.label}>Select Sport</Text>
+              <View style={[styles.inputWrapper,{justifyContent:'center'}]}>
+              <Dropdown
+          
+                  data={EventType}
+                  maxHeight={200}
+                  labelField="name"
+                  valueField="name"
+                  placeholder={!isFocus ? 'Select sport' : '...'}
+                  containerStyle={styles.dropdownContainer}
+                  
+                  value={value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={item => {
+                    setValue(item.name);
+                    setIsFocus(false);
+                  }}
+                />
+              </View>
+            </View>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Event Name</Text>
               <View style={styles.inputWrapper}>
@@ -188,29 +241,17 @@ const EventModal = ({ visible, onClose, data }) => {
                 />
               </View>
             </View>
-            {/* <View style={styles.inputContainer}>
-              <Text style={styles.label}>Select Sport</Text>
-              <View style={[styles.inputWrapper,{justifyContent:'center'}]}>
-              <Dropdown
-          
-                  data={sportList}
-                  maxHeight={200}
-                  labelField="name"
-                  valueField="name"
-                  placeholder={!isFocus ? 'Select sport' : '...'}
-                  containerStyle={styles.dropdownContainer}
-                  
-                  value={value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={item => {
-                    setValue(item.name);
-                    setIsFocus(false);
-                  }}
-                />
-              </View>
-            </View> */}
-
+     
+            <TouchableOpacity
+           onPress={()=>{
+            setMember(true)
+           }}
+            style={{borderWidth:1,marginTop:20,borderRadius:10,height:45,
+            
+            marginStart:0,
+            alignItems:'center',justifyContent:'center'}}>
+            <Text style={{fontSize:14,color:'#000',fontWeight:'600'}}>{MemberListData?.length >0?`(${MemberListData?.length}) members  Add more..`:'Add Participation'}</Text>
+          </TouchableOpacity>
           
         
           <TouchableOpacity
@@ -250,9 +291,14 @@ const EventModal = ({ visible, onClose, data }) => {
         }}
         locale="en"
       />
+      <AddEventMember 
+      onsetData={MemberList}
+      visible={Members}  onClose={()=>{setMember(false)}}/>
     </Modal>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -265,8 +311,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop:hp(25),
-    minHeight: hp(75),
+    marginTop:hp(15),
+    minHeight: hp(85),
     elevation: 5, // Add this for Android shadow
   },
   header: {
@@ -341,7 +387,17 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
-
+const EventType = [
+  {
+    name:'Match'
+  },
+  {
+    name:'Metting'
+  },
+  {
+    name:'Practice'
+  },
+]
 export default EventModal;
 
 
