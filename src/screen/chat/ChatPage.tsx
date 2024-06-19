@@ -47,7 +47,7 @@ export default function ChatPage() {
       getChatContact();
       setIsSelected('Individual')
     }
-  }, [user,modalVisible]);
+  }, [user,modalVisible,isFocused]);
 
   const getChatGroup = () => {
     const params = {

@@ -17,18 +17,22 @@ import {
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  add_event_memeber,
   delete_event,
   get_event_details,
   get_event_members,
+  update_event,
   update_event_memeber_data,
 } from '../../redux/feature/featuresSlice';
 import Loading from '../../configs/Loader';
 import UpdateEventModal from '../coach/modal/UpdateEventModal';
 import { Dropdown } from 'react-native-element-dropdown';
 import { errorToast } from '../../configs/customToast';
+import EventDotModal from '../coach/modal/EventDotmodal';
+import ScreenNameEnum from '../../routes/screenName.enum';
 export default function EventDetilas({ route }) {
   const [attendanceStatus, setAttendanceStatus] = useState({});
-  const [selectedTab, setSelectedTab] = useState('Parent');
+  const [DotmodalVisible, setDotModalVisible] = useState(false);
   const user = useSelector(state => state.auth.userData);
   const isLoading = useSelector(state => state.feature.isLoading);
   const isFocused = useIsFocused();
@@ -39,10 +43,8 @@ export default function EventDetilas({ route }) {
 
   const eventdetails = useSelector(state => state.feature.event_details);
   const getEventMembers = useSelector(state => state.feature.getEventMembers);
-  const user_data = useSelector(state => state.auth.userData);
-  const [UpdatedModal, setUpdatedModal] = useState(false);
+
   const [Options, setOption] = useState('Event')
-  console.log('eventdetails=>>>>>>', event_id, eventdetails);
 
   const get_monthName = dateStr => {
     const dateParts = dateStr.split('/');
@@ -106,13 +108,12 @@ export default function EventDetilas({ route }) {
 
     return dayOfMonth;
   };
-  console.log('getEventMembers=>>>>>>>>>>>>', getEventMembers);
 
   const isFocuse = useIsFocused();
   useEffect(() => {
     event_details();
     event_members();
-  }, [isFocuse, event_id, UpdatedModal]);
+  }, [isFocuse, event_id,]);
   const dispatch = useDispatch();
 
   const event_details = async () => {
@@ -127,25 +128,35 @@ export default function EventDetilas({ route }) {
     };
     await dispatch(get_event_members(params));
   };
-  const delete_events = async () => {
-    const params = {
-      event_id: event_id,
-      navigation: navigation,
-    };
-    await dispatch(delete_event(params));
-  };
 
-const updateEventAttendance =async(id,value)=>{
-  const params = {
-    member_id:id,
-    attendence:value,
-  };
-  await dispatch(update_event_memeber_data(params));
-}
+
+  const updateEventAttendance = async (id, value) => {
+    const params = {
+      member_id: id,
+      attendence: value,
+    };
+    await dispatch(update_event_memeber_data(params));
+  }
+  const AddParticipant = async (id, value) => {
+    const params = {
+     
+      event_id:event_id,
+     user_id:user.id
+    };
+    await dispatch(add_event_memeber(params)).then(res=>{
+
+    })
+  }
+
 
   const RecentListItem = ({ item, index }) => (
     <TouchableOpacity
+disabled={Options == 'Attendance'}
 
+
+onPress={()=>{
+  navigation.navigate(ScreenNameEnum.PersnalInfo,{item:item.user_data})
+}}
       style={[
         styles.listItem,
         {
@@ -165,38 +176,38 @@ const updateEventAttendance =async(id,value)=>{
           </Text>
         )}
       </View>
-      <View style={{ width:Options =='Attendance'?'50%':'80%' }}>
+      <View style={{ width: Options == 'Attendance' ? '50%' : '80%' }}>
         <Text style={styles.listItemText}>
           {item.user_data.first_name} {item.user_data.last_name}
         </Text>
         <Text style={styles.listItemText}>{item.user_data.email}</Text>
       </View>
-      {Options =='Attendance' &&
-      <Dropdown
+      {Options == 'Attendance' &&
+        <Dropdown
           style={styles.dropdown}
           data={attendanceOptions}
           labelField="label"
           valueField="value"
           placeholder="Select"
           value={attendanceStatus[item.id] || item.attendence}
-        
-          itemTextStyle={{fontSize:12,color:'#000'}}
+
+          itemTextStyle={{ fontSize: 12, color: '#000' }}
           onChange={selectedItem => {
             setAttendanceStatus(prev => ({ ...prev, [item.id]: selectedItem.value }));
             updateEventAttendance(item.id, selectedItem.value);
           }}
         />
-}
+      }
     </TouchableOpacity>
   );
- 
+
   return (
     <View style={styles.container}>
       {isLoading ? <Loading /> : null}
 
       {eventdetails != null && (
         <>
-          <View style={styles.colorDiv}>
+        <View style={styles.colorDiv}>  
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image
                 source={require('../../assets/Cropping/Back-Navs3x.png')}
@@ -231,137 +242,123 @@ const updateEventAttendance =async(id,value)=>{
               style={[styles.matchTypeItem, { backgroundColor: Options == 'Attendance' ? '#DDFBE8' : '#fff' }]}>
               <Text style={styles.matchTypeText}>Attendance</Text>
             </TouchableOpacity>
-            {/* 
-            {user_data?.id == eventdetails?.user_details.id && (
-              <View style={styles.actionButtonsContainer}>
-               <TouchableOpacity
-                  onPress={() => {
-                    setUpdatedModal(true);
-                  }}
-                  style={styles.actionButton}>
-                  <Image
-                    source={require('../../assets/Cropping/arrow.png')}
-                    style={styles.actionButtonIcon}
-                  />
-                </TouchableOpacity>
-              
-              </View>
-            )}
-             */}
+            
+        
+            
           </View>
-          {Options == 'Event' && <View style={[styles.contentContainer, {
-            shadowColor: "#000",
-            paddingBottom: 20,
-            backgroundColor: '#fff', borderRadius: 10, margin: 10,
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
+          {Options == 'Event' && <>
+            <View style={[styles.contentContainer, {
+              shadowColor: "#000",
+              paddingBottom: 20,
+              backgroundColor: '#fff', borderRadius: 10, margin: 10,
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
 
-            elevation: 5,
-          }]}>
+              elevation: 5,
+            }]}>
 
-            <View style={{
-              borderTopRightRadius: 10, borderTopLeftRadius: 10,
+              <View style={{
+                borderTopRightRadius: 10, borderTopLeftRadius: 10,
 
-              paddingHorizontal: 10, paddingVertical: 10,
-              backgroundColor: eventdetails.type == 'Metting' ? '#e7cbf2' : eventdetails.type == 'Match' ? '#DDFBE8' : '#fff9cd'
-            }} >
-              <Text style={[styles.sectionDescription, {
+                paddingHorizontal: 10, paddingVertical: 10,
+                backgroundColor: eventdetails.type == 'Metting' ? '#e7cbf2' : eventdetails.type == 'Match' ? '#DDFBE8' : '#fff9cd'
+              }} >
+                <Text style={[styles.sectionDescription, {
 
-                color: eventdetails.type == 'Metting' ? '#ae62bd' : eventdetails.type == 'Match' ? '#62bdab' : '#dec610'
-              }]}>
-                {eventdetails?.type}
-              </Text>
-              <Text style={styles.sectionTitle}>
-                {eventdetails?.event_name}
-              </Text>
+                  color: eventdetails.type == 'Metting' ? '#ae62bd' : eventdetails.type == 'Match' ? '#62bdab' : '#dec610'
+                }]}>
+                  {eventdetails?.type}
+                </Text>
+                <Text style={styles.sectionTitle}>
+                  {eventdetails?.event_name}
+                </Text>
 
-            </View>
-            <View style={styles.sectionContainer}>
-              <Image
-                source={require('../../assets/Cropping/appointment.png')}
-                style={styles.sectionIcon}
-              />
-              <View>
+              </View>
+              <View style={styles.sectionContainer}>
+                <Image
+                  source={require('../../assets/Cropping/appointment.png')}
+                  style={styles.sectionIcon}
+                />
+                <View>
+                  <Text style={styles.sectionText}>
+                    {get_DayName(
+                      new Date(eventdetails?.event_date).toLocaleDateString(),
+                    )}
+                    ,{' '}
+                    {get_monthName(
+                      new Date(eventdetails?.event_date).toLocaleDateString(),
+                    )}{' '}
+                    {get_dayDate(
+                      new Date(eventdetails?.event_date).toLocaleDateString(),
+                    )}{' '}
+                    ,
+                    {new Date(eventdetails?.event_time).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.userDetailsContainer, { marginTop: 10, paddingHorizontal: 15 }]}>
+                <Image
+                  source={require('../../assets/Cropping/location.png')}
+                  style={styles.sectionIcon}
+                />
                 <Text style={styles.sectionText}>
-                  {get_DayName(
-                    new Date(eventdetails?.event_date).toLocaleDateString(),
-                  )}
-                  ,{' '}
-                  {get_monthName(
-                    new Date(eventdetails?.event_date).toLocaleDateString(),
-                  )}{' '}
-                  {get_dayDate(
-                    new Date(eventdetails?.event_date).toLocaleDateString(),
-                  )}{' '}
-                  ,
-                  {new Date(eventdetails?.event_time).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {eventdetails?.event_location}
                 </Text>
               </View>
-            </View>
-            <View style={[styles.userDetailsContainer, { marginTop: 10, paddingHorizontal: 15 }]}>
-              <Image
-                source={require('../../assets/Cropping/location.png')}
-                style={styles.sectionIcon}
-              />
-              <Text style={styles.sectionText}>
-                {eventdetails?.event_location}
-              </Text>
-            </View>
 
-            <View style={[styles.userDetailsContainer, {}]}>
-              <Image
-                source={require('../../assets/Cropping/appointment.png')}
-                style={styles.sectionIcon}
-              />
-              <Text style={styles.sectionText}> Created time ({eventdetails?.event_date})</Text>
-            </View>
-            <View style={[styles.userDetailsContainer, {}]}>
-              <Image
-                source={{ uri: eventdetails?.user_details.image }}
-                style={styles.userImage}
-                resizeMode="contain"
-              />
-              <Text style={styles.userDetailsText}>
-                Created by {eventdetails?.user_details.first_name}{' '}
-                {eventdetails?.user_details.last_name}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                errorToast('This Option Coming soon')
-                // Alert.alert(
-                //   'Delete Event',
-                //   'Are you sure you want to delete this event?',
-                //   [
-                //     {
-                //       text: 'Cancel',
-                //       style: 'cancel',
-                //     },
-                //     {
-                //       text: 'Delete',
-                //       onPress: () => {
-                //         delete_events();
-                //       },
-                //       style: 'destructive',
-                //     },
-                //   ],
-                //   { cancelable: false },
-                // );
-              }}
-              style={styles.actionButton}>
-              <Image
-                source={require('../../assets/Cropping/dots.png')}
-                style={styles.actionButtonIcon}
-              />
+              <View style={[styles.userDetailsContainer, {}]}>
+                <Image
+                  source={require('../../assets/Cropping/appointment.png')}
+                  style={styles.sectionIcon}
+                />
+                <Text style={styles.sectionText}> Created time ({eventdetails?.event_date})</Text>
+              </View>
+              <View style={[styles.userDetailsContainer, {}]}>
+                <Image
+                  source={{ uri: eventdetails?.user_details?.image }}
+                  style={styles.userImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.userDetailsText}>
+                  Created by {eventdetails?.user_details?.first_name}{' '}
+                  {eventdetails?.user_details?.last_name}
+                </Text>
+              </View>
+              {eventdetails?.user_id == user.id && <TouchableOpacity
+                onPress={() => {
+                  setDotModalVisible(true);
+                }}
+                style={styles.actionButton}>
+                <Image
+                  source={require('../../assets/Cropping/dots2.png')}
+                  style={styles.actionButtonIcon}
+                />
+                
+              </TouchableOpacity>}
+            </View> 
+
+            <TouchableOpacity 
+            
+            onPress={()=>{
+              AddParticipant()
+            }}
+            style={{
+              borderWidth: 0.8, height: 45,
+
+              borderRadius: 10, backgroundColor: '#fff',
+              marginHorizontal: 20, alignItems: 'center', justifyContent: 'center'
+            }}>
+              <Text style={{ fontSize: 16, color: '#000', fontWeight: '500' }}>Participant</Text>
             </TouchableOpacity>
-          </View>}
+          </>
+          }
           {Options == 'Participants' &&
 
             <View style={styles.listContainer}>
@@ -385,22 +382,35 @@ const updateEventAttendance =async(id,value)=>{
         </>
       )}
 
-      {eventdetails == null && (
+      {eventdetails == null && (<>
+        <View style={styles.colorDiv}>  
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Image
+                source={require('../../assets/Cropping/Back-Navs3x.png')}
+                style={styles.backButton}
+              />
+            </TouchableOpacity>
+            <Text style={styles.headerText}>Event Details</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+
+            </TouchableOpacity>
+          </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
           <Text>No Details found</Text>
 
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={{}}>
-            <Text>Click Go Back</Text>
-          </TouchableOpacity>
         </View>
+        </>
       )}
-      <UpdateEventModal
-        visible={UpdatedModal}
-        onClose={() => setUpdatedModal(false)}
+    
+       <EventDotModal
+        visible={DotmodalVisible}
+        onClose={() => {
+          setDotModalVisible(false);
+          event_details();
+          event_members();
+        }}
+        event_id={event_id}
       />
     </View>
   );
@@ -491,10 +501,10 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     marginTop: 10,
-    width:'30%',
+    width: '30%',
     backgroundColor: '#fafafa',
     borderWidth: 1,
-    height:30,
+    height: 30,
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 8,
@@ -526,8 +536,8 @@ const styles = StyleSheet.create({
     top: 5
   },
   actionButtonIcon: {
-    height: 25,
-    width: 25,
+    height: 30,
+    width: 30,
   },
   sectionText: {
     fontSize: 14,

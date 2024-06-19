@@ -91,6 +91,7 @@ const SingleChat = ({visible, onClose}) => {
       firebase_chat_id: groupRef.id,
       user_id: user?.id,
       reciver_id: item.id,
+      navigation:navigation
     };
 
     dispatch(add_chat_user(params));

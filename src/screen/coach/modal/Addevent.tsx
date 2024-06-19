@@ -311,8 +311,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop:hp(15),
-    minHeight: hp(85),
+    marginTop:hp(10),
+    minHeight: hp(90),
     elevation: 5, // Add this for Android shadow
   },
   header: {
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 10,
+    bottom:5,
     alignSelf: 'center',
   },
   publishButtonText: {

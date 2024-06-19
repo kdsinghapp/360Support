@@ -286,7 +286,6 @@ export default function coachCalendar() {
         {Event_List.length == 0 && <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
           <Text style={{ fontSize: 14, color: '#777777', fontWeight: '500' }}>No Event Found</Text>
         </View>
-
         }
 
 

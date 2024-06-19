@@ -14,31 +14,58 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {
-  Get_Group,
-  get_profile,
-  update_parent_profile,
-} from '../../redux/feature/authSlice';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import ScreenNameEnum from '../../routes/screenName.enum';
 import BackBtn from '../../assets/svg/BackBtn.svg';
-import PickPhoto from '../../assets/svg/PickPhoto.svg';
 import {useDispatch, useSelector} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ImagePicker from 'react-native-image-crop-picker';
-import {Dropdown} from 'react-native-element-dropdown';
-import DatePicker from 'react-native-date-picker';
 import Loading from '../../configs/Loader';
-
+import { add_chat_user, get_individual_chat } from '../../redux/feature/featuresSlice';
+import firestore from '@react-native-firebase/firestore';
 export default function PersnalInfo() {
     const navigation = useNavigation()
     const GroupDetails = useSelector(state => state.auth.Group_Details);
-    const isLoading: GroupDetails | undefined = useSelector((state: any) => state.auth.isLoading);
+    const isLoading= useSelector(state => state.feature.isLoading);
     const routes = useRoute()
+    const user = useSelector(state => state.auth.userData);
     const {item} = routes.params
 const dispatch = useDispatch();
 
+const handleSubmit = async () => {
 
+ 
+  
+  try{
+  const groupRef = firestore().collection('Chat_User').doc();
+  await groupRef.set({
+    firebase_chat_id: groupRef.id,
+    user_id: user?.id,
+    reciver_id: item.id,
+    group_group_code: user?.group_code,
+    Created_user: user?.id,
+    timestamp: firestore.FieldValue.serverTimestamp(),
+  });
+
+  const params = {
+    firebase_chat_id: groupRef.id,
+    user_id: user?.id,
+    reciver_id: item.id,
+    navigation:navigation
+  };
+
+  dispatch(add_chat_user(params)).then(res=>{
+   
+      const params = {
+        user_id: user?.id,
+      };
+      dispatch(get_individual_chat(params));
+    
+  })
+}
+catch(err){
+  console.log('errrr',err);
+  
+}
+
+};
 
   return (
     <View style={styles.container}>
@@ -213,7 +240,11 @@ const dispatch = useDispatch();
                {item.email}
               </Text>
             </View>
-            <View
+            <TouchableOpacity
+
+            onPress={()=>{
+              handleSubmit()
+            }}
               style={[
                 {
                   marginTop: 20,
@@ -237,7 +268,7 @@ const dispatch = useDispatch();
                 ]}>
                 send message
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.emptySpace} />

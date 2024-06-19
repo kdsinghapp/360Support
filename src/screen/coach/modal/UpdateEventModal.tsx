@@ -31,14 +31,15 @@ const UpdateEventModal = ({visible, onClose, data}) => {
   const [time, setTime] = useState(new Date());
   
   const [open, setOpen] = useState(false);
-
+  const [value, setValue] = useState('');
+  const [isFocus, setIsFocus] = useState(false);
   const [Timeopen, setTimeOpen] = useState(false);
   const user_data = useSelector(state => state.auth.userData);
   const [name, setName] = useState('');
   const [Location, setLocation] = useState('');
   const [eventType, setEventType] = useState('');
   const [description, setDiscription] = useState('');
-  const [value, setValue] = useState<string | null>(null);
+ 
   const eventdetails = useSelector(state => state.feature.event_details);
   const formatTime = () => {
     return time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
@@ -59,6 +60,7 @@ const UpdateEventModal = ({visible, onClose, data}) => {
     setTime(new Date(eventdetails?.event_time));
     setLocation(eventdetails?.event_location);
     setDiscription(eventdetails?.event_description);
+    setValue(eventdetails?.type);
   }, [isFocuse]);
 
   const openModal = () => {
@@ -83,18 +85,23 @@ const UpdateEventModal = ({visible, onClose, data}) => {
     if (name === '' && Location === '' && description === '')
       // Changed comparison operator
       return errorToast('Please Enter all fields');
+      const formData = new FormData();
+      formData.append('event_id',eventdetails?.id,);
+      formData.append('event_name', name);
+      formData.append('event_date',date.toString(),);
+      formData.append('event_time', date.toString(), );
+      formData.append('event_location', Location,);
+      formData.append('event_description',description);
+      formData.append('group_code',user_data?.group_code,);
+      formData.append('type', value);
       const params = {
-        event_id: eventdetails?.id,
-        event_name: name,
-        event_location: Location,
-        event_description: description,
-        event_date: date.toString(),
-        event_time: date.toString(), // Same value as event_date
-        group_code: user_data?.group_code,
+       data:formData
       };
       
-    onClose();
-    dispatch(update_event(params));
+   
+    dispatch(update_event(params)).then(res=>{
+      onClose()
+    })
   };
 
   return (
@@ -114,7 +121,25 @@ const UpdateEventModal = ({visible, onClose, data}) => {
                 <Close />
               </TouchableOpacity>
             </View>
-
+            <View style={[styles.inputWrapper,{justifyContent:'center',marginHorizontal:15}]}>
+              <Dropdown
+          
+                  data={EventType}
+                  maxHeight={200}
+                  labelField="name"
+                  valueField="name"
+                  placeholder={!isFocus ? 'Select sport' : '...'}
+                  containerStyle={styles.dropdownContainer}
+                  
+                  value={value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={item => {
+                    setValue(item.name);
+                    setIsFocus(false);
+                  }}
+                />
+              </View>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Event Name</Text>
               <View style={styles.inputWrapper}>
@@ -343,17 +368,14 @@ const styles = StyleSheet.create({
 
 export default UpdateEventModal;
 
-const sportList = [
+const EventType = [
   {
-    name: 'soccer',
+    name:'Match'
   },
   {
-    name: 'basketball',
+    name:'Metting'
   },
   {
-    name: 'volleyball',
+    name:'Practice'
   },
-  {
-    name: 'hockey',
-  },
-];
+]

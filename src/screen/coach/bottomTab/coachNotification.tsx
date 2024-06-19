@@ -170,7 +170,7 @@
                     fontWeight: '700',
                     fontSize: 22,
                     lineHeight: 32,
-                    color: '#FFF',
+                    color: '#000',
                   }}>
                   Notification
                 </Text>

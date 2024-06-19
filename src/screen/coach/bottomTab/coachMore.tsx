@@ -269,7 +269,7 @@ const data = [
   },
   {
     id: '5',
-    titile: 'Matche Result Management',
+    titile: 'Matche Result',
     logo: require('../../../assets/Cropping/results.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
     screen: ScreenNameEnum.coachMatches,

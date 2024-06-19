@@ -14,7 +14,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {Get_Group, get_profile, update_parent_profile} from '../../../redux/feature/authSlice';
+import {Get_Country, Get_Group, get_profile, update_parent_profile} from '../../../redux/feature/authSlice';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import BackBtn from '../../../assets/svg/BackBtn.svg';
@@ -160,6 +160,7 @@ export default function coachProfile() {
   }, [My_Profile]);
   useEffect(() => {
     getChild_profile();
+    dispatch(Get_Country());
   }, [user_data, isFocuse]);
 
   const getChild_profile = async () => {
@@ -169,6 +170,7 @@ export default function coachProfile() {
     };
     dispatch(get_profile(params));
   };
+
   const openImageLibrary = () => {
     ImagePicker.openPicker({
       width: 300,
@@ -182,6 +184,9 @@ export default function coachProfile() {
         console.log(err);
       });
   };
+
+
+  
   return (
     <View style={styles.container}>
           {isLoading ? <Loading /> : null}

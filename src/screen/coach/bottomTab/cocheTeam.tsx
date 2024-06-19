@@ -46,8 +46,8 @@ export default function CocheTeamScreen() {
       <TouchableOpacity
         onPress={() => {
           navigation.navigate(ScreenNameEnum.TeamListScreen, {
-            item: item.members,
-            team_name:item.team_name
+            item: item,
+           
           });
         }}
         style={[
