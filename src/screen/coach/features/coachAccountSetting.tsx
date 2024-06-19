@@ -63,7 +63,11 @@ if(confirmPassword != newPassword) return errorToast('New password or Confirm pa
 
 
 
-  dispatch(update_password(params))
+  dispatch(update_password(params)).then(res=>{
+    setConfirmPassword('')
+    setCurrentPassword('')
+    setConfirmPassword('')
+  })
   };
 
   return (

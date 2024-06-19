@@ -286,17 +286,20 @@ export const update_password = createAsyncThunk(
       console.log('FormData:', formData);
 
       const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/update_password', config);
-      console.log('update_password=>>>>>>>>', response.data);
+  
       const data = await response.json();
-
+   console.log('update_password=>>>>>>>>', data);
       if (data.status === '1') {
         successToast('Password Change Successfully');
+      }
+      else{
+        errorToast(data.message);
       }
 
       return data.result;
     } catch (error) {
       console.log('Error:', error);
-      errorToast('Failed to  update_password');
+      errorToast('Password Chang Failed');
       return thunkApi.rejectWithValue(error);
     }
   }
