@@ -85,6 +85,8 @@ import cochRegistration from "../screen/coach/features/cochRegistration";
 import TeamListScreen from "../screen/coach/features/TeamMemberList";
 import coachAccountSetting from "../screen/coach/features/coachAccountSetting";
 import GroupmemberPage from "../screen/chat/GroupMemberScreen";
+import VideoPlayer from "../screen/coach/features/VideoPlayer";
+import coachNotificationSetting from "../screen/coach/features/coachNotificationSetting";
 
 
 const _routes = {
@@ -294,6 +296,14 @@ const _routes = {
     {
       name: ScreenNameEnum.GroupmemberPage,
       Component: GroupmemberPage,
+    },
+    {
+      name: ScreenNameEnum.VideoPlayer,
+      Component: VideoPlayer,
+    },
+    {
+      name: ScreenNameEnum.coachNotificationSetting,
+      Component: coachNotificationSetting,
     },
 
 

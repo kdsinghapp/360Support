@@ -17,14 +17,24 @@ import {
 import Right from '../../../assets/svg/WhiteRight.svg';
 import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Close from '../../../assets/svg/Close.svg';
 import AddIcon from '../../../assets/svg/AddIcon.svg';
+import { log_out, logout } from '../../../redux/feature/authSlice';
+import Loading from '../../../configs/Loader';
 export default function coachMore() {
   const navigation = useNavigation();
-
+  const isLoading = useSelector(state => state.auth.isLoading);
   const [isVisible, setIsVisible] = useState(false);
   const dispatch = useDispatch();
+
+  const User_logOut =()=>{
+    setIsVisible(false);
+    const params ={
+      navigation:navigation
+    }
+    dispatch(log_out(params))
+  }
   const RecentListItem = ({item}) => (
     <TouchableOpacity
       onPress={() => {
@@ -57,10 +67,10 @@ export default function coachMore() {
 
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>
+      {isLoading?<Loading />:null}
       <View style={{marginHorizontal: 15, marginTop: hp(5)}}>
         <Text style={{fontSize: 18, fontWeight: '500', color: '#FFF'}}>
-          Parent Account
-        </Text>
+          Profile        </Text>
       </View>
       <View
         style={[
@@ -175,8 +185,8 @@ export default function coachMore() {
             </View>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
-                setIsVisible(false);
+                User_logOut()
+            
               }}
               style={{
                 width: 225,
@@ -275,7 +285,7 @@ const data = [
     screen: ScreenNameEnum.coachMatches,
   },
   {
-    id: '5',
+    id: '6',
     titile: 'Registration',
     logo: require('../../../assets/Cropping/online-registration.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
@@ -291,11 +301,11 @@ const data2 = [
   },
 
   {
-    id: '3',
+    id: '2',
     titile: 'Notification',
 
     logo: require('../../../assets/Cropping/Notification2x.png'),
-    screen: ScreenNameEnum.MY_CHILDREN,
+    screen: ScreenNameEnum.coachNotificationSetting,
   },
   {
     id: '3',

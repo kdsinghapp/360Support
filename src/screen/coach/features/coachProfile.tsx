@@ -158,12 +158,14 @@ export default function coachProfile() {
     setCity(My_Profile.city);
     setzipCode(My_Profile.zip_code);
   }, [My_Profile]);
+
+  
   useEffect(() => {
-    getChild_profile();
+    get_profile();
     dispatch(Get_Country());
   }, [user_data, isFocuse]);
 
-  const getChild_profile = async () => {
+  const get_profile = async () => {
     const id = await AsyncStorage.getItem('user_id');
     params = {
       user_id: id,

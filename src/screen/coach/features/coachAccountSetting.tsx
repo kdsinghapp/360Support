@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,14 @@ import {
   Image,
 } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import BackBtn from '../../../assets/svg/BackBtn.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_privacy_policy, get_terms_conditions, update_password } from '../../../redux/feature/featuresSlice';
+import Loading from '../../../configs/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import TextInputField from '../../../configs/TextInput';
+import { errorToast } from '../../../configs/customToast';
 
 interface TabData {
   name: string;
@@ -20,12 +26,49 @@ interface TabData {
 export default function coachAccountSetting() {
   const [Selected, setSelected] = useState<string>('Account');
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const termsConditions = useSelector(state => state.feature?.TermsCondition);
+  const Privacypolicy = useSelector(state => state.feature?.Privacypolicy);
+  const isLoading = useSelector(state => state.feature.isLoading);
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
+  const isFocuss = useIsFocused();
   const toggleSwitch = () => setIsEnabled(prevState => !prevState);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const user = useSelector(state => state.auth.userData);
+  const handleCurrentPasswordChange = (text) => {
+    setCurrentPassword(text);
+  };
+  const handleNewPasswordChange = (text) => {
+    setNewPassword(text);
+  };
+
+  const handleConfirmPasswordChange = (text) => {
+    setConfirmPassword(text);
+  };
+  useEffect(() => {
+    dispatch(get_terms_conditions());
+    dispatch(get_privacy_policy());
+  }, [isFocuss]);
+  const handleSave = () => {
+if(confirmPassword != newPassword) return errorToast('New password or Confirm password not match')
+    const params = {
+  user_id:user.id,
+      password: newPassword,
+      old_password: currentPassword,
+   
+    }
+
+
+
+  dispatch(update_password(params))
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFDF5' }}>
+      {isLoading?<Loading />:null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.header}>
@@ -68,56 +111,62 @@ export default function coachAccountSetting() {
           </View>
         {Selected == 'Account' && (
           <View style={styles.container}>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Notifications</Text>
-              <View style={styles.notificationOption}>
-                <View style={styles.notificationText}>
-                  <Text style={styles.notificationLabel}>Email notifications</Text>
-                  <Text style={styles.notificationDescription}>
-                    Receive notifications regarding posts, events and more in your email inbox.
-                  </Text>
-                </View>
-                <Switch
-                  trackColor={{ false: '#767577', true: '#81b0ff' }}
-                  thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}
-                />
-              </View>
-              <View style={styles.notificationOption}>
-                <View style={styles.notificationText}>
-                  <Text style={styles.notificationLabel}>Push notifications</Text>
-                  <Text style={styles.notificationDescription}>
-                    Receive notifications regarding posts, events and more in your email inbox.
-                  </Text>
-                </View>
-                <Switch
-                  trackColor={{ false: '#767577', true: '#81b0ff' }}
-                  thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}
-                />
-              </View>
-            </View>
+            
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Login options</Text>
-              <View style={styles.loginOption}>
-                <Text style={styles.loginLabel}>Email</Text>
-                <Text style={styles.loginDescription}>Demo@gmail.com</Text>
-                <TouchableOpacity style={styles.changeButton}>
-                  <Text style={styles.changeButtonText}>Change</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.loginOption}>
-                <Text style={styles.loginLabel}>Password</Text>
-                <Text style={styles.loginDescription}>Demo@gmail.com</Text>
-                <TouchableOpacity style={styles.changeButton}>
-                  <Text style={styles.changeButtonText}>Change</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.sectionTitle}>Change Password</Text>
+              <View style={{ marginTop: 20 }}>
+        <TextInputField
+          hide={true}
+          onChangeText={handleCurrentPasswordChange}
+          isFocus={true}
+          name={'Current Password'}
+          placeholder={'Current Password'}
+          firstLogo={false}
+          showEye={true}
+          txtColor={'#7756FC'}
+        />
+      </View>
+      <View style={{ marginTop: 10 }}>
+        <TextInputField
+          hide={true}
+          onChangeText={handleNewPasswordChange}
+          isFocus={true}
+          name={'New Password'}
+          placeholder={'New Password'}
+          firstLogo={false}
+          showEye={true}
+          txtColor={'#7756FC'}
+        />
+      </View>
+      <View style={{ marginTop: 10 }}>
+        <TextInputField
+          hide={true}
+          onChangeText={handleConfirmPasswordChange}
+          isFocus={true}
+          name={'Confirm Password'}
+          placeholder={'Confirm Password'}
+          firstLogo={false}
+          showEye={true}
+          txtColor={'#7756FC'}
+        />
+      </View>
+      <TouchableOpacity
+        style={[styles.tabBtn, { }]}
+        onPress={handleSave}
+      >
+        <Text
+          style={{
+            fontWeight: '600',
+            fontSize: 17,
+            color: '#fff',
+            lineHeight: 25.5,
+            marginLeft: 10,
+          }}
+        >
+          Save
+        </Text>
+      </TouchableOpacity>
             </View>
           </View>
         )}
@@ -135,26 +184,22 @@ export default function coachAccountSetting() {
             </View>
             <View style={styles.privacyContent}>
               <Text style={styles.privacyTitle}>Privacy Policy</Text>
-              <Text style={styles.privacyText}>
-                The Lorem ipsum dolor sit amet consectetur. Proin urna lorem odio consectetur
-                pharetra nisi sit et. Ut venenatis in id tortor arcu viverra tempor orci felis.
-                Metus urna venenatis accumsan mi id. Molestie ipsum egestas varius mollis tellus
-                neque nec ultrices vel. Integer cursus fermentum nisl pharetra massa id nibh
-                aliquam. Nulla pellentesque diam tellus erat ac consequat a amet scelerisque.
-                Ornare magna consequat ut egestas ridiculus consequat. Dictumst habitasse nunc
-                arcu elit. Massa adipiscing penatibus ut mauris. Nibh porttitor ornare interdum
-                scelerisque eros duis gravida amet sodales. Pellentesque at vehicula mus
-                suspendisse aliquam. Amet dui diam integer purus vitae. Lobortis mauris enim at
-                vestibulum ultrices tortor. Nulla a sed neque quam sed in diam proin. Congue sit
-                arcu volutpat nisi maecenas cursus fusce quam donec. Velit orci pharetra nisl
-                pharetra ligula imperdiet. Donec sit dignissim bibendum tortor semper. Sem odio
-                neque viverra in purus fames. Lacus in nec porttitor mi. Proin metus risus
-                adipiscing in nibh fames. Imperdiet nulla ornare hac turpis vestibulum mauris id.
-                Maecenas sed fames sed nulla rutrum odio. Tristique augue placerat mattis
-                tincidunt et. Amet in sit magna convallis odio in vestibulum dignissim semper.
-                Risus netus lacus vitae posuere a sed magna egestas. Urna pellentesque neque
-                convallis rhoncus quisque viverra placerat
-              </Text>
+              <Text style={styles.privacyText}>{Privacypolicy?.content}</Text>
+            </View>
+          </View>
+        )}
+        {Selected == 'Term & Conditions' && (
+          <View style={styles.privacyContainer}>
+            <View style={styles.privacyImageContainer}>
+              <Image
+                source={require('../../../assets/Cropping/I_1-2.png')}
+                style={styles.privacyImage}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.privacyContent}>
+              <Text style={styles.privacyTitle}>Term & Conditions</Text>
+              <Text style={styles.privacyText}>{termsConditions?.content}</Text>
             </View>
           </View>
         )}
@@ -164,6 +209,29 @@ export default function coachAccountSetting() {
 }
 
 const styles = StyleSheet.create({
+  tabBtn:{
+    height:60,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 60,
+    marginTop: 25,
+   
+    width: '100%',
+  
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+
+    elevation: 1,
+    backgroundColor: '#874be9',
+  },
     colorDiv: {
         backgroundColor: '#874be9',
         height: hp(8),
@@ -402,5 +470,9 @@ const tabData = [
 
   {
     name: 'Privacy',
+  },
+
+  {
+    name: 'Term & Conditions',
   },
 ];

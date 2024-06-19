@@ -26,6 +26,7 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 import {successToast} from '../../../configs/customToast';
 import DeleteVideo from '../modal/VideoDeleteModal';
 import DeleteVideoModal from '../modal/VideoDeleteModal';
+import ScreenNameEnum from '../../../routes/screenName.enum';
 
 interface PostItem {
   id: string;
@@ -92,8 +93,17 @@ export default function cocheVideo() {
     return () => clearTimeout(timeoutId);
   };
   const RecentListItem = ({item}: {item: PostItem}) => (
-    <View style={[styles.shadow, styles.recentListItem]}>
-      <View></View>
+    <TouchableOpacity 
+
+    onPress={()=>{
+      navigation.navigate(ScreenNameEnum.VideoPlayer,{url:getYouTubeVideoId(item?.video_url),item:{
+        title:item.title,
+        description:item.description
+      }})
+    }}
+    
+    style={[styles.shadow, styles.recentListItem]}>
+     
       <View style={styles.interactionContainer}>
         <YoutubePlayer
           height={300}
@@ -103,11 +113,9 @@ export default function cocheVideo() {
         />
       </View>
       <View style={styles.postContent}>
-        <Text style={styles.postTitle}>{item.title}</Text>
-        <Text style={styles.postDescription}>{item.description}</Text>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={styles.postTitle}>{item.title}</Text>
-        </View>
+        <Text style={styles.postTitle}>{item.title?.substring(0,10)}</Text>
+        <Text style={styles.postDescription}>{item.description?.substring(0,20)}</Text>
+       
       </View>
       <TouchableOpacity
         onPress={() => {
@@ -151,7 +159,7 @@ export default function cocheVideo() {
           }}
         />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -319,8 +327,8 @@ const styles = StyleSheet.create({
     color: '#294247',
   },
   postContent: {
+    height:'80%',
     marginTop: 10,
-    justifyContent: 'center',
     marginLeft: 14,
   },
   profileImage: {

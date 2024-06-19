@@ -92,14 +92,16 @@ export const Get_UserProfile = createAsyncThunk(
   async (params, thunkApi) => {
 
     try {
-      const response = await API.get('/get_profile', params.data);
+
+      console.log('get profile =>>>>>>',params);
+      const response = await API.post('/get_profile', params.data);
      
       if (response.data.status == '1') {
         console.log('Get_UserProfile Success', response.data.message);
       } else {
         console.log(
           'Get_UserProfile Not Found',
-          'Please Enter Valid Group Code',
+         
         );
       }
 
@@ -424,28 +426,36 @@ export const Updated_ChildInfo = createAsyncThunk(
   },
 );
 
-export const logout = createAsyncThunk('logout', async (params, thunkApi) => {
+export const log_out = createAsyncThunk('log_out', async (params, thunkApi) => {
   try {
-    const response = await API.post('/log_out', params.data);
+    console.log(' AuthSlice.js:29 ~ logout ~ called:');
 
-    console.log(
-      '🚀 ~ file: AuthSlice.js:29 ~ logout ~ response:',
-      response.data,
-    );
+    const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/logout', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other headers you might need
+      },
+    });
 
-    if (response.data.status == '1') {
-      successToast(response.data.message);
+    const data = await response.json();
+
+    console.log(' AuthSlice.js:29 ~ logout ~ response:', data);
+
+    if (data.status == '1') {
+      successToast(data.message);
+      params.navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
     } else {
-      errorToast(response.data.message);
+      errorToast(data.message);
     }
 
-    params.navigation.navigate('Login');
   } catch (error) {
     errorToast('Network error');
     console.log('🚀 ~ file: AuthSlice.js:32 ~ logout ~ error:', error);
     return thunkApi.rejectWithValue(error);
   }
 });
+
 
 //get Profile
 export const get_profile = createAsyncThunk(
@@ -558,17 +568,17 @@ const AuthSlice = createSlice({
       state.isLogin = false;
     });
 
-    builder.addCase(logout.pending, state => {
+    builder.addCase(log_out.pending, state => {
       state.isLoading = true;
     });
-    builder.addCase(logout.fulfilled, (state, action) => {
+    builder.addCase(log_out.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isSuccess = false;
       state.isError = false;
       state.isLogin = false;
       state.isLogOut = true;
     });
-    builder.addCase(logout.rejected, (state, action) => {
+    builder.addCase(log_out.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

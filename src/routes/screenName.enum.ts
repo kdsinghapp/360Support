@@ -33,6 +33,8 @@ enum ScreenNameEnum {
   TeamListScreen='TeamListScreen',
   coachAccountSetting='coachAccountSetting',
   GroupmemberPage='GroupmemberPage',
+  VideoPlayer='VideoPlayer',
+  coachNotificationSetting='coachNotificationSetting',
 
   //TAb
   BOTTOM_TAB ='BOTTOM_TAB',

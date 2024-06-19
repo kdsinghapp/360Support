@@ -355,7 +355,7 @@ onPress={()=>{
               borderRadius: 10, backgroundColor: '#fff',
               marginHorizontal: 20, alignItems: 'center', justifyContent: 'center'
             }}>
-              <Text style={{ fontSize: 16, color: '#000', fontWeight: '500' }}>Participant</Text>
+              <Text style={{ fontSize: 16, color: '#000', fontWeight: '500' }}>Join Event</Text>
             </TouchableOpacity>
           </>
           }

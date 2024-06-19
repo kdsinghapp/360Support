@@ -10,6 +10,8 @@ const initialState = {
   isSuccess: false,
   get_PostList: [],
   childRequest: null,
+  Privacypolicy: null,
+  TermsCondition: null,
   Event_list: [],
   Video_list: [],
   Training_list: [],
@@ -22,9 +24,47 @@ const initialState = {
   teamList: [],
   getIndividualChat: [],
   getEventMembers: [],
-  TeamDetails: []
+  TeamDetails: [],
+
 };
 
+
+export const get_terms_conditions = createAsyncThunk(
+  'get_terms_conditions',
+  async (params, thunkApi) => {
+    try {
+      const response = await API.get('/get_term_condition',);
+
+      if (response.data.success) {
+        console.log('User get_terms_conditions Succesfuly');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ : get_terms_conditions error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_privacy_policy = createAsyncThunk(
+  'get_privacy_policy',
+  async (params, thunkApi) => {
+    try {
+      const response = await API.get('/get_privacy_policy', );
+
+
+
+      if (response.data.success) {
+        console.log('User get_privacy_policy Succesfuly');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ : get_privacy_policy error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 export const get_post = createAsyncThunk(
   'get_posts',
   async (params, thunkApi) => {
@@ -224,6 +264,43 @@ export const add_event = createAsyncThunk(
     }
   }
 );
+export const update_password = createAsyncThunk(
+  'update_password',
+  async (params, thunkApi) => {
+    try {
+      const formData = new FormData();
+
+
+      formData.append('old_password', params.old_password);
+      formData.append('password', params.password);
+      formData.append('user_id', params.user_id);
+
+      const config = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: formData,
+      };
+
+      console.log('FormData:', formData);
+
+      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/update_password', config);
+      console.log('update_password=>>>>>>>>', response.data);
+      const data = await response.json();
+
+      if (data.status === '1') {
+        successToast('Password Change Successfully');
+      }
+
+      return data.result;
+    } catch (error) {
+      console.log('Error:', error);
+      errorToast('Failed to  update_password');
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
 export const add_team_member = createAsyncThunk(
   'add_team_member',
   async (params, thunkApi) => {
@@ -285,6 +362,39 @@ console.log('delete_team_member=>>>>>>>>>>>',params.data);
     } catch (error) {
       console.log('Error:', error);
       errorToast('Failed to add event');
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const update_details = createAsyncThunk(
+  'update_details',
+  async (params, thunkApi) => {
+    try {
+
+
+      const config = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: params.data,
+      };
+
+
+
+      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/update_details', config);
+      const data = await response.json();
+
+      if (data.status === '1') {
+        console.log('update_details=>>>>>>>>', response);
+        //successToast('Team Member Remove Successfuly')
+
+      }
+
+      return data.result;
+    } catch (error) {
+      console.log('Error:', error);
+      errorToast('Failed to update_details');
       return thunkApi.rejectWithValue(error);
     }
   }
@@ -1022,6 +1132,20 @@ const FeatureSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
     });
+    builder.addCase(update_password.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(update_password.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+
+    });
+    builder.addCase(update_password.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
     builder.addCase(delete_team_member.pending, state => {
       state.isLoading = true;
     });
@@ -1032,6 +1156,20 @@ const FeatureSlice = createSlice({
       
     });
     builder.addCase(delete_team_member.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(update_details.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(update_details.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      
+    });
+    builder.addCase(update_details.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
@@ -1086,6 +1224,34 @@ const FeatureSlice = createSlice({
       state.isSuccess = true;
       state.isError = false;
 
+    });
+    builder.addCase(get_privacy_policy.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_privacy_policy.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.Privacypolicy = action.payload;
+    });
+    builder.addCase(get_privacy_policy.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_terms_conditions.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_terms_conditions.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.TermsCondition = action.payload;
+    });
+    builder.addCase(get_terms_conditions.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
     });
     builder.addCase(update_event_memeber_data.rejected, (state, action) => {
       state.isLoading = false;

@@ -95,7 +95,7 @@ export default function TextInputField({...props}) {
               justifyContent: 'center',
             }}>
             <Image
-              source={require('../assets/croping/Hide-Password.png')}
+              source={require('../assets/Cropping/HidePassword3x.png')}
               style={{width: 24, height: 24, color: '#EBEBEB'}}
             />
           </TouchableOpacity>

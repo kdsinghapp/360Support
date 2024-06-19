@@ -14,9 +14,6 @@ const persistConfig = {
   storage: AsyncStorage,
   whitelist: [
     'auth',
-    'Get_UserProfile',
-    'Updated_UserInfo',
-    'Updated_ChildInfo',
   ],
 };
 
