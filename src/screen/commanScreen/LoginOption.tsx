@@ -46,7 +46,7 @@ export default function LoginOption() {
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(ScreenNameEnum.SIGNIN_OPTION)
+            navigation.navigate(ScreenNameEnum.REQUESTSENTSETP2)
           }}
           style={[styles.btn, { backgroundColor: '#294247' }]}>
           <Text style={styles.buttonText}>SIGN IN</Text>

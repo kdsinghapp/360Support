@@ -1,7 +1,7 @@
 
 
 import {View, Text, Image, TouchableOpacity, StyleSheet,TextInput, ScrollView, Alert} from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -24,6 +24,9 @@ export default function CreateChildAccount({route}) {
   const [Cemail, setCEmail] = useState('');
   const [Cpassword, setCPassword] = useState('');
 
+  
+
+
   const dispatch = useDispatch();
   const isLoading = useSelector(state => state.auth.isLoading);
 
@@ -44,9 +47,7 @@ export default function CreateChildAccount({route}) {
   const UpdatedChild = async() => {
     const id = await AsyncStorage.getItem('child_user_id');
 
-    console.log('====================================');
-    console.log(id);
-    console.log('====================================');
+
     if (password != '' && email != '') {
 
 

@@ -132,6 +132,9 @@ export const send_child_request = createAsyncThunk(
         successToast('User Request Successfully');
         params.navigation.navigate(ScreenNameEnum.REQUESTSENTSETP2);
       }
+      else{
+        errorToast(response.data.message);
+      }
       return response.data.result;
     } catch (error) {
       console.log('🚀 ~ file: get_posts .js:16 ~  ~ error:', error);

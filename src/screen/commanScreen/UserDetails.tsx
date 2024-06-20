@@ -147,6 +147,7 @@ export default function UserDetails() {
                 setValue(item.name);
                 setIsFocus(false);
               }}
+              search
             />}
           </View>
 

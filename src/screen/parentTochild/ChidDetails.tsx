@@ -54,7 +54,9 @@ export default function ChidDetails({ route }: Props) {
   const [lastName, setlastName] = useState<string>('');
   const isLoading = useSelector((state: any) => state.auth.isLoading);
   const dispatch = useDispatch();
+  const group_code = useSelector((state: any) => state.auth.group_code);
 
+  
   const openImageLibrary = () => {
     ImagePicker.openPicker({
       width: 300,
@@ -77,6 +79,9 @@ export default function ChidDetails({ route }: Props) {
     if (profile === null) return Alert.alert('Please Pick ', 'Profile image');
     if (value === '') return Alert.alert('Please selecte ', 'Country');
 
+
+   
+    
     const params = {
       data: {
         first_name: firstName,
@@ -85,6 +90,7 @@ export default function ChidDetails({ route }: Props) {
         country: value,
         type: 'Player',
         parent_id: id,
+        group_code: group_code,
         image: {
           uri: Platform.OS === 'android' ? profile?.path : profile?.path?.replace('file://', ''),
           type: profile?.mime,
@@ -142,6 +148,7 @@ export default function ChidDetails({ route }: Props) {
             {Country_List && (
               <Dropdown
                 data={Country_List}
+                search
                 maxHeight={200}
                 labelField="name"
                 valueField="name"

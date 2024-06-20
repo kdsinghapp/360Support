@@ -13,9 +13,7 @@ import { useSelector } from 'react-redux';
       
       const navigation = useNavigation();
       const GroupDetails = useSelector(state => state.auth.Group_Details);
-      console.log('====================================');
-      console.log(GroupDetails);
-      console.log('====================================');
+    
       return (
         <View style={{flex: 1, backgroundColor: '#874be9'}}>
           <View

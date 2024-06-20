@@ -54,19 +54,21 @@ export default function NoWithoutLoginScreen() {
 
   const idFousce = useIsFocused();
 
-console.log(Get_profile);
+console.log('NOWITHOUTSCREEN',Get_profile);
 
 
   const dispatch = useDispatch();
   const get_profileDetails = async () => {
     const id = await AsyncStorage.getItem('user_id');
-   if (!id) return  navigation.navigate(ScreenNameEnum.USER_DETAILS);;
-    const params = {
-      user_id: id,
-      navigation: navigation,
-    };
 
-    dispatch(get_profile(params));
+    
+  //  if (!id) return  navigation.navigate(ScreenNameEnum.USER_DETAILS);;
+  //   const params = {
+  //     user_id: id,
+  //     navigation: navigation,
+  //   };
+
+  //   dispatch(get_profile(params));
   };
 
   useEffect(() => {
@@ -112,8 +114,8 @@ console.log(Get_profile);
         <View style={[styles.tab, { marginTop: 20 }]}>
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarText}>
-              {Get_profile?.first_name[0].toUpperCase()}
-              {Get_profile?.last_name[0].toUpperCase()}
+              {Get_profile?.first_name[0]?.toUpperCase()}
+              {Get_profile?.last_name[0]?.toUpperCase()}
             
             </Text>
           </View>
@@ -133,7 +135,7 @@ console.log(Get_profile);
         <View style={styles.childAccountContainer}>
           <Text style={styles.childAccountTitle}>child account</Text>
         </View>
-        {Get_profile?.child_details && (
+        {Get_profile?.child_details?.length > 0 && (
           <View style={[styles.tab, { marginTop: 20 }]}>
             {Get_profile?.child_details ? (
               <>

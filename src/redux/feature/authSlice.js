@@ -351,6 +351,7 @@ export const Add_ChildInfo = createAsyncThunk(
       formData.append('dob', params.data.dob);
       formData.append('country', params.data.country);
       formData.append('parent_id', params.data.parent_id);
+      formData.append('group_code', params.data.group_code);
       formData.append('type', params.data.type);
       formData.append('image', params.data.image);
 
@@ -443,6 +444,7 @@ export const log_out = createAsyncThunk('log_out', async (params, thunkApi) => {
     console.log(' AuthSlice.js:29 ~ logout ~ response:', data);
 
     if (data.status == '1') {
+      await AsyncStorage.clear();
       successToast(data.message);
       params.navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
     } else {

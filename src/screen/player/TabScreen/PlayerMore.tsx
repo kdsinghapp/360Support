@@ -18,14 +18,35 @@
       import Right from '../../../assets/svg/WhiteRight.svg';
       import {useNavigation} from '@react-navigation/native';
       import ScreenNameEnum from '../../../routes/screenName.enum';
-      import { useDispatch } from 'react-redux';
+      import { useDispatch, useSelector } from 'react-redux';
       import  Close from '../../../assets/svg/Close.svg'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { log_out } from '../../../redux/feature/authSlice';
+import Loading from '../../../configs/Loader';
 
       export default function PlayerMore() {
         const navigation = useNavigation();
-      
+        const user_data = useSelector((state: RootState) => state.auth.userData);
         const [isVisible, setIsVisible] = useState(false);
         const dispatch = useDispatch();
+        const isLoading = useSelector(state => state.auth.isLoading);
+        const clearStorageData = async () => {
+          try {
+            await AsyncStorage.clear();
+            console.log('Storage data cleared successfully');
+          } catch (error) {
+            console.error('Error clearing storage data:', error);
+          }
+        };
+        const User_logOut =()=>{
+          setIsVisible(false);
+          const params ={
+            navigation:navigation
+          }
+          dispatch(log_out(params)).then(res=>{
+            clearStorageData();
+          })
+        }
         const RecentListItem = ({item}) => (
           <TouchableOpacity
             onPress={() => {
@@ -64,8 +85,9 @@
       
         return (
           <View style={{flex: 1,  backgroundColor: '#874be9'}}>
+             {isLoading ? <Loading /> : null}
        <View style={{marginHorizontal:15 ,marginTop:hp(5),}}>
-              <Text style={{ fontSize:18, fontWeight: '500',color:'#FFF' }}>Parent Account</Text>
+              <Text style={{ fontSize:18, fontWeight: '500',color:'#FFF' }}>{user_data?.type} Account</Text>
             </View>
             <View style={[styles.shdow,{backgroundColor: '#874be9',marginHorizontal:15,
             marginTop:20,opacity:0.8,
@@ -158,8 +180,8 @@
                   </View>
                   <TouchableOpacity
                     onPress={() => {
-                     navigation.navigate(ScreenNameEnum.LOGIN_OPTION,)
-                     setIsVisible(false)
+                    
+                     User_logOut()
                     }}
                     style={{
                       width: 225,

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import {useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../configs/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { send_child_request } from '../../../redux/feature/featuresSlice';
 
 export default function Step2Requestsent() {
   const navigation = useNavigation();
@@ -25,10 +27,25 @@ export default function Step2Requestsent() {
   const childRequest = useSelector(
     (state: RootState) => state.feature.childRequest,
   );
+  const dispatch= useDispatch()
+
+
 
   console.log('====================================');
   console.log(childRequest);
   console.log('====================================');
+  const send_request = async () => {
+    const id = await AsyncStorage.getItem('user_id');
+    const params = {
+      data: {
+        parent_id:id,
+        email: 'player3@gmail.com',
+      },
+      navigation: navigation,
+    };
+
+    dispatch(send_child_request(params));
+  };
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -67,21 +84,21 @@ export default function Step2Requestsent() {
 
         <View style={styles.tabContainer}>
           <Text style={styles.tabTitle}>Child connection</Text>
-          <FlatList
+         {childRequest?.length > 0 && <FlatList
             data={childRequest}
             renderItem={({item}) => (
               <View style={styles.tab}>
                 <View style={styles.avatarContainer}>
                   <Text style={styles.avatarText}>
-                    {childRequest?.first_name[0]}
-                    {childRequest?.last_name[0]}
+                    {item?.first_name[0]}
+                    {item?.last_name[0]}
                   </Text>
                 </View>
                 <View style={styles.userInfoContainer}>
                   <Text style={styles.userName}>
-                    {childRequest?.first_name} {childRequest?.last_name}
+                    {item?.first_name} {item?.last_name}
                   </Text>
-                  <Text style={styles.userEmail}>{childRequest?.email}</Text>
+                  <Text style={styles.userEmail}>{item?.email}</Text>
                 </View>
                 <View style={styles.statusContainer}>
                   <Text style={styles.statusText}>Pending</Text>
@@ -93,7 +110,8 @@ export default function Step2Requestsent() {
                 </View>
               </View>
             )}
-          />
+          />}
+          
         </View>
 
         <TouchableOpacity
@@ -119,7 +137,7 @@ export default function Step2Requestsent() {
           </View>
         </TouchableOpacity>
 
-        <View style={styles.tabContainer}>
+        {/* <View style={styles.tabContainer}>
           <Text style={styles.tabTitle}>Groups</Text>
           <TouchableOpacity style={[styles.tab, {}]}>
             <View style={styles.plusIconContainer}>
@@ -136,7 +154,7 @@ export default function Step2Requestsent() {
               </Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
