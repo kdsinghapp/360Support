@@ -220,6 +220,7 @@ export default function coachHome() {
     const params = {
       user_id: id,
       group_code: user_data?.group_code,
+      type:'all'
     };
     await dispatch(get_event(params));
   };

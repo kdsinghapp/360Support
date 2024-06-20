@@ -205,7 +205,7 @@ export default function Chat({route}) {
           />
         </View>
       </ScrollView>
-      <View style={styles.inputContainerWrapper}>
+   {user?.type === 'Player' || user?.type == 'Coache' &&  <View style={styles.inputContainerWrapper}>
         <View style={styles.inputContainer}>
           {/* <TouchableOpacity>
             <Emoji />
@@ -234,7 +234,7 @@ export default function Chat({route}) {
             )}
           </TouchableOpacity>
         </View>
-      </View>
+      </View>}
     </View>
   );
 }

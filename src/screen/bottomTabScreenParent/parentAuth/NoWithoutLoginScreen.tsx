@@ -139,20 +139,20 @@ console.log(Get_profile);
               <>
                 <View style={styles.avatarContainer}>
                   <Text style={styles.avatarText}>
-                    {Get_profile?.child_details[0].first_name &&
-                      Get_profile?.child_details[0].first_name[0].toUpperCase()}
-                    {Get_profile?.child_details[0].last_name &&
-                      Get_profile?.child_details[0].last_name[0].toUpperCase()}
+                    {Get_profile?.child_details[0]?.first_name &&
+                      Get_profile?.child_details[0]?.first_name[0].toUpperCase()}
+                    {Get_profile?.child_details[0]?.last_name &&
+                      Get_profile?.child_details[0]?.last_name[0].toUpperCase()}
                   </Text>
                 </View>
 
                 <View style={styles.userInfoContainer}>
                   <Text style={styles.userName}>
-                    {Get_profile?.child_details[0].first_name}{' '}
-                    {Get_profile?.child_details[0].last_name}
+                    {Get_profile?.child_details[0]?.first_name}{' '}
+                    {Get_profile?.child_details[0]?.last_name}
                   </Text>
                   <Text style={styles.userEmail}>
-                    {Get_profile?.child_details[0].email}
+                    {Get_profile?.child_details[0]?.email}
                   </Text>
                 </View>
               </>

@@ -35,7 +35,11 @@ enum ScreenNameEnum {
   GroupmemberPage='GroupmemberPage',
   VideoPlayer='VideoPlayer',
   coachNotificationSetting='coachNotificationSetting',
-
+  Event='Event',
+  Tranning="Tranning",
+  Match='Match',
+  ChildrenProfiles='ChildrenProfiles',
+  EditChildProfile='EditChildProfile',
   //TAb
   BOTTOM_TAB ='BOTTOM_TAB',
   PROFILE_SCREEN='PROFILE_SCREEN',

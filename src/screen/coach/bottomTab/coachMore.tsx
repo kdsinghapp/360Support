@@ -9,33 +9,43 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Right from '../../../assets/svg/WhiteRight.svg';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Close from '../../../assets/svg/Close.svg';
 import AddIcon from '../../../assets/svg/AddIcon.svg';
 import { log_out, logout } from '../../../redux/feature/authSlice';
 import Loading from '../../../configs/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function coachMore() {
   const navigation = useNavigation();
   const isLoading = useSelector(state => state.auth.isLoading);
   const [isVisible, setIsVisible] = useState(false);
   const dispatch = useDispatch();
-
-  const User_logOut =()=>{
-    setIsVisible(false);
-    const params ={
-      navigation:navigation
+  const clearStorageData = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log('Storage data cleared successfully');
+    } catch (error) {
+      console.error('Error clearing storage data:', error);
     }
-    dispatch(log_out(params))
+  };
+  const User_logOut = () => {
+    setIsVisible(false);
+    const params = {
+      navigation: navigation
+    }
+    dispatch(log_out(params)).then(res => {
+      clearStorageData()
+    })
   }
-  const RecentListItem = ({item}) => (
+  const RecentListItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
         item.titile == 'Log Out'
@@ -52,10 +62,10 @@ export default function coachMore() {
         },
       ]}>
       <View>
-        <Image source={item.logo} style={{height: 25, width: 25}} />
+        <Image source={item.logo} style={{ height: 25, width: 25 }} />
       </View>
-      <View style={{marginLeft: 20, width: '80%'}}>
-        <Text style={{fontSize: 14, fontWeight: '500', color: '#FFF'}}>
+      <View style={{ marginLeft: 20, width: '80%' }}>
+        <Text style={{ fontSize: 14, fontWeight: '500', color: '#FFF' }}>
           {item.titile}
         </Text>
       </View>
@@ -66,10 +76,10 @@ export default function coachMore() {
   );
 
   return (
-    <View style={{flex: 1, backgroundColor: '#874be9'}}>
-      {isLoading?<Loading />:null}
-      <View style={{marginHorizontal: 15, marginTop: hp(5)}}>
-        <Text style={{fontSize: 18, fontWeight: '500', color: '#FFF'}}>
+    <View style={{ flex: 1, backgroundColor: '#874be9' }}>
+      {isLoading ? <Loading /> : null}
+      <View style={{ marginHorizontal: 15, marginTop: hp(5) }}>
+        <Text style={{ fontSize: 18, fontWeight: '500', color: '#FFF' }}>
           Profile        </Text>
       </View>
       <View
@@ -100,8 +110,8 @@ export default function coachMore() {
         }}
       />
 
-      <View style={{marginHorizontal: 15, marginTop: hp(3)}}>
-        <Text style={{fontSize: 18, fontWeight: '500', color: '#FFF'}}>
+      <View style={{ marginHorizontal: 15, marginTop: hp(3) }}>
+        <Text style={{ fontSize: 18, fontWeight: '500', color: '#FFF' }}>
           Logged in Account Name
         </Text>
       </View>
@@ -144,7 +154,7 @@ export default function coachMore() {
               onPress={() => {
                 setIsVisible(false);
               }}
-              style={{height: 25, width: 25, alignSelf: 'flex-start'}}>
+              style={{ height: 25, width: 25, alignSelf: 'flex-start' }}>
               <Close />
             </TouchableOpacity>
             <View
@@ -170,7 +180,7 @@ export default function coachMore() {
                   justifyContent: 'space-around',
                   marginTop: 20,
                 }}>
-                <View style={{height: hp(5)}}>
+                <View style={{ height: hp(5) }}>
                   <Text
                     style={{
                       color: '#9DB2BF',
@@ -186,7 +196,7 @@ export default function coachMore() {
             <TouchableOpacity
               onPress={() => {
                 User_logOut()
-            
+
               }}
               style={{
                 width: 225,

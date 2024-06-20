@@ -10,9 +10,9 @@ import {
   FlatList,
 } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import BackBtn from '../assets/svg/BackBtn.svg';
-import SearchIcon from '../assets/svg/search.svg';
-import BottomToTopModal from './Modal/Modal';
+import BackBtn from '../../../assets/svg/BackBtn.svg';
+import SearchIcon from '../../../assets/svg/search.svg';
+import BottomToTopModal from '../../Modal/Modal';
 import { useNavigation } from '@react-navigation/native';
 
 interface Item {
@@ -29,12 +29,12 @@ const Registrations: React.FC = () => {
     {
       title: 'Test',
       description: 'test',
-      img: require('../assets/Cropping/img1.png'),
+      img: require('../../../assets/Cropping/img1.png'),
     },
     {
       title: 'Test',
       description: 'test',
-      img: require('../assets/Cropping/img1.png'),
+      img: require('../../../assets/Cropping/img1.png'),
     },
   ];
 

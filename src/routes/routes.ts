@@ -38,8 +38,8 @@ import SocialLogin from "../screen/commanScreen/SocialLogin";
 import CreateConnection from "../screen/bottomTabScreenParent/parentAuth/CreateOrRequestConnection";
 import Calendar from "../screen/bottomTabScreenParent/Calendar";
 import More from "../screen/bottomTabScreenParent/More";
-import Wall from "../screen/Wall";
-import Registrations from "../screen/Registration";
+
+import Registrations from "../screen/bottomTabScreenParent/Feature/Registration";
 import ChildProfile from "../screen/parentTochild/ChildProfile";
 import MyChildren from "../screen/parentTochild/MyChildren";
 import CalendarScreen from "../screen/bottomTabScreenParent/Calendar";
@@ -55,7 +55,7 @@ import PlayerTeamScreen from "../screen/player/TabScreen/PlayerTeamScreen";
 import PlayerCalendarScreen from "../screen/player/TabScreen/PlayerCalendarScreen";
 import PlayerHome from "../screen/player/TabScreen/PlayerHome";
 import PlayerMore from "../screen/player/TabScreen/PlayerMore";
-import VideoScreen from "../screen/VideoScreen";
+import VideoScreen from "../screen/bottomTabScreenParent/Feature/VideoScreen";
 import SignInOption from "../screen/loginscreen/SignInOption";
 import ChidDetails from "../screen/parentTochild/ChidDetails";
 import sentConnectionReq from "../screen/bottomTabScreenParent/parentAuth/sentConnectionReq";
@@ -87,6 +87,13 @@ import coachAccountSetting from "../screen/coach/features/coachAccountSetting";
 import GroupmemberPage from "../screen/chat/GroupMemberScreen";
 import VideoPlayer from "../screen/coach/features/VideoPlayer";
 import coachNotificationSetting from "../screen/coach/features/coachNotificationSetting";
+import Wall from "../screen/bottomTabScreenParent/Feature/Wall";
+import Matches from "../screen/bottomTabScreenParent/Feature/Matches";
+import Event from "../screen/bottomTabScreenParent/Feature/Event";
+import TranningCoachNotificationSetting from "../screen/coach/features/coachNotificationSetting";
+import Training from "../screen/bottomTabScreenParent/Feature/Traning";
+import ChildrenProfiles from "../screen/bottomTabScreenParent/Feature/ChildrenProfiles";
+import EditChildProfile from "../screen/bottomTabScreenParent/Feature/EditChildProfile";
 
 
 const _routes = {
@@ -302,8 +309,24 @@ const _routes = {
       Component: VideoPlayer,
     },
     {
-      name: ScreenNameEnum.coachNotificationSetting,
-      Component: coachNotificationSetting,
+      name: ScreenNameEnum.Match,
+      Component: Matches,
+    },
+    {
+      name: ScreenNameEnum.Event,
+      Component: Event,
+    },
+    {
+      name: ScreenNameEnum.Tranning,
+      Component: Training,
+    },
+    {
+      name: ScreenNameEnum.ChildrenProfiles,
+      Component: ChildrenProfiles,
+    },
+    {
+      name: ScreenNameEnum.EditChildProfile,
+      Component: EditChildProfile,
     },
 
 
@@ -343,12 +366,7 @@ const _routes = {
       logo: require('../assets/Cropping/Team2x.png'),
       lable: 'Team'
     },
-    {
-      name: ScreenNameEnum.NOTIFICATION_SCREEN,
-      Component: PlayerNotificationScreen,
-      logo: require('../assets/Cropping/Notification-1.png'),
-      lable: 'Notification'
-    },
+   
 
     {
       name: ScreenNameEnum.MORE_SCREEN,
@@ -417,13 +435,7 @@ const _routes = {
       logo: require('../assets/Cropping/Team2x.png'),
       lable: 'Team'
     },
-    {
-      name: ScreenNameEnum.NOTIFICATION_SCREEN,
-      Component: NotificationScreen,
-      logo: require('../assets/Cropping/Notification-1.png'),
-      lable: 'Notification'
-    },
-
+    
     {
       name: ScreenNameEnum.MORE_SCREEN,
       Component: More,

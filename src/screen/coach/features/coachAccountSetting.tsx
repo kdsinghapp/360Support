@@ -63,11 +63,16 @@ if(confirmPassword != newPassword) return errorToast('New password or Confirm pa
 
 
 
-  dispatch(update_password(params)).then(res=>{
+  dispatch(update_password(params)).then((res)=>{
     setConfirmPassword('')
     setCurrentPassword('')
     setConfirmPassword('')
+  }).catch((error) => {
+    // Handle errors if update_password failed
+    console.error('Failed to update password:', error);
+    // Optionally handle errors or show a toast/message to the user
   })
+
   };
 
   return (

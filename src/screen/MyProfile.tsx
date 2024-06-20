@@ -322,9 +322,10 @@ export default function MyProfile() {
                       marginLeft: 12,
                       marginRight: 7,
                       backgroundColor:
-                        Selected === item.name ? '#9271c9' : '#874be9',
+                      Selected === item.name ? '#9271c9' : '#874be9',
                       height: 35,
                       marginVertical: 10,
+                      width:wp(45),
                       borderRadius: 30,
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1186,9 +1187,7 @@ const tabData = [
   {
     name: 'Attendance',
   },
-  {
-    name: 'Videos',
-  },
+ 
 ];
 
 const staticData = [

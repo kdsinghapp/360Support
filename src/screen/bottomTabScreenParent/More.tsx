@@ -18,7 +18,8 @@ import ScreenNameEnum from '../../routes/screenName.enum';
 import { useDispatch, useSelector } from 'react-redux';
 import Close from '../../assets/svg/Close.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Get_Country } from '../../redux/feature/authSlice';
+import { Get_Country, log_out } from '../../redux/feature/authSlice';
+import Loading from '../../configs/Loader';
 
 interface ListItem {
   id: string;
@@ -33,7 +34,9 @@ export default function More() {
   const [isVisible, setIsVisible] = useState(false);
   const dispatch = useDispatch();
 const isFocuse = useIsFocused()
+const isLoading = useSelector(state => state.auth.isLoading);
 
+const user = useSelector((state: RootState) => state.auth.userData);
   useEffect(()=>{
     dispatch(Get_Country());
   },[isFocuse])
@@ -46,7 +49,15 @@ const isFocuse = useIsFocused()
       console.error('Error clearing storage data:', error);
     }
   };
-
+  const User_logOut =()=>{
+    setIsVisible(false);
+    const params ={
+      navigation:navigation
+    }
+    dispatch(log_out(params)).then(res=>{
+      clearStorageData();
+    })
+  }
   const RecentListItem = ({ item }: { item: ListItem }) => (
     <TouchableOpacity
       onPress={() => {
@@ -72,8 +83,9 @@ const isFocuse = useIsFocused()
 
   return (
     <View style={styles.container}>
+        {isLoading ? <Loading /> : null}
       <View style={styles.header}>
-        <Text style={styles.headerText}>Parent Account</Text>
+        <Text style={styles.headerText}>{user?.type} Account</Text>
       </View>
       <View style={styles.contentContainer}>
         <FlatList
@@ -111,9 +123,10 @@ const isFocuse = useIsFocused()
             </View>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate(ScreenNameEnum.LOGIN_OPTION);
-                clearStorageData();
-                setIsVisible(false);
+             
+             
+               
+                User_logOut()
               }}
               style={styles.logoutButton}>
               <Text style={styles.logoutButtonText}>Log Out</Text>
@@ -257,8 +270,23 @@ const data: ListItem[] = [
     logo: require('../../assets/Cropping/video-octagon.png'),
     screen: ScreenNameEnum.VIDEO_SCREEN,
   },
+  
   {
     id: '4',
+    title: 'Events',
+    logo: require('../../assets/Cropping/event.png'),
+    // screen: ScreenNameEnum.REGISTRATION_SCREEN,
+    screen: ScreenNameEnum.Event,
+  },
+  {
+    id: '5',
+    title: 'Matche Result',
+    logo: require('../../assets/Cropping/results.png'),
+    // screen: ScreenNameEnum.REGISTRATION_SCREEN,
+    screen: ScreenNameEnum.Match,
+  },
+  {
+    id: '6',
     title: 'Registration',
     logo: require('../../assets/Cropping/user-octagon.png'),
     screen: ScreenNameEnum.REGISTRATION_SCREEN,
@@ -270,20 +298,15 @@ const data2: ListItem[] = [
     id: '1',
     title: 'Children Profile',
     logo: require('../../assets/Cropping/MyProfile-1.png'),
-    screen: ScreenNameEnum.CHILD_PROFILE,
+    screen: ScreenNameEnum.ChildrenProfiles,
   },
   {
     id: '2',
-    title: 'Children Setting',
+    title: 'Account Setting',
     logo: require('../../assets/Cropping/profile-2user.png'),
     screen: ScreenNameEnum.MY_CHILDREN,
   },
-  {
-    id: '3',
-    title: 'Account settings',
-    logo: require('../../assets/Cropping/video-octagon.png'),
-    screen: ScreenNameEnum.MY_CHILDREN,
-  },
+ 
   // {
   //   id: '4',
   //   title: 'Billing',

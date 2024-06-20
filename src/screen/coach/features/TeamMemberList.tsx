@@ -153,7 +153,7 @@ export default function TeamListScreen() {
             style={styles.backButton}>
             <BackBtn />
           </TouchableOpacity>
-          <View style={{ marginRight: 20 }}>
+          <View style={{ marginRight: 20,width:'45%' }}>
             <Text
               style={{
                 fontWeight: '700',
@@ -164,7 +164,7 @@ export default function TeamListScreen() {
               {TeamDetails.team_name}
             </Text>
           </View>
-          <TouchableOpacity
+          {user?.type == 'Coache' &&   <TouchableOpacity
             onPress={() => {
               setMember(true);
             }}
@@ -175,6 +175,7 @@ export default function TeamListScreen() {
               resizeMode="contain"
             />
           </TouchableOpacity>
+}
         </View>
 
         <View style={{ marginHorizontal: 20, marginTop: 20, 
@@ -182,7 +183,7 @@ export default function TeamListScreen() {
           flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 20, fontWeight: '700', color: '#000' }}>Team Members</Text>
 
-          <TouchableOpacity
+          {user?.type == 'Coache' &&<TouchableOpacity
             onPress={() => {
               setRemoveMember(RemoveMember=>!RemoveMember)
             }}
@@ -193,7 +194,7 @@ export default function TeamListScreen() {
               borderRadius: 10, paddingHorizontal: 15, paddingVertical: 4,
             }}>
             <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>{RemoveMember?'Back':'Edit'}</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </View>
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
           <View style={{ flex: 1, paddingTop: 20 }}>

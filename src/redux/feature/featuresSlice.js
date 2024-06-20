@@ -25,6 +25,9 @@ const initialState = {
   getIndividualChat: [],
   getEventMembers: [],
   TeamDetails: [],
+  getMyChild:[],
+  getTeam_by_Member:[],
+
 
 };
 
@@ -781,10 +784,63 @@ export const get_team_list = createAsyncThunk(
     }
   },
 );
+export const get_team_by_member_id = createAsyncThunk(
+  'get_team_by_member_id',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('user_id', params.user_id);
+      const response = await API.post('/get_team_by_member_id', data, config);
+      console.log('==============get_team_by_member_id======================');
+      console.log(response.data);
+      console.log('====================================');
+      if (response.data.status == '1') {
+        console.log('get get_team_by_member_id Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_team_by_member_id .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_event_by_member_id = createAsyncThunk(
+  'get_event_by_member_id',
+  async (params, thunkApi) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('user_id', params.user_id);
+      const response = await API.post('/get_event_by_member_id', data, config);
+      console.log('==============get_event_by_member_id======================');
+      console.log(response.data);
+      console.log('====================================');
+      if (response.data.status == '1') {
+        console.log('get get_event_by_member_id Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_event_by_member_id .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 export const get_event_members = createAsyncThunk(
   'get_event_members',
   async (params, thunkApi) => {
     try {
+      console.log('==============get_event_members======================', params);
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -802,6 +858,33 @@ export const get_event_members = createAsyncThunk(
       return response.data.result;
     } catch (error) {
       console.log('🚀 ~ file: get_event_members .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_my_child = createAsyncThunk(
+  'get_my_child',
+  async (params, thunkApi) => {
+    try {
+      console.log('==============get_my_child======================', params);
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('user_id', params.user_id);
+      const response = await API.post('/get_my_child', data, config);
+      console.log('==============get_my_child======================', response.data);
+
+
+      if (response.data.status == '1') {
+        console.log('get get_my_child Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_my_child .js:16 ~  ~ error:', error);
 
       return thunkApi.rejectWithValue(error);
     }
@@ -1131,6 +1214,48 @@ const FeatureSlice = createSlice({
       state.get_PostList = action.payload;
     });
     builder.addCase(get_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_team_by_member_id.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_team_by_member_id.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.getTeam_by_Member = action.payload;
+    });
+    builder.addCase(get_team_by_member_id.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_event_by_member_id.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_event_by_member_id.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.Event_list = action.payload;
+    });
+    builder.addCase(get_event_by_member_id.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_my_child.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_my_child.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.getMyChild = action.payload;
+    });
+    builder.addCase(get_my_child.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

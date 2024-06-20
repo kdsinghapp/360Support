@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,13 @@ import {
   Image,
 } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import BackBtn from '../../assets/svg/BackBtn.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_my_child, get_privacy_policy, update_details } from '../../redux/feature/featuresSlice';
+import { get_profile } from '../../redux/feature/authSlice';
+import Loading from '../../configs/Loader';
+import ScreenNameEnum from '../../routes/screenName.enum';
 
 interface TabData {
   name: string;
@@ -20,12 +25,80 @@ interface TabData {
 export default function MyChildren() {
   const [Selected, setSelected] = useState<string>('Account');
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const navigation = useNavigation();
 
-  const toggleSwitch = () => setIsEnabled(prevState => !prevState);
+  const user = useSelector((state: RootState) => state.auth.userData);
+  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const getMyChild = useSelector((state: RootState) => state.feature.getMyChild);
+  const Privacypolicy = useSelector(state => state.feature?.Privacypolicy);
+
+  useEffect(() => {
+      const params = {
+          user_id: user.id
+      }
+
+      dispatch(get_my_child(params))
+  }, [user])
+  const [isEmailEnabled, setIsEmailEnabled] = useState<boolean>(false);
+  const [isPushEnabled, setIsPushEnabled] = useState<boolean>(false);
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const My_Profile = useSelector(state => state.auth.GetUserProfile);
+const isFocuse = useIsFocused()
+  useEffect(() => {
+    if (My_Profile) {
+      setIsEmailEnabled(My_Profile.email_notify === '1');
+      setIsPushEnabled(My_Profile.push_notify === '1');
+    }
+  }, [My_Profile]);
+
+  useEffect(() => {
+    get_profile_notification();
+    dispatch(get_privacy_policy())
+  }, [isFocuse]);
+
+
+  
+  const get_profile_notification = async () => {
+    
+    const params = {
+      user_id: My_Profile.id,
+    };
+    dispatch(get_profile(params));
+  };
+
+  const toggleEmailSwitch = () => {
+    const newValue = !isEmailEnabled;
+    setIsEmailEnabled(newValue);
+    updateNotificationSettings('email_notify', newValue ? '1' : '0');
+  };
+
+  const togglePushSwitch = () => {
+    const newValue = !isPushEnabled;
+    setIsPushEnabled(newValue);
+    updateNotificationSettings('push_notify', newValue ? '1' : '0');
+  };
+
+  const updateNotificationSettings = (key, value) => {
+   
+let data = new FormData();
+data.append('user_id', My_Profile?.id);
+data.append(`${[key]}`, value);
+
+    const params = {
+      user_id: My_Profile.id,
+     data: data,
+    };
+
+    console.log('updateNotificationSettings=<>',params);
+    
+    dispatch(update_details(params)).then(res=>{
+      get_profile_notification()
+   })
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFDF5' }}>
+      {isLoading?<Loading />:null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.header}>
@@ -67,95 +140,54 @@ export default function MyChildren() {
         </View>
 
         {Selected == 'Account' && (
-          <View style={styles.container}>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Notifications</Text>
-              <View style={styles.notificationOption}>
-                <View style={styles.notificationText}>
-                  <Text style={styles.notificationLabel}>Email notifications</Text>
-                  <Text style={styles.notificationDescription}>
-                    Receive notifications regarding posts, events and more in your email inbox.
-                  </Text>
-                </View>
-                <Switch
-                  trackColor={{ false: '#767577', true: '#81b0ff' }}
-                  thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}
-                />
-              </View>
-              <View style={styles.notificationOption}>
-                <View style={styles.notificationText}>
-                  <Text style={styles.notificationLabel}>Push notifications</Text>
-                  <Text style={styles.notificationDescription}>
-                    Receive notifications regarding posts, events and more in your email inbox.
-                  </Text>
-                </View>
-                <Switch
-                  trackColor={{ false: '#767577', true: '#81b0ff' }}
-                  thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}
-                />
-              </View>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Login options</Text>
-              <View style={styles.loginOption}>
-                <Text style={styles.loginLabel}>Email</Text>
-                <Text style={styles.loginDescription}>Demo@gmail.com</Text>
-                <TouchableOpacity style={styles.changeButton}>
-                  <Text style={styles.changeButtonText}>Change</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.loginOption}>
-                <Text style={styles.loginLabel}>Password</Text>
-                <Text style={styles.loginDescription}>Demo@gmail.com</Text>
-                <TouchableOpacity style={styles.changeButton}>
-                  <Text style={styles.changeButtonText}>Change</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+         <View style={styles.container}>
+         <View style={styles.section}>
+           <View style={styles.notificationOption}>
+             <View style={styles.notificationText}>
+               <Text style={styles.notificationLabel}>Email notifications</Text>
+               <Text style={styles.notificationDescription}>
+                 Receive notifications regarding posts, events and more in your email inbox.
+               </Text>
+             </View>
+             <Switch
+               trackColor={{ false: '#767577', true: '#81b0ff' }}
+               thumbColor={isEmailEnabled ? '#f5dd4b' : '#f4f3f4'}
+               ios_backgroundColor="#3e3e3e"
+               onValueChange={toggleEmailSwitch}
+               value={isEmailEnabled}
+             />
+           </View>
+           <View style={styles.notificationOption}>
+             <View style={styles.notificationText}>
+               <Text style={styles.notificationLabel}>Push notifications</Text>
+               <Text style={styles.notificationDescription}>
+                 Receive notifications regarding posts, events and more in your email inbox.
+               </Text>
+             </View>
+             <Switch
+               trackColor={{ false: '#767577', true: '#81b0ff' }}
+               thumbColor={isPushEnabled ? '#f5dd4b' : '#f4f3f4'}
+               ios_backgroundColor="#3e3e3e"
+               onValueChange={togglePushSwitch}
+               value={isPushEnabled}
+             />
+           </View>
+         </View>
+       </View>
         )}
 
         {Selected == 'My children' && (
-          <View style={styles.container}>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Child connections</Text>
-              <View style={styles.childConnection}>
-                <View style={styles.childAvatar}>
-                  <Text style={styles.childInitials}>JS</Text>
-                </View>
-                <View style={styles.childInfo}>
-                  <Text style={styles.childName}>Shubham Patidar</Text>
-                  <Text style={styles.childEmail}>Demo@gmail.com</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Add more children</Text>
-              <View style={styles.childConnection}>
-                <View style={styles.childAvatar}>
-                  <Text style={styles.childInitials}>JS</Text>
-                </View>
-                <View style={styles.childInfo}>
-                  <Text style={styles.childName}>Farham FC</Text>
-                  <Text style={styles.childEmail}>Since 4/17/2024</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.createAccount}>
+   <View style={styles.container}>
+             <View style={styles.createAccount}>
               <Text style={styles.createAccountTitle}>Create a new account for your child</Text>
               <Text style={styles.createAccountDescription}>
                 If your child doesn't already have an account...
               </Text>
-              <TouchableOpacity style={styles.createAccountButton}>
+              <TouchableOpacity
+                 onPress={() =>
+                  navigation.navigate(ScreenNameEnum.CHILDCREATEACCOUNTLOGIN)
+                }
+              style={styles.createAccountButton}>
                 <Text style={styles.createAccountButtonText}>Create Account</Text>
               </TouchableOpacity>
             </View>
@@ -165,7 +197,13 @@ export default function MyChildren() {
               <Text style={styles.connectAccountDescription}>
                 If your child doesn't already have an account...
               </Text>
-              <TouchableOpacity style={styles.connectAccountButton}>
+              <TouchableOpacity 
+               onPress={() =>
+                navigation.navigate(ScreenNameEnum.SENT_CONNECTIONREQ, {
+                  showCreateaccount: false,
+                })
+              }
+              style={styles.connectAccountButton}>
                 <Text style={styles.connectAccountButtonText}>Create connection</Text>
               </TouchableOpacity>
             </View>
@@ -183,25 +221,7 @@ export default function MyChildren() {
             </View>
             <View style={styles.privacyContent}>
               <Text style={styles.privacyTitle}>Privacy Policy</Text>
-              <Text style={styles.privacyText}>
-                The Lorem ipsum dolor sit amet consectetur. Proin urna lorem odio consectetur
-                pharetra nisi sit et. Ut venenatis in id tortor arcu viverra tempor orci felis.
-                Metus urna venenatis accumsan mi id. Molestie ipsum egestas varius mollis tellus
-                neque nec ultrices vel. Integer cursus fermentum nisl pharetra massa id nibh
-                aliquam. Nulla pellentesque diam tellus erat ac consequat a amet scelerisque.
-                Ornare magna consequat ut egestas ridiculus consequat. Dictumst habitasse nunc
-                arcu elit. Massa adipiscing penatibus ut mauris. Nibh porttitor ornare interdum
-                scelerisque eros duis gravida amet sodales. Pellentesque at vehicula mus
-                suspendisse aliquam. Amet dui diam integer purus vitae. Lobortis mauris enim at
-                vestibulum ultrices tortor. Nulla a sed neque quam sed in diam proin. Congue sit
-                arcu volutpat nisi maecenas cursus fusce quam donec. Velit orci pharetra nisl
-                pharetra ligula imperdiet. Donec sit dignissim bibendum tortor semper. Sem odio
-                neque viverra in purus fames. Lacus in nec porttitor mi. Proin metus risus
-                adipiscing in nibh fames. Imperdiet nulla ornare hac turpis vestibulum mauris id.
-                Maecenas sed fames sed nulla rutrum odio. Tristique augue placerat mattis
-                tincidunt et. Amet in sit magna convallis odio in vestibulum dignissim semper.
-                Risus netus lacus vitae posuere a sed magna egestas. Urna pellentesque neque
-                convallis rhoncus quisque viverra placerat
+              <Text style={styles.privacyText}>{Privacypolicy?.content}
               </Text>
             </View>
           </View>
@@ -212,6 +232,14 @@ export default function MyChildren() {
 }
 
 const styles = StyleSheet.create({
+     colorDiv: {
+        backgroundColor: '#874be9',
+        height: hp(15),
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        borderBottomRightRadius: 30,
+        borderBottomLeftRadius: 30,
+    },
   header: {
     justifyContent: 'space-between',
     paddingHorizontal: 20,
@@ -225,8 +253,8 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   tabContainer: {
-    height: hp(7),
-    marginTop: 30,
+ 
+
   },
   tab: {
     marginRight: 7,
@@ -330,7 +358,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   childInitials: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
     color: '#FFF',
   },

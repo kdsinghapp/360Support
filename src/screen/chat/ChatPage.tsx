@@ -152,7 +152,7 @@ export default function ChatPage() {
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Chat</Text>
             </View>
-            <TouchableOpacity
+           {user?.type == 'Coache' ? <TouchableOpacity
               onPress={() => {
                 setModalVisible(true);
               }}
@@ -162,7 +162,7 @@ export default function ChatPage() {
                 style={styles.addButtonIcon}
                 resizeMode="contain"
               />
-            </TouchableOpacity>
+            </TouchableOpacity>:<View style={{width:'15%'}}/>}
           </View>
         </View>
         <View style={styles.searchContainer}>

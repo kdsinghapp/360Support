@@ -397,6 +397,9 @@ const EventType = [
   {
     name:'Practice'
   },
+  {
+    name:'Training'
+  },
 ]
 export default EventModal;
 

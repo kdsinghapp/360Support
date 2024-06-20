@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
-import BackBtn from '../assets/svg/BackBtn.svg';
-import AddIcon from '../assets/svg/AddIcon.svg';
+import BackBtn from '../../../assets/svg/BackBtn.svg';
+
 import { useDispatch, useSelector } from 'react-redux';
 
 interface PostItem {
@@ -42,24 +42,7 @@ export default function Wall() {
       </View>
       <Text style={styles.postDetails}>{item.details}</Text>
       <Image source={{ uri: item.image }} style={styles.postImage} resizeMode="cover" />
-      <View style={styles.interactionContainer}>
-        <View style={styles.interactionItem}>
-          <Image
-            source={require('../assets/Cropping/Like2x.png')}
-            style={styles.interactionIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.interactionText}>Like</Text>
-        </View>
-        <View style={styles.interactionItem}>
-          <Image
-            source={require('../assets/Cropping/Comment2x.png')}
-            style={styles.interactionIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.interactionText}>Comments</Text>
-        </View>
-      </View>
+     
     </View>
   );
 
@@ -73,11 +56,7 @@ export default function Wall() {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Wall</Text>
           </View>
-          {!My_Profile?.type === 'Parent' && (
-            <TouchableOpacity style={styles.addButton}>
-              <Image source={require('../assets/Cropping/WhiteAdd.png')} style={styles.addButtonIcon} resizeMode="contain" />
-            </TouchableOpacity>
-          )}
+          
         </View>
       </View>
       <View style={styles.content}>

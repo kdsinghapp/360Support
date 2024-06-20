@@ -35,11 +35,10 @@ export default function EventDetilas({ route }) {
   const [DotmodalVisible, setDotModalVisible] = useState(false);
   const user = useSelector(state => state.auth.userData);
   const isLoading = useSelector(state => state.feature.isLoading);
-  const isFocused = useIsFocused();
-  const ClubMember = useSelector(state => state.feature.clubUsers);
 
   const { event_id } = route.params;
   const navigation = useNavigation();
+
 
   const eventdetails = useSelector(state => state.feature.event_details);
   const getEventMembers = useSelector(state => state.feature.getEventMembers);
@@ -184,6 +183,7 @@ onPress={()=>{
       </View>
       {Options == 'Attendance' &&
         <Dropdown
+      disable={user?.type == 'Parent' || user?.type == 'Player'}
           style={styles.dropdown}
           data={attendanceOptions}
           labelField="label"
