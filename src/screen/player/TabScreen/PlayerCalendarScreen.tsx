@@ -1,3 +1,8 @@
+
+
+
+
+ 
 import {
   View,
   Text,
@@ -8,44 +13,122 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import Line from '../../../assets/svg/Line.svg';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {Agenda, Calendar, LocaleConfig} from 'react-native-calendars';
-import LeftIcon from '../../../assets/svg/leftIcon.svg';
-import RightIcon from '../../../assets/svg/rightIcon.svg';
-import Filter from '../../../assets/svg/filter.svg';
-
-import moment from 'moment';
-import Timetable from 'react-native-calendar-timetable';
-import FilterMOdal from '../../Modal/FilterModal';
-import CustomCalendar from '../../Modal/CustomCalendar';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { get_event, get_event_by_member_id } from '../../../redux/feature/featuresSlice';
+import Loading from '../../../configs/Loader';
+import ScreenNameEnum from '../../../routes/screenName.enum';
 
 export default function PlayerCalendarScreen() {
-  const [Selected, setSelected] = useState('Schedule');
-  const [selectedCalendar, setSelectedCalendar] = useState('');
+  const [Selected, setSelected] = useState('Team Event');
   const [modalVisible, setModalVisible] = useState(false);
-  const startingMonth = new Date();
-  const [date] = useState(new Date());
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const getEvent_by_Member = useSelector((state: RootState) => state.feature.getEvent_by_Member);
+  const user_data = useSelector(state => state.auth.userData);
+  const Event_List = useSelector(
+    state => state.feature.Event_list,
+  );
+  const [Eventtype, setEventtype] = useState('user');
+  const navigation =useNavigation()
+  const get_monthName = dateStr => {
+    const dateParts = dateStr.split('/');
+    const year = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
+    const day = parseInt(dateParts[1]);
 
-  const [from] = React.useState(moment().subtract(3, 'days').toDate());
-  const [till] = React.useState(moment().add(3, 'days').toISOString());
-  const range = {from, till};
+    const dateObject = new Date(year, month, day);
+
+    const monthName = dateObject.toLocaleString('default', { month: 'long' });
+    return monthName;
+  };
 
 
-  const [items] = React.useState([
-    {
-      title: 'event name',
-      startDate: new Date(),
-      endDate:  new Date()
-    },
-  ]);
+  console.log('getEvent_by_Member=>>>>>>>>',getEvent_by_Member);
+  
+  const get_DayName = dateStr => {
+    const dateParts = dateStr.split('/');
+    const year = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
+    const day = parseInt(dateParts[1]);
+    const dayOfWeekIndex = new Date(year, month, day).getDay();
+
+    // Convert day of week index to string representation
+    let dayOfWeek;
+    switch (dayOfWeekIndex) {
+      case 0:
+        dayOfWeek = 'Sunday';
+        break;
+      case 1:
+        dayOfWeek = 'Monday';
+        break;
+      case 2:
+        dayOfWeek = 'Tuesday';
+        break;
+      case 3:
+        dayOfWeek = 'Wednesday';
+        break;
+      case 4:
+        dayOfWeek = 'Thursday';
+        break;
+      case 5:
+        dayOfWeek = 'Friday';
+        break;
+      case 6:
+        dayOfWeek = 'Saturday';
+        break;
+      default:
+        dayOfWeek = 'Invalid day';
+    }
+
+    return dayOfWeek;
+  };
+  const get_dayDate = dateStr => {
+    const parts = dateStr.split('/');
+    const month = parseInt(parts[0], 10);
+    const day = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+
+    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
+
+    const dayOfMonth = date.getDate(); // This will give you the day of the month
+
+    return dayOfMonth;
+  };
+  const isFocuse = useIsFocused();
+  useEffect(() => {
+    get_eventList('all');
+  }, [isFocuse, modalVisible]);
+
+  const get_eventList = async Eventtype => {
+
+    const params = {
+      user_id:user_data?.id,
+      group_code: user_data?.group_code,
+      type: Eventtype,
+    };
+    await dispatch(get_event(params));
+  };
+  const event_by_member_id = async () => {
+
+    const params = {
+      user_id: user_data?.id,
+     
+    };
+    await dispatch(get_event_by_member_id(params));
+  };
+
   return (
-    <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
+    <View style={{ flex: 1, backgroundColor: '#FFFDF5' }}>
+      {isLoading ? <Loading /> : null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View
@@ -80,13 +163,22 @@ export default function PlayerCalendarScreen() {
               horizontal
               scrollEnabled={false}
               showsHorizontalScrollIndicator={false}
-              renderItem={({item, index}) => (
+              renderItem={({ item, index }) => (
                 <TouchableOpacity
                   onPress={() => {
                     setSelected(item.name);
+                    
+                    if(item.name == 'Team Event'){
+                      setSelected(item.name);
+                    get_eventList('all')
+                    }else{
+                      event_by_member_id()
+                    }
                   }}
                   style={[
                     {
+
+                      width: 180,
                       marginLeft: 12,
                       marginRight: 7,
                       backgroundColor:
@@ -113,421 +205,263 @@ export default function PlayerCalendarScreen() {
               )}
             />
           </View>
-          <View style={{height: hp(1)}} />
+
         </View>
-        {Selected === 'Schedule' && (
-          <>
-            <View style={{paddingHorizontal: 15, marginTop: 20}}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontSize: 18, fontWeight: '700', color: '#000'}}>
-                  From today
-                </Text>
-                <Image
-                  source={require('../../../assets/Cropping/arrow-down.png')}
-                  style={{height: 20, width: 20, marginLeft: 10}}
-                />
-              </View>
-            </View>
-
-            <View style={{paddingHorizontal: 15, marginTop: 20}}>
-              <View>
-                <Text style={{fontSize: 18, fontWeight: '700', color: '#000'}}>
-                  April 17 today
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '500',
-                    color: 'grey',
-                    marginTop: 10,
-                  }}>
-                  Nothing planned for today
-                </Text>
-              </View>
-              <View
-                style={{
-                  marginTop: 20,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{fontSize: 18, fontWeight: '700', color: '#326A3D'}}>
-                  August 10
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '500',
-                    color: '#326A3D',
-                    marginLeft: 10,
-                  }}>
-                  Saturday
-                </Text>
-              </View>
-            </View>
-
-            <View
+        {Event_List?.length > 0  &&<FlatList
+          data={Event_List}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+            
+                onPress={() => {
+                  navigation.navigate(ScreenNameEnum.EventDetilas, {
+                    event_id: item.id,
+                  });
+                }}
+           
               style={[
-                styles.shadow,
-                {
-                  backgroundColor: '#DDFBE8',
-                  height: hp(15),
-                  marginHorizontal: 10,
-                  marginTop: hp(3),
-                  borderRadius: 20,
-                  marginVertical: 10,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 15,
-                },
+                styles.shdow,
+                styles.Event,
+                { marginVertical: 10, alignSelf: 'center', backgroundColor: item.type == 'Metting' ? '#e7cbf2' : item.type == 'Match' ? '#DDFBE8' : '#fff9cd' },
               ]}>
-              <View
-                style={{
-                  height: '60%',
-                  backgroundColor: '#326A3D',
-                  width: 3,
-                  marginLeft: 10,
-                }}
-              />
-              <View style={{marginLeft: 20, width: '80%'}}>
+              <View>
+                <Line />
+              </View>
+              <View>
                 <Text
-                  style={{
-                    color: '#326A3D',
-                    fontWeight: '700',
-                    fontSize: 15,
-                  }}>
-                  Match vs Bridgeport
+                  style={[
+                    styles.txt,
+                    {
+                      fontSize: 22,
+                      fontWeight: '700',
+                      lineHeight: 33,
+                      color: item.type == 'Match' ? '#326A3D' : '#000'
+                    },
+                  ]}>
+                  {item?.event_date != null &&
+                    get_dayDate(
+                      new Date(item?.event_date).toLocaleDateString(),
+                    )}
                 </Text>
-                <Text
-                  style={{
-                    color: '#326A3D',
-                    fontWeight: '400',
-                    fontSize: 14,
-                  }}>
-                  11:30 PM 01:30 AM (Aug 11)
-                </Text>
-                <Text
-                  style={{
-                    color: '#326A3D',
-                    fontWeight: '400',
-                    fontSize: 14,
-                  }}>
-                  Farham Fields
-                </Text>
-                <Text
-                  style={{
-                    color: '#326A3D',
-                    fontWeight: '400',
-                    fontSize: 14,
-                  }}>
-                  Match
+                <Text style={[styles.txt, { color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
+                  {get_monthName(
+                    new Date(item?.event_date).toLocaleDateString(),
+                  )}
                 </Text>
               </View>
-              <View style={{alignSelf: 'flex-end', paddingVertical: 10}}>
+
+              <View style={{ width: '65%' }}>
                 <Text
-                  style={{
-                    color: '#326A3D',
-                    fontWeight: '500',
-                    fontSize: 14,
-                  }}>
-                  U17
+                  style={[
+                    styles.txt,
+                    {
+                      fontSize: 18,
+                      fontWeight: '700',
+                      lineHeight: 24,
+                      color: item.type == 'Match' ? '#326A3D' : '#000'
+                    },
+                  ]}>
+                  {item?.event_name}
+                </Text>
+                <Text style={[styles.txt, { fontSize: 10, color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
+                  {item?.event_description}
+                </Text>
+                <Text style={[styles.txt,{    color:item.type=='Match'?'#326A3D':'#000'}]}>
+                  {get_DayName(
+                    new Date(item?.event_date).toLocaleDateString(),
+                  )}{' '}
+                  {new Date(item?.event_time).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image
+                    source={require('../../../assets/Cropping/pin.png')}
+                    style={{ height: 12, width: 12 }}
+                  />
+                  <Text style={[styles.txt, { marginLeft: 5,    color:item.type=='Match'?'#326A3D':'#000' }]}>
+                    {item?.event_location}
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <Text
+                  style={[styles.txt, { alignSelf: 'flex-end', fontSize: 10,color:item.type=='Match'?'#326A3D':'#000' }]}>
+                  {item.type}
                 </Text>
               </View>
-            </View>
-          </>
-        )}
+            </TouchableOpacity>
+          )}
+        />}
+        {Event_List.length == 0 && <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+          <Text style={{ fontSize: 14, color: '#777777', fontWeight: '500' }}>No Event Found</Text>
+        </View>
+        }
 
-        {Selected == 'Month' && (
-          <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-            <View
-              style={{
-                height: hp(8),
-                marginTop: 10,
-                justifyContent: 'space-between',
-                paddingHorizontal: 15,
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <LeftIcon />
-                </TouchableOpacity>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <RightIcon />
-                </TouchableOpacity>
-              </View>
-              <View style={{marginHorizontal: 15, width: '50%'}}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: '#000',
-                  }}>
-                  Apr 2024
-                </Text>
-              </View>
-              <TouchableOpacity
-               onPress={()=>{
-                setModalVisible(true)
-              }}
-              style={{width: '10%'}}>
-                <Filter height={30} width={30} />
-              </TouchableOpacity>
-            </View>
-            <View style={{padding: 20}}>
-              <Calendar
-                onDayPress={day => {
-                  setSelectedCalendar(day.dateString);
-                }}
-                markedDates={{
-                  [selectedCalendar]: {
-                    selectedCalendar: true,
-                    disableTouchEvent: true,
-                    selectedDotColor: 'orange',
-                  },
-                }}
-              />
-            </View>
-          </View>
-        )}
-        {Selected == 'Year' && (
-          <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
-            <View
-              style={{
-                height: hp(8),
-                marginTop: 10,
-                justifyContent: 'space-between',
-                paddingHorizontal: 15,
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <LeftIcon />
-                </TouchableOpacity>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <RightIcon />
-                </TouchableOpacity>
-              </View>
-              <View style={{marginHorizontal: 15, width: '50%'}}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: '#000',
-                  }}>
-                  2024
-                </Text>
-              </View>
-              <TouchableOpacity
-               onPress={()=>{
-                setModalVisible(true)
-              }}
-              style={{width: '10%'}}>
-                <Filter height={30} width={30} />
-              </TouchableOpacity>
-            </View>
-            <View style={{padding: 20, flex: 1}}>
-              <CustomCalendar startingMonth={startingMonth} />
-            </View>
-          </View>
-        )}
 
-        {Selected == 'Day' && (
-          <>
-            <View
-              style={{
-                height: hp(8),
-                marginTop: 10,
-                justifyContent: 'space-between',
-                paddingHorizontal: 15,
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <LeftIcon />
-                </TouchableOpacity>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <RightIcon />
-                </TouchableOpacity>
-              </View>
-              <View style={{marginHorizontal: 15, width: '50%'}}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: '#000',
-                  }}>
-                  Apr 2024
-                </Text>
-              </View>
-              <TouchableOpacity 
-               onPress={()=>{
-                setModalVisible(true)
-              }}
-              style={{width: '10%'}}>
-                <Filter height={30} width={30} />
-              </TouchableOpacity>
-            </View>
-
-            <Agenda
-              items={items}
-              renderItem={(item, firstItemInDay) => {
-                return <View />;
-              }}
-              // Specify how each date should be rendered. day can be undefined if the item is not first in that day
-              renderDay={(day, item) => {
-                return <View />;
-              }}
-              // Specify how empty date content with no items should be rendered
-              renderEmptyDate={() => {
-                return <View />;
-              }}
-              // Specify how agenda knob should look like
-              renderKnob={() => {
-                return <View />;
-              }}
-              // Specify what should be rendered instead of ActivityIndicator
-              renderEmptyData={() => {
-                return <View />;
-              }}
-              // Specify your item comparison function for increased performance
-              rowHasChanged={(r1, r2) => {
-                return r1.text !== r2.text;
-              }}
-              // Hide knob button. Default = false
-              hideKnob={true}
-              // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
-              showClosingKnob={false}
-              // By default, agenda dates are marked if they have at least one item, but you can override this if needed
-
-              // If disabledByDefault={true} dates flagged as not disabled will be enabled. Default = false
-              disabledByDefault={true}
-              style={{}}
-            />
-
-            <Timetable
-              // these two are required
-              items={items}
-              renderItem={props => <Dayshedule {...props} />}
-              date={date}
-              range={range}
-            />
-          </>
-        )}
-        {Selected == 'Week' && (
-          <>
-            <View
-              style={{
-                height: hp(8),
-                marginTop: 10,
-                justifyContent: 'space-between',
-                paddingHorizontal: 15,
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <LeftIcon />
-                </TouchableOpacity>
-                <TouchableOpacity style={{marginHorizontal: 10}}>
-                  <RightIcon />
-                </TouchableOpacity>
-              </View>
-              <View style={{marginHorizontal: 15, width: '50%'}}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: '#000',
-                  }}>
-                  Apr 2024
-                </Text>
-              </View>
-              <TouchableOpacity
-              onPress={()=>{
-                setModalVisible(true)
-              }}
-              style={{width: '10%'}}>
-                <Filter height={30} width={30} />
-              </TouchableOpacity>
-            </View>
-
-            <Agenda
-              items={items}
-              renderItem={(item, firstItemInDay) => {
-                return <View />;
-              }}
-              // Specify how each date should be rendered. day can be undefined if the item is not first in that day
-              renderDay={(day, item) => {
-                return <View />;
-              }}
-              // Specify how empty date content with no items should be rendered
-              renderEmptyDate={() => {
-                return <View />;
-              }}
-              // Specify how agenda knob should look like
-              renderKnob={() => {
-                return <View />;
-              }}
-              // Specify what should be rendered instead of ActivityIndicator
-              renderEmptyData={() => {
-                return <View />;
-              }}
-              // Specify your item comparison function for increased performance
-              rowHasChanged={(r1, r2) => {
-                return r1.text !== r2.text;
-              }}
-              // Hide knob button. Default = false
-              hideKnob={true}
-              // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
-              showClosingKnob={false}
-              // By default, agenda dates are marked if they have at least one item, but you can override this if needed
-
-              // If disabledByDefault={true} dates flagged as not disabled will be enabled. Default = false
-              disabledByDefault={true}
-              style={{}}
-            />
-
-            <Timetable
-              // these two are required
-              items={items}
-              renderItem={props => <Dayshedule {...props} />}
-              date={date}
-              range={range}
-            />
-          </>
-        )}
-
-<FilterMOdal visible={modalVisible}  onClose={() => setModalVisible(false)}  />
       </ScrollView>
     </View>
   );
 }
-function Dayshedule({style, item, dayIndex, daysTotal}) {
-  return (
-    <View
-      style={{
-        ...style, // apply calculated styles, be careful not to override these accidentally (unless you know what you are doing)
 
-        borderRadius: 10,
-        elevation: 5,
-        backgroundColor: '#FFF',
-        height: 45,
-        padding: 10,
-        justifyContent: 'center',
-      }}>
-      <Text>{item.title}</Text>
-      <Text>
-        {dayIndex} of {daysTotal}
-      </Text>
-    </View>
-  );
-}
 
 
 const styles = StyleSheet.create({
+
+  txt: {
+    color: '#326A3D',
+    fontWeight: '500',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  Event: {
+    justifyContent: 'space-between',
+    height: hp(12),
+    backgroundColor: '#DDFBE8',
+    marginTop: 20,
+    marginHorizontal: 10,
+    width: wp(90),
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  shdow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+
+    elevation: 7,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF',
+  },
+  colorDiv: {
+    backgroundColor: '#874be9',
+    height: hp(12),
+    borderBottomRightRadius: 50,
+    borderBottomLeftRadius: 50,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  backButton: {
+    width: '25%',
+  },
+  titleContainer: {
+    width: '25%',
+  },
+  title: {
+    fontWeight: '700',
+    fontSize: 22,
+    lineHeight: 32,
+    color: '#FFF',
+  },
+  addButton: {},
+  addButtonIcon: {
+    height: 50,
+    width: 50,
+  },
+  content: {
+    flex: 1,
+    paddingTop: 20,
+  },
+  recentListItem: {
+    paddingVertical: 15,
+    padding: 10,
+    marginHorizontal: 15,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    marginVertical: 10,
+  },
+  stickyPostContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  stickyPostText: {
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 18,
+    color: '#294247',
+  },
+  postContent: {
+    flexDirection: 'row',
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  profileImage: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+  },
+  postDetails: {
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  postTitle: {
+    color: '#000000',
+    fontSize: 14,
+    fontWeight: '800',
+    lineHeight: 18,
+  },
+  postDescription: {
+    color: '#B0B0B0',
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 18,
+  },
+  postDateTime: {
+    color: '#B0B0B0',
+    fontSize: 10,
+    fontWeight: '400',
+    lineHeight: 18,
+  },
+  postImage: {
+    marginTop: 15,
+    width: '100%',
+    height: 190,
+  },
+  interactionContainer: {
+    flexDirection: 'row',
+    marginTop: 15,
+  },
+  interactionItem: {
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  interactionIcon: {
+    height: 15,
+    width: 15,
+    marginHorizontal: 10,
+  },
+  interactionText: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '500',
+    color: '#292D32',
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
+
   shadow: {
     shadowColor: '#000',
     shadowOffset: {
@@ -549,18 +483,23 @@ const styles = StyleSheet.create({
 
 const tabData = [
   {
-    name: 'Schedule',
+    name: 'Team Event',
   },
   {
-    name: 'Day',
+    name: 'My Event',
   },
-  {
-    name: 'Week',
-  },
-  {
-    name: 'Month',
-  },
-  {
-    name: 'Year',
-  },
+
+
 ];
+const EventList = [
+  {
+    name: 'Team Event',
+  },
+  {
+    name: 'My Event',
+  },
+
+
+];
+
+ 

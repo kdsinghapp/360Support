@@ -61,6 +61,8 @@ export default function MyProfile() {
   const [City, setCity] = useState('');
   const [Email, setEmail] = useState('');
   const isFocuse = useIsFocused();
+  const user_data = useSelector(state => state.auth.userData);
+
   useEffect(() => {
     getProfile();
   }, [isFocuse]);
@@ -92,9 +94,9 @@ export default function MyProfile() {
   }
 
   const getProfile = async () => {
-    const id = await AsyncStorage.getItem('user_id');
+    
     params = {
-      user_id: id,
+      user_id: user_data?.id,
     };
     dispatch(get_profile(params));
   };
@@ -144,10 +146,9 @@ export default function MyProfile() {
   };
 
   const Updated_profile = async () => {
-    const id = await AsyncStorage.getItem('user_id');
 
     const params = {
-      user_id: id,
+      user_id: user_data?.id,
       first_name: FirstName,
       last_name: LastName,
       dob: Dob,

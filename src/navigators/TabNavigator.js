@@ -1,17 +1,26 @@
 import {View, Text, Image} from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Add from '../assets/svg/Add.svg';
 import _routes from '../routes/routes';
 import {useSelector} from 'react-redux';
 import ScreenNameEnum from '../routes/screenName.enum';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
   const selected = useSelector(state => state.auth.selectedRole);
   const userData = useSelector(state => state.auth.userData);
+  
+useEffect(()=>{
+  allkey()
+},[])
 
+const allkey =async()=>{
+  const data =await AsyncStorage.getAllKeys()
+  console.log('=>>>>>>>>>>.data>>>>>>>>>',data);
+}
   const renderTabScreens = () => {
     if (userData?.type == 'Parent') {
       return _routes.BOTTOMTAB_ROUTE.map(screen => (

@@ -716,7 +716,7 @@ export const get_chat_groups_by_code = createAsyncThunk(
         },
       };
       let data = new FormData();
-      data.append('group_code', params.group_code);
+      data.append('user_id', params.user_id);
       const response = await API.post('/get_chat_groups_by_code', data, config);
       console.log(
         '==============get_chat_groups_by_code======================',

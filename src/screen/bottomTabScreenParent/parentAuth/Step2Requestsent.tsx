@@ -30,22 +30,6 @@ export default function Step2Requestsent() {
   const dispatch= useDispatch()
 
 
-
-  console.log('====================================');
-  console.log(childRequest);
-  console.log('====================================');
-  const send_request = async () => {
-    const id = await AsyncStorage.getItem('user_id');
-    const params = {
-      data: {
-        parent_id:id,
-        email: 'player3@gmail.com',
-      },
-      navigation: navigation,
-    };
-
-    dispatch(send_child_request(params));
-  };
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>

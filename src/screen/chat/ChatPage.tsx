@@ -8,17 +8,17 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import SearchIcon from '../../assets/svg/search.svg';
 import BackBtn from '../../assets/svg/BackBtn.svg';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
 import NewChat from '../coach/modal/NewChat';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   get_chat_groups_by_code,
   get_club_users,
@@ -28,30 +28,25 @@ import Loading from '../../configs/Loader';
 
 export default function ChatPage() {
   const [modalVisible, setModalVisible] = useState(false);
-
   const user = useSelector(state => state.auth.userData);
-
   const isLoading = useSelector(state => state.feature.isLoading);
   const ChatGroupList = useSelector(state => state.feature.ChatGroupList);
-  const getIndividualChat = useSelector(
-    state => state.feature.getIndividualChat,
-  );
+  const getIndividualChat = useSelector(state => state.feature.getIndividualChat);
   const [isSelected, setIsSelected] = useState('Individual');
   const navigation = useNavigation();
-
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (user) {
       getChatContact();
-      setIsSelected('Individual')
+      setIsSelected('Individual');
     }
-  }, [user,modalVisible,isFocused]);
+  }, [user, modalVisible, isFocused]);
 
   const getChatGroup = () => {
     const params = {
-      group_code: user?.group_code,
+      user_id: user?.id,
     };
     dispatch(get_chat_groups_by_code(params));
   };
@@ -63,7 +58,7 @@ export default function ChatPage() {
     dispatch(get_individual_chat(params));
   };
 
-  const RecentListItem = ({item}) => (
+  const RecentListItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
         navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {
@@ -74,7 +69,7 @@ export default function ChatPage() {
       style={[styles.shadow, styles.listItem]}>
       <View style={styles.avatarContainer}>
         {item.chat_group_image ? (
-          <Image source={{uri: item.chat_group_image}} style={styles.avatar} />
+          <Image source={{ uri: item.chat_group_image }} style={styles.avatar} />
         ) : (
           <Text style={styles.avatarText}>
             {item.chat_group_name[0]?.toUpperCase()}
@@ -98,7 +93,7 @@ export default function ChatPage() {
     </TouchableOpacity>
   );
 
-  const indiListItem = ({item}) => (
+  const IndiListItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
         navigation.navigate(ScreenNameEnum.CHAT_SCREEN, {
@@ -110,7 +105,7 @@ export default function ChatPage() {
       <View style={styles.avatarContainer}>
         {item.reciver_data ? (
           <Image
-            source={{uri: item.reciver_data?.image}}
+            source={{ uri: item.reciver_data?.image }}
             style={styles.avatar}
           />
         ) : (
@@ -152,17 +147,21 @@ export default function ChatPage() {
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Chat</Text>
             </View>
-           {user?.type == 'Coache' ? <TouchableOpacity
-              onPress={() => {
-                setModalVisible(true);
-              }}
-              style={styles.addButton}>
-              <Image
-                source={require('../../assets/Cropping/WhiteAdd.png')}
-                style={styles.addButtonIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>:<View style={{width:'15%'}}/>}
+            {user?.type === 'Coache' ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(true);
+                }}
+                style={styles.addButton}>
+                <Image
+                  source={require('../../assets/Cropping/WhiteAdd.png')}
+                  style={styles.addButtonIcon}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            ) : (
+              <View style={{ width: '15%' }} />
+            )}
           </View>
         </View>
         <View style={styles.searchContainer}>
@@ -201,12 +200,18 @@ export default function ChatPage() {
           </TouchableOpacity>
         </View>
         <View style={styles.listContainer}>
-          <FlatList
-            data={isSelected === 'Groups' ? ChatGroupList : getIndividualChat}
-            renderItem={isSelected === 'Groups' ? RecentListItem : indiListItem}
-            keyExtractor={item => item.id}
-            ListFooterComponent={<View style={styles.listFooter} />}
-          />
+          {isSelected === 'Groups' && ChatGroupList.length === 0 ? (
+            <Text style={styles.noDataText}>No groups found</Text>
+          ) : isSelected === 'Individual' && getIndividualChat.length === 0 ? (
+            <Text style={styles.noDataText}>No contacts found</Text>
+          ) : (
+            <FlatList
+              data={isSelected === 'Groups' ? ChatGroupList : getIndividualChat}
+              renderItem={isSelected === 'Groups' ? RecentListItem : IndiListItem}
+              keyExtractor={item => item.id}
+              ListFooterComponent={<View style={styles.listFooter} />}
+            />
+          )}
         </View>
       </ScrollView>
       <NewChat visible={modalVisible} onClose={() => setModalVisible(false)} />
@@ -365,5 +370,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.29,
     shadowRadius: 4.65,
     elevation: 7,
+  },
+  noDataText: {
+    textAlign: 'center',
+    color: '#000',
+    fontSize: 18,
+    marginVertical: 20,
   },
 });

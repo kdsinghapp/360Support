@@ -59,7 +59,6 @@ console.log('NOWITHOUTSCREEN',Get_profile);
 
   const dispatch = useDispatch();
   const get_profileDetails = async () => {
-    const id = await AsyncStorage.getItem('user_id');
 
     
   //  if (!id) return  navigation.navigate(ScreenNameEnum.USER_DETAILS);;

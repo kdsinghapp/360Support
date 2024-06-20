@@ -66,7 +66,7 @@
       get_eventList();
       getGroupDetails();
       get_videoList('all');
-      Get_Training('all');
+  
       LastGame_result('all')
     }, [isFocuse, user_data,]);
   
@@ -156,15 +156,10 @@
   
       return dayOfMonth;
     };
-    const Get_Training = async (type): Promise<void> => {
-      const id = await AsyncStorage.getItem('user_id');
-      const params = {
-        user_id: id,
-        group_code: user_data?.group_code,
-        type: type,
-      };
-      await dispatch(get_training(params));
-    };
+
+    console.log('user_data?.group_code',My_Profile?.group_code);
+    
+
     const LastGame_result = async (type): Promise<void> => {
      
       const params = {  
@@ -200,9 +195,9 @@
       dispatch(Get_Group(params));
     };
     const get_eventList = async (): Promise<void> => {
-      const id = await AsyncStorage.getItem('user_id');
+    
       const params = {
-        user_id: id,
+        user_id: user_data?.id,
         group_code: user_data?.group_code,
         type:'all'
       };

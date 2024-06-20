@@ -81,10 +81,8 @@ export default function coachProfile() {
   const Updated_profile = async () => {
    
    
-    const id = await AsyncStorage.getItem('user_id');
-
     const params = {
-      user_id: id,
+      user_id: user_data?.id,
       first_name: FirstName,
       last_name: LastName,
       dob: Dob,
@@ -166,9 +164,9 @@ export default function coachProfile() {
   }, [user_data, isFocuse]);
 
   const get_profile = async () => {
-    const id = await AsyncStorage.getItem('user_id');
-    params = {
-      user_id: id,
+
+   const params = {
+      user_id: user_data?.id,
     };
     dispatch(get_profile(params));
   };

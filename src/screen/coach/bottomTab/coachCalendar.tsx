@@ -111,9 +111,9 @@ export default function coachCalendar() {
   }, [isFocuse, modalVisible]);
 
   const get_eventList = async Eventtype => {
-    const id = await AsyncStorage.getItem('user_id');
+
     const params = {
-      user_id: id,
+      user_id: user_data?.id,
       group_code: user_data?.group_code,
       type: Eventtype,
     };

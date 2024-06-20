@@ -173,9 +173,9 @@ export default function coachHome() {
     return dayOfMonth;
   };
   const Get_Training = async (type): Promise<void> => {
-    const id = await AsyncStorage.getItem('user_id');
+
     const params = {
-      user_id: id,
+      user_id: user_data?.id,
       group_code: user_data?.group_code,
       type: type,
     };
@@ -216,9 +216,9 @@ export default function coachHome() {
     dispatch(Get_Group(params));
   };
   const get_eventList = async (): Promise<void> => {
-    const id = await AsyncStorage.getItem('user_id');
+
     const params = {
-      user_id: id,
+      user_id: user_data?.id,
       group_code: user_data?.group_code,
       type:'all'
     };
