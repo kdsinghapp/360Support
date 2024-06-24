@@ -38,69 +38,40 @@ export default function CalendarScreen() {
   const [Eventtype, setEventtype] = useState('user');
   const navigation =useNavigation()
   const get_monthName = dateStr => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
-    const dateObject = new Date(year, month, day);
+    // Get the month name using toLocaleString
+    const monthName = date.toLocaleString('default', { month: 'long' });
 
-    const monthName = dateObject.toLocaleString('default', { month: 'long' });
     return monthName;
   };
-
-
-  console.log('getEvent_by_Member=>>>>>>>>',getEvent_by_Member);
-  
   const get_DayName = dateStr => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-    const dayOfWeekIndex = new Date(year, month, day).getDay();
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
-    // Convert day of week index to string representation
-    let dayOfWeek;
-    switch (dayOfWeekIndex) {
-      case 0:
-        dayOfWeek = 'Sunday';
-        break;
-      case 1:
-        dayOfWeek = 'Monday';
-        break;
-      case 2:
-        dayOfWeek = 'Tuesday';
-        break;
-      case 3:
-        dayOfWeek = 'Wednesday';
-        break;
-      case 4:
-        dayOfWeek = 'Thursday';
-        break;
-      case 5:
-        dayOfWeek = 'Friday';
-        break;
-      case 6:
-        dayOfWeek = 'Saturday';
-        break;
-      default:
-        dayOfWeek = 'Invalid day';
-    }
+    // Get the day name using toLocaleString
+    const dayName = date.toLocaleString('default', { weekday: 'long' });
 
-    return dayOfWeek;
+    return dayName;
   };
   const get_dayDate = dateStr => {
-    const parts = dateStr.split('/');
-    const month = parseInt(parts[0], 10);
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-
-    const dayOfMonth = date.getDate(); // This will give you the day of the month
-
+    const date = new Date(dateStr); // Parse the date string
+    const dayOfMonth = date.getDate(); // Get the day of the month
     return dayOfMonth;
   };
+
+  const get_time = dateString => {
+    // Regular expression to extract the time portion
+    let timeMatch = dateString.match(/(\d{2}:\d{2}:\d{2})/);
+
+    // If a match is found, return the matched time
+    if (timeMatch) {
+      return timeMatch[0];
+    } else {
+      throw new Error("Time format not found in the provided date string.");
+    }
+  }
   const isFocuse = useIsFocused();
   useEffect(() => {
     get_eventList('all');
@@ -238,12 +209,12 @@ export default function CalendarScreen() {
                   ]}>
                   {item?.event_date != null &&
                     get_dayDate(
-                      new Date(item?.event_date).toLocaleDateString(),
+                     item?.event_date
                     )}
                 </Text>
                 <Text style={[styles.txt, { color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
                   {get_monthName(
-                    new Date(item?.event_date).toLocaleDateString(),
+               item?.event_date
                   )}
                 </Text>
               </View>
@@ -266,12 +237,9 @@ export default function CalendarScreen() {
                 </Text>
                 <Text style={[styles.txt,{    color:item.type=='Match'?'#326A3D':'#000'}]}>
                   {get_DayName(
-                    new Date(item?.event_date).toLocaleDateString(),
+                   item?.event_date
                   )}{' '}
-                  {new Date(item?.event_time).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {get_time(item?.event_time)}
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Image

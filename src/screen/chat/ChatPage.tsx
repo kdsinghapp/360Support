@@ -72,7 +72,7 @@ export default function ChatPage() {
           <Image source={{ uri: item.chat_group_image }} style={styles.avatar} />
         ) : (
           <Text style={styles.avatarText}>
-            {item.chat_group_name[0]?.toUpperCase()}
+            {item?.chat_group_name[0]?.toUpperCase()}
           </Text>
         )}
       </View>

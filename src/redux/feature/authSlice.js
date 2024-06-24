@@ -33,16 +33,18 @@ export const login = createAsyncThunk('login', async (params, thunkApi) => {
     };
     const response = await API.post('/login', params.data, config);
 
-   
+    console.log('===============login=====================', response.data);
     if (response.data.status == '1') {
-      thunkApi.dispatch(loginSuccess(response.data.data));
+  
 
       if(response.data?.result.child_details){
      params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
        await AsyncStorage.setItem('user_id',response.data?.result.id)
+
+       thunkApi.dispatch(loginSuccess(response.data.data));
       }
       else{
-        params.navigation.navigate(ScreenNameEnum.WELCOME_SCREEN);
+        params.navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
       }
       successToast(response.data.message);
     } else {

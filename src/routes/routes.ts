@@ -94,6 +94,7 @@ import TranningCoachNotificationSetting from "../screen/coach/features/coachNoti
 import Training from "../screen/bottomTabScreenParent/Feature/Traning";
 import ChildrenProfiles from "../screen/bottomTabScreenParent/Feature/ChildrenProfiles";
 import EditChildProfile from "../screen/bottomTabScreenParent/Feature/EditChildProfile";
+import AccountSettingPlayer from "../screen/player/features/AccountSettingPlayer";
 
 
 const _routes = {
@@ -327,6 +328,14 @@ const _routes = {
     {
       name: ScreenNameEnum.EditChildProfile,
       Component: EditChildProfile,
+    },
+    {
+      name: ScreenNameEnum.coachNotificationSetting,
+      Component: coachNotificationSetting,
+    },
+    {
+      name: ScreenNameEnum.AccountSettingPlayer,
+      Component: AccountSettingPlayer,
     },
 
 

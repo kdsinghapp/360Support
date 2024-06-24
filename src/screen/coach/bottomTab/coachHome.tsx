@@ -34,6 +34,7 @@ import {
   get_event,
   get_game_result,
   get_post,
+  get_registration_category,
   get_training,
   get_video,
 } from '../../../redux/feature/featuresSlice';
@@ -63,6 +64,7 @@ export default function coachHome() {
   const [ModalVisibleVideo, setModalVisibleVideo] = useState<boolean>(false);
   const [AddGroupModal, setAddGroupModal] = useState<boolean>(false);
   const [TrainingVisible, setTrainingVisible] = useState<boolean>(false);
+  const Registration_list = useSelector((state: RootState) => state.feature.Registration_list);
   const [AddMatchResultModal, setAddMatchResultModal] =
     useState<boolean>(false);
   const [eventVisible, setEventVisible] = useState<boolean>(false);
@@ -75,6 +77,31 @@ export default function coachHome() {
   );
   const dispatch = useDispatch();
   const [playing, setPlaying] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRegisterList, setFilteredRegisterList] = useState(Registration_list);
+
+  useEffect(() => {
+    if (searchQuery === '') {
+      setFilteredRegisterList(Registration_list);
+    } else {
+      setFilteredRegisterList(
+        Registration_list.filter(item =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  }, [searchQuery]);
+  useEffect(() => {
+    get_Registration();
+  }, [user_data]);
+
+  const get_Registration = async () => {
+    const params = {
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_registration_category(params));
+  };
 
   useEffect(() => {
     get_profileDetails();
@@ -110,68 +137,41 @@ export default function coachHome() {
     (state: RootState) => state.feature.Event_list,
   );
 
-  const get_monthName = (dateStr: string): string => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
+  const get_monthName = dateStr => {
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
-    const dateObject = new Date(year, month, day);
+    // Get the month name using toLocaleString
+    const monthName = date.toLocaleString('default', { month: 'long' });
 
-    const monthName = dateObject.toLocaleString('default', {month: 'long'});
     return monthName;
   };
+  const get_DayName = dateStr => {
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
-  const get_DayName = (dateStr: string): string => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-    const dayOfWeekIndex = new Date(year, month, day).getDay();
+    // Get the day name using toLocaleString
+    const dayName = date.toLocaleString('default', { weekday: 'long' });
 
-    // Convert day of week index to string representation
-    let dayOfWeek;
-    switch (dayOfWeekIndex) {
-      case 0:
-        dayOfWeek = 'Sunday';
-        break;
-      case 1:
-        dayOfWeek = 'Monday';
-        break;
-      case 2:
-        dayOfWeek = 'Tuesday';
-        break;
-      case 3:
-        dayOfWeek = 'Wednesday';
-        break;
-      case 4:
-        dayOfWeek = 'Thursday';
-        break;
-      case 5:
-        dayOfWeek = 'Friday';
-        break;
-      case 6:
-        dayOfWeek = 'Saturday';
-        break;
-      default:
-        dayOfWeek = 'Invalid day';
-    }
-
-    return dayOfWeek;
+    return dayName;
   };
-
-  const get_dayDate = (dateStr: string): number => {
-    const parts = dateStr.split('/');
-    const month = parseInt(parts[0], 10);
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-
-    const dayOfMonth = date.getDate(); // This will give you the day of the month
-
+  const get_dayDate = dateStr => {
+    const date = new Date(dateStr); // Parse the date string
+    const dayOfMonth = date.getDate(); // Get the day of the month
     return dayOfMonth;
   };
+
+  const get_time = dateString => {
+    // Regular expression to extract the time portion
+    let timeMatch = dateString.match(/(\d{2}:\d{2}:\d{2})/);
+
+    // If a match is found, return the matched time
+    if (timeMatch) {
+      return timeMatch[0];
+    } else {
+      throw new Error("Time format not found in the provided date string.");
+    }
+  }
   const Get_Training = async (type): Promise<void> => {
 
     const params = {
@@ -421,17 +421,17 @@ export default function coachHome() {
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_date != null &&
                     get_dayDate(
-                      new Date(
+          
                         Event_List[Event_List?.length - 1]?.event_date,
-                      ).toLocaleDateString(),
+                     
                     )}
                 </Text>
                 <Text style={styles.txt}>
                   {get_monthName(
-                    new Date(
+               
                       Event_List[Event_List?.length - 1]?.event_date,
-                    ).toLocaleDateString(),
-                  ).substring(0, 3)}
+                    
+                  ).substring(0, 3).toUpperCase()}
                 </Text>
               </View>
 
@@ -457,16 +457,13 @@ export default function coachHome() {
                 </Text>
                 <Text style={styles.txt}>
                   {get_DayName(
-                    new Date(
+                 
                       Event_List[Event_List?.length - 1]?.event_date,
-                    ).toLocaleDateString(),
+                   
                   )}{' '}
-                  {new Date(
+                  {get_time(
                     Event_List[Event_List?.length - 1]?.event_time,
-                  ).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  )}
                 </Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Image
@@ -664,7 +661,7 @@ export default function coachHome() {
             </View>
           )}
         </View>
-        <View
+        {/* <View
           style={{
             marginHorizontal: 15,
             marginTop: 30,
@@ -699,8 +696,8 @@ export default function coachHome() {
               See all
             </Text>
           </TouchableOpacity>
-        </View>
-
+        </View> */}
+{/* 
         {Traininglist.length > 0 && (
           <View
             style={[
@@ -876,7 +873,7 @@ export default function coachHome() {
             }}>
             No training Found
           </Text>
-        )}
+        )} */}
         <View
           style={{
             marginHorizontal: 15,
@@ -1072,25 +1069,29 @@ export default function coachHome() {
           </TouchableOpacity>
         </View>
 
-        <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
-          <View style={[styles.shdow, styles.search]}>
-            <SearchIcon />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor={'#000'}
-              style={{
-                marginLeft: 10,
-                fontSize: 14,
-                color: '#000',
-                lineHeight: 18,
-              }}
-            />
-          </View>
+ 
+      <View style={{ marginTop: 10, height: hp(8), justifyContent: 'center' }}>
+        <View style={[styles.shadow, styles.search]}>
+          <SearchIcon />
+          <TextInput
+            placeholder="Search"
+            placeholderTextColor={'#000'}
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+            style={{
+              marginLeft: 10,
+              fontSize: 14,
+              color: '#000',
+              lineHeight: 18,
+              width:'90%',
+            }}
+          />
         </View>
-        <View style={{flex: 1}}>
+      </View>
+        {Registration_list?.length > 0 && <View style={{ flex: 1 }}>
           <FlatList
-            data={RegisterList}
-            renderItem={({item}) => (
+            data={filteredRegisterList}
+            renderItem={({ item }) => (
               <View
                 style={[
                   styles.shdow,
@@ -1103,24 +1104,25 @@ export default function coachHome() {
                     padding: 20,
                   },
                 ]}>
-                <View style={{width: '100%', flexDirection: 'row'}}>
+                <View style={{ width: '100%', flexDirection: 'row' }}>
                   <View>
                     <Image
-                      source={item.img}
+                      source={{uri:item.image}}
                       style={{
                         height: 45,
                         width: 45,
+                        borderRadius:24.5
                       }}
                     />
                   </View>
-                  <View style={{marginLeft: 15, width: '75%'}}>
+                  <View style={{ marginLeft: 15, width: '75%' }}>
                     <Text
                       style={{
                         fontSize: 16,
                         color: '#000',
                         fontWeight: '700',
                       }}>
-                      {item.titile}
+                      {item.name}
                     </Text>
                     <Text
                       style={{
@@ -1153,15 +1155,11 @@ export default function coachHome() {
                     Register
                   </Text>
                 </TouchableOpacity>
-                <BottomToTopModal
-                  visible={modalVisible}
-                  data={item}
-                  onClose={() => setModalVisible(false)}
-                />
               </View>
             )}
           />
         </View>
+        }
         <PostModal
           visible={OpenModal == 'Post' && ModalVisiblePost ? true : false}
           onClose={() => setModalVisiblePost(false)}
@@ -1455,10 +1453,7 @@ const Create = [
     name: 'Add Event',
     logo: require('../../../assets/Cropping/traning.png'),
   },
-  {
-    name: 'Add Training',
-    logo: require('../../../assets/Cropping/traning.png'),
-  },
+
   {
     name: 'Add Match Video',
     logo: require('../../../assets/Cropping/video.png'),

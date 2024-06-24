@@ -8,7 +8,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   Image,
   FlatList,
 } from 'react-native';
@@ -17,22 +16,16 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Close from '../../../assets/svg/Close.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import {
-  create_chat_group,
   get_club_users,
 } from '../../../redux/feature/featuresSlice';
 import {useIsFocused} from '@react-navigation/native';
 import Loading from '../../../configs/Loader';
-import {errorToast} from '../../../configs/customToast';
-import firestore from '@react-native-firebase/firestore';
-
 
 const AddEventMember = ({visible, onClose, onsetData}) => {
   const screenHeight = Dimensions.get('screen').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
-  const [name, setName] = useState('');
   const [selectedParentIndices, setSelectedParentIndices] = useState([]);
   const [selectedPlayerIndices, setSelectedPlayerIndices] = useState([]);
   const [selectedCoachIndices, setSelectedCoachIndices] = useState([]);
@@ -161,24 +154,23 @@ const AddEventMember = ({visible, onClose, onsetData}) => {
 
   const tabs = ['Parent', 'Player', 'Coach'];
 
-const handleSubmit = async () => {
-  const selectedMembers = [
-    ...selectedParentIndices.map(index => ClubMember[index].id),
-    ...selectedPlayerIndices.map(index => ClubMember[index].id),
-    ...selectedCoachIndices.map(index => ClubMember[index].id),
-  ];
+  const handleSubmit = async () => {
+    const selectedMembers = [
+      ...selectedParentIndices.map(index => sections['Parent'][index].id),
+      ...selectedPlayerIndices.map(index => sections['Player'][index].id),
+      ...selectedCoachIndices.map(index => sections['Coach'][index].id),
+    ];
 
-  console.log('Selected member IDs:', selectedMembers);
+    console.log('Selected member IDs:', selectedMembers);
 
-  onsetData(selectedMembers);
-  onClose();
+    onsetData(selectedMembers);
+    onClose();
 
-  // Reset selected member indices after closing the modal
-  setSelectedParentIndices([]);
-  setSelectedPlayerIndices([]);
-  setSelectedCoachIndices([]);
-};
-
+    // Reset selected member indices after closing the modal
+    setSelectedParentIndices([]);
+    setSelectedPlayerIndices([]);
+    setSelectedCoachIndices([]);
+  };
 
   return (
     <Modal visible={visible} transparent>

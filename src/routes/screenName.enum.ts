@@ -76,7 +76,8 @@ enum ScreenNameEnum {
   CHILD_PROFILE ='CHILD_PROFILE',
   MY_CHILDREN ='MY_CHILDREN',
   SUPPORT_SCREEN ='SUPPORT_SCREEN',
-  VIDEO_SCREEN = 'VIDEO_SCREEN'
+  VIDEO_SCREEN = 'VIDEO_SCREEN',
+  AccountSettingPlayer='AccountSettingPlayer'
   
 
 

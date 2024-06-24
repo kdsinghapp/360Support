@@ -268,34 +268,34 @@ const data = [
     screen: ScreenNameEnum.coachWall,
   },
 
+  // {
+  //   id: '2',
+  //   titile: 'Training Schedule',
+  //   logo: require('../../../assets/Cropping/user-octagon.png'),
+  //   screen: ScreenNameEnum.cocheTraning,
+  // },
   {
     id: '2',
-    titile: 'Training Schedule',
-    logo: require('../../../assets/Cropping/user-octagon.png'),
-    screen: ScreenNameEnum.cocheTraning,
-  },
-  {
-    id: '3',
     titile: 'Video',
     logo: require('../../../assets/Cropping/video-octagon.png'),
     screen: ScreenNameEnum.cocheVideo,
   },
   {
-    id: '4',
+    id: '3',
     titile: 'Event Management',
     logo: require('../../../assets/Cropping/event.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
     screen: ScreenNameEnum.cocheEvent,
   },
   {
-    id: '5',
+    id: '4',
     titile: 'Matche Result',
     logo: require('../../../assets/Cropping/results.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,
     screen: ScreenNameEnum.coachMatches,
   },
   {
-    id: '6',
+    id: '5',
     titile: 'Registration',
     logo: require('../../../assets/Cropping/online-registration.png'),
     // screen: ScreenNameEnum.REGISTRATION_SCREEN,

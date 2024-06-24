@@ -40,73 +40,47 @@ export default function EventDetilas({ route }) {
   const navigation = useNavigation();
 
 
+
   const eventdetails = useSelector(state => state.feature.event_details);
   const getEventMembers = useSelector(state => state.feature.getEventMembers);
 
   const [Options, setOption] = useState('Event')
 
   const get_monthName = dateStr => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
-    const dateObject = new Date(year, month, day);
+    // Get the month name using toLocaleString
+    const monthName = date.toLocaleString('default', { month: 'long' });
 
-    const monthName = dateObject.toLocaleString('default', { month: 'long' });
     return monthName;
   };
-
   const get_DayName = dateStr => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-    const dayOfWeekIndex = new Date(year, month, day).getDay();
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
-    // Convert day of week index to string representation
-    let dayOfWeek;
-    switch (dayOfWeekIndex) {
-      case 0:
-        dayOfWeek = 'Sun';
-        break;
-      case 1:
-        dayOfWeek = 'Mon';
-        break;
-      case 2:
-        dayOfWeek = 'Tue';
-        break;
-      case 3:
-        dayOfWeek = 'Wed';
-        break;
-      case 4:
-        dayOfWeek = 'Thu';
-        break;
-      case 5:
-        dayOfWeek = 'Fri';
-        break;
-      case 6:
-        dayOfWeek = 'Sat';
-        break;
-      default:
-        dayOfWeek = 'Invalid day';
-    }
+    // Get the day name using toLocaleString
+    const dayName = date.toLocaleString('default', { weekday: 'long' });
 
-    return dayOfWeek;
+    return dayName;
   };
-
   const get_dayDate = dateStr => {
-    const parts = dateStr.split('/');
-    const month = parseInt(parts[0], 10);
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-
-    const dayOfMonth = date.getDate(); // This will give you the day of the month
-
+    const date = new Date(dateStr); // Parse the date string
+    const dayOfMonth = date.getDate(); // Get the day of the month
     return dayOfMonth;
   };
+
+  const get_time = dateString => {
+    // Regular expression to extract the time portion
+    let timeMatch = dateString.match(/(\d{2}:\d{2}:\d{2})/);
+
+    // If a match is found, return the matched time
+    if (timeMatch) {
+      return timeMatch[0];
+    } else {
+      throw new Error("Time format not found in the provided date string.");
+    }
+  }
 
   const isFocuse = useIsFocused();
   useEffect(() => {
@@ -138,24 +112,24 @@ export default function EventDetilas({ route }) {
   }
   const AddParticipant = async (id, value) => {
     const params = {
-     
-      event_id:event_id,
-     user_id:user.id
-    };
-    await dispatch(add_event_memeber(params)).then(res=>{
 
+      event_id: event_id,
+      user_id: user.id
+    };
+    await dispatch(add_event_memeber(params)).then(res => {
+      event_members();
     })
   }
 
 
   const RecentListItem = ({ item, index }) => (
     <TouchableOpacity
-disabled={Options == 'Attendance'}
+      disabled={Options == 'Attendance'}
 
 
-onPress={()=>{
-  navigation.navigate(ScreenNameEnum.PersnalInfo,{item:item.user_data})
-}}
+      onPress={() => {
+        navigation.navigate(ScreenNameEnum.PersnalInfo, { item: item.user_data })
+      }}
       style={[
         styles.listItem,
         {
@@ -183,12 +157,12 @@ onPress={()=>{
       </View>
       {Options == 'Attendance' &&
         <Dropdown
-      disable={user?.type == 'Parent' || user?.type == 'Player'}
+          disable={user?.type == 'Parent' || user?.type == 'Player'}
           style={styles.dropdown}
           data={attendanceOptions}
           labelField="label"
           valueField="value"
-          placeholder="Select"
+          placeholder="none"
           value={attendanceStatus[item.id] || item.attendence}
 
           itemTextStyle={{ fontSize: 12, color: '#000' }}
@@ -200,14 +174,18 @@ onPress={()=>{
       }
     </TouchableOpacity>
   );
-
+  const getFormattedDate = dateStr => {
+    const date = new Date(dateStr);
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  };
   return (
     <View style={styles.container}>
       {isLoading ? <Loading /> : null}
 
       {eventdetails != null && (
         <>
-        <View style={styles.colorDiv}>  
+          <View style={styles.colorDiv}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image
                 source={require('../../assets/Cropping/Back-Navs3x.png')}
@@ -242,9 +220,9 @@ onPress={()=>{
               style={[styles.matchTypeItem, { backgroundColor: Options == 'Attendance' ? '#DDFBE8' : '#fff' }]}>
               <Text style={styles.matchTypeText}>Attendance</Text>
             </TouchableOpacity>
-            
-        
-            
+
+
+
           </View>
           {Options == 'Event' && <>
             <View style={[styles.contentContainer, {
@@ -286,20 +264,17 @@ onPress={()=>{
                 <View>
                   <Text style={styles.sectionText}>
                     {get_DayName(
-                      new Date(eventdetails?.event_date).toLocaleDateString(),
+                      eventdetails?.event_date
                     )}
                     ,{' '}
                     {get_monthName(
-                      new Date(eventdetails?.event_date).toLocaleDateString(),
+                      eventdetails?.event_date
                     )}{' '}
                     {get_dayDate(
-                      new Date(eventdetails?.event_date).toLocaleDateString(),
+                      eventdetails?.event_date
                     )}{' '}
                     ,
-                    {new Date(eventdetails?.event_time).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {get_time(eventdetails?.event_time)}
                   </Text>
                 </View>
               </View>
@@ -318,7 +293,7 @@ onPress={()=>{
                   source={require('../../assets/Cropping/appointment.png')}
                   style={styles.sectionIcon}
                 />
-                <Text style={styles.sectionText}> Created time ({eventdetails?.event_date})</Text>
+                <Text style={styles.sectionText}>{getFormattedDate(eventdetails?.event_date)} {get_time(eventdetails?.event_time)}</Text>
               </View>
               <View style={[styles.userDetailsContainer, {}]}>
                 <Image
@@ -340,21 +315,21 @@ onPress={()=>{
                   source={require('../../assets/Cropping/dots2.png')}
                   style={styles.actionButtonIcon}
                 />
-                
+
               </TouchableOpacity>}
-            </View> 
+            </View>
 
-            <TouchableOpacity 
-            
-            onPress={()=>{
-              AddParticipant()
-            }}
-            style={{
-              borderWidth: 0.8, height: 45,
+            <TouchableOpacity
 
-              borderRadius: 10, backgroundColor: '#fff',
-              marginHorizontal: 20, alignItems: 'center', justifyContent: 'center'
-            }}>
+              onPress={() => {
+                AddParticipant()
+              }}
+              style={{
+                borderWidth: 0.8, height: 45,
+
+                borderRadius: 10, backgroundColor: '#fff',
+                marginHorizontal: 20, alignItems: 'center', justifyContent: 'center'
+              }}>
               <Text style={{ fontSize: 16, color: '#000', fontWeight: '500' }}>Join Event</Text>
             </TouchableOpacity>
           </>
@@ -383,27 +358,27 @@ onPress={()=>{
       )}
 
       {eventdetails == null && (<>
-        <View style={styles.colorDiv}>  
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Image
-                source={require('../../assets/Cropping/Back-Navs3x.png')}
-                style={styles.backButton}
-              />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>Event Details</Text>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+        <View style={styles.colorDiv}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image
+              source={require('../../assets/Cropping/Back-Navs3x.png')}
+              style={styles.backButton}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Event Details</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
 
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
+        </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
           <Text>No Details found</Text>
 
         </View>
-        </>
+      </>
       )}
-    
-       <EventDotModal
+
+      <EventDotModal
         visible={DotmodalVisible}
         onClose={() => {
           setDotModalVisible(false);

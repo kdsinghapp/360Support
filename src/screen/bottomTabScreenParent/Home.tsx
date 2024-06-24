@@ -45,6 +45,7 @@ export default function Home() {
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const LastGameresult = useSelector((state: RootState) => state.feature.LastGameresult);
   const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
+  const RegisterList = useSelector((state: RootState) => state.feature.Registration_list);
   const My_Profile = useSelector(
     (state: RootState) => state.auth.GetUserProfile,
   );
@@ -60,6 +61,21 @@ export default function Home() {
   const [ModalVisibleVideo, setModalVisibleVideo] = useState<boolean>(false);
 
   const [eventVisible, setEventVisible] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRegisterList, setFilteredRegisterList] = useState(RegisterList);
+ 
+  useEffect(() => {
+    if (searchQuery === '') {
+      setFilteredRegisterList(RegisterList);
+    } else {
+      setFilteredRegisterList(
+        RegisterList.filter(item =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  }, [searchQuery]);
   const isFocuse = useIsFocused();
   const GroupDetails = useSelector(
     (state: RootState) => state.auth.Group_Details,
@@ -104,68 +120,6 @@ export default function Home() {
     (state: RootState) => state.feature.Event_list,
   );
 
-  const get_monthName = (dateStr: string): string => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-
-    const dateObject = new Date(year, month, day);
-
-    const monthName = dateObject.toLocaleString('default', {month: 'long'});
-    return monthName;
-  };
-
-  const get_DayName = (dateStr: string): string => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-    const dayOfWeekIndex = new Date(year, month, day).getDay();
-
-    // Convert day of week index to string representation
-    let dayOfWeek;
-    switch (dayOfWeekIndex) {
-      case 0:
-        dayOfWeek = 'Sunday';
-        break;
-      case 1:
-        dayOfWeek = 'Monday';
-        break;
-      case 2:
-        dayOfWeek = 'Tuesday';
-        break;
-      case 3:
-        dayOfWeek = 'Wednesday';
-        break;
-      case 4:
-        dayOfWeek = 'Thursday';
-        break;
-      case 5:
-        dayOfWeek = 'Friday';
-        break;
-      case 6:
-        dayOfWeek = 'Saturday';
-        break;
-      default:
-        dayOfWeek = 'Invalid day';
-    }
-
-    return dayOfWeek;
-  };
-
-  const get_dayDate = (dateStr: string): number => {
-    const parts = dateStr.split('/');
-    const month = parseInt(parts[0], 10);
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-
-    const dayOfMonth = date.getDate(); // This will give you the day of the month
-
-    return dayOfMonth;
-  };
 
   const LastGame_result = async (type): Promise<void> => {
    
@@ -219,7 +173,41 @@ export default function Home() {
     };
     await dispatch(get_video(params));
   };
+  const get_monthName = dateStr => {
+    // Parse the date string directly
+    const date = new Date(dateStr);
 
+    // Get the month name using toLocaleString
+    const monthName = date.toLocaleString('default', { month: 'long' });
+
+    return monthName;
+  };
+  const get_DayName = dateStr => {
+    // Parse the date string directly
+    const date = new Date(dateStr);
+
+    // Get the day name using toLocaleString
+    const dayName = date.toLocaleString('default', { weekday: 'long' });
+
+    return dayName;
+  };
+  const get_dayDate = dateStr => {
+    const date = new Date(dateStr); // Parse the date string
+    const dayOfMonth = date.getDate(); // Get the day of the month
+    return dayOfMonth;
+  };
+
+  const get_time = dateString => {
+    // Regular expression to extract the time portion
+    let timeMatch = dateString.match(/(\d{2}:\d{2}:\d{2})/);
+
+    // If a match is found, return the matched time
+    if (timeMatch) {
+      return timeMatch[0];
+    } else {
+      throw new Error("Time format not found in the provided date string.");
+    }
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFDF5'}}>
@@ -361,17 +349,17 @@ export default function Home() {
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_date != null &&
                     get_dayDate(
-                      new Date(
+          
                         Event_List[Event_List?.length - 1]?.event_date,
-                      ).toLocaleDateString(),
+                     
                     )}
                 </Text>
                 <Text style={styles.txt}>
                   {get_monthName(
-                    new Date(
+               
                       Event_List[Event_List?.length - 1]?.event_date,
-                    ).toLocaleDateString(),
-                  ).substring(0, 3)}
+                    
+                  ).substring(0, 3).toUpperCase()}
                 </Text>
               </View>
 
@@ -397,16 +385,13 @@ export default function Home() {
                 </Text>
                 <Text style={styles.txt}>
                   {get_DayName(
-                    new Date(
+                 
                       Event_List[Event_List?.length - 1]?.event_date,
-                    ).toLocaleDateString(),
+                   
                   )}{' '}
-                  {new Date(
+                  {get_time(
                     Event_List[Event_List?.length - 1]?.event_time,
-                  ).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  )}
                 </Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Image
@@ -780,24 +765,27 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
-          <View style={[styles.shdow, styles.search]}>
-            <SearchIcon />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor={'#000'}
-              style={{
-                marginLeft: 10,
-                fontSize: 14,
-                color: '#000',
-                lineHeight: 18,
-              }}
-            />
-          </View>
+        <View style={{ marginTop: 10, height: hp(8), justifyContent: 'center' }}>
+        <View style={[styles.shadow, styles.search]}>
+          <SearchIcon />
+          <TextInput
+            placeholder="Search"
+            placeholderTextColor={'#000'}
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+            style={{
+              marginLeft: 10,
+              fontSize: 14,
+              color: '#000',
+              lineHeight: 18,
+              width:'90%',
+            }}
+          />
         </View>
+      </View>
         <View style={{flex: 1}}>
           <FlatList
-            data={RegisterList}
+            data={filteredRegisterList}
             renderItem={({item}) => (
               <View
                 style={[
@@ -814,10 +802,11 @@ export default function Home() {
                 <View style={{width: '100%', flexDirection: 'row'}}>
                   <View>
                     <Image
-                      source={item.img}
+                      source={{uri:item.image}}
                       style={{
                         height: 45,
                         width: 45,
+                        borderRadius:24.51
                       }}
                     />
                   </View>
@@ -828,7 +817,7 @@ export default function Home() {
                         color: '#000',
                         fontWeight: '700',
                       }}>
-                      {item.titile}
+                      {item.name}
                     </Text>
                     <Text
                       style={{
@@ -1110,16 +1099,5 @@ const styles = StyleSheet.create({
     marginTop: 10, // Adding margin to avoid overlapping or alignment issues
   },
 });
-const RegisterList = [
-  {
-    titile: 'Summer Camp 2024',
-    description: 'test',
-    img: require('../../assets/Cropping/img1.png'),
-  },
-  {
-    titile: 'Spring camp 2024',
-    description: 'Apply for our Spring Camp before 10th of jun 2024!',
-    img: require('../../assets/Cropping/img1.png'),
-  },
-];
+
 

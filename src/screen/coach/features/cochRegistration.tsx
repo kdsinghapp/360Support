@@ -32,15 +32,32 @@ export default function CochRegistration() {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
-  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
+  const isLoading = useSelector(state => state.feature.isLoading);
   const user_data = useSelector(state => state.auth.userData);
-const [registerId,setregisterId]=useState('')
-
-const [ModalVisible,setModalVisible]= useState(false)
+  const [registerId, setRegisterId] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     get_Registration();
   }, [user_data]);
+
+  useEffect(() => {
+    if (RegistrationType === 'Open') {
+      setFilteredData(
+        RegistraionList.filter(item =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredData(
+        submissionsList.filter(item =>
+          item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  }, [searchQuery, RegistrationType, RegistraionList, submissionsList]);
 
   const get_Registration = async () => {
     const params = {
@@ -48,6 +65,7 @@ const [ModalVisible,setModalVisible]= useState(false)
     };
     await dispatch(get_registration_category(params));
   };
+  
   const get_Registration_form = async () => {
     const params = {
       user_id: user_data?.id,
@@ -55,9 +73,10 @@ const [ModalVisible,setModalVisible]= useState(false)
     };
     await dispatch(get_registration_form(params));
   };
+
   return (
     <View style={styles.container}>
-      {isLoading ? <Loading /> : null}
+      {isLoading && <Loading />}
       <View style={styles.colorDiv}>
         <View style={styles.header}>
           <TouchableOpacity
@@ -68,112 +87,83 @@ const [ModalVisible,setModalVisible]= useState(false)
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Registration</Text>
           </View>
-
           <View style={styles.addButton} />
         </View>
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 20,
-          marginTop: 20,
-        }}>
+      <View style={styles.registrationTypeContainer}>
         <TouchableOpacity
-          onPress={() => {
-            setRegistrationType('Open');
-            // Get_Training('user');
-          }}
-          style={{
-            paddingHorizontal: 20,
-            paddingVertical: 5,
-            borderWidth: RegistrationType === 'Open' ? 0 : 1,
-            borderRadius: 30,
-            backgroundColor: RegistrationType === 'Open' ? '#DDFBE8' : '#fff',
-          }}>
-          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
-            Open registrations
-          </Text>
+          onPress={() => setRegistrationType('Open')}
+          style={[
+            styles.registrationTypeButton,
+            RegistrationType === 'Open' && styles.activeButton,
+          ]}>
+          <Text style={styles.registrationTypeText}>Open registrations</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             setRegistrationType('submissions');
             get_Registration_form();
-            // Get_Training('all');
           }}
-          style={{
-            paddingHorizontal: 20,
-            paddingVertical: 5,
-            marginLeft: 20,
-            borderWidth: RegistrationType === 'submissions' ? 0 : 1,
-            borderRadius: 30,
-            backgroundColor:
-              RegistrationType === 'submissions' ? '#DDFBE8' : '#fff',
-          }}>
-          <Text style={{fontSize: 12, fontWeight: '600', color: '#000'}}>
-            Submissions
-          </Text>
+          style={[
+            styles.registrationTypeButton,
+            RegistrationType === 'submissions' && styles.activeButton,
+          ]}>
+          <Text style={styles.registrationTypeText}>Submissions</Text>
         </TouchableOpacity>
       </View>
-
       <View style={styles.searchContainer}>
         <View style={[styles.shadow, styles.search]}>
           <SearchIcon />
           <TextInput
             placeholder="Search"
-            placeholderTextColor={'#000'}
+            placeholderTextColor="#000"
             style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
           />
         </View>
       </View>
-
-     
-      
-      {submissionsList.length >0 || RegistraionList.length > 0 &&
-      <View style={styles.flatListContainer}>
-        
-            <FlatList
-              data={RegistrationType == 'Open' ? RegistraionList : submissionsList}
-              renderItem={({item}) => (
-                <View style={[styles.shadow, styles.registerItemContainer]}>
-                  <View style={styles.registerItemRow}>
-                    <Image
-                      source={{uri: item.image}}
-                      style={styles.registerItemImage}
-                    />
-                    <View style={styles.registerItemTextContainer}>
-                      <Text style={styles.registerItemTitle}>{item.name}</Text>
-                      <Text style={styles.registerItemDescription}>
-                        {item.description}
-                      </Text>
-                    </View>
+      {filteredData.length > 0 ? (
+        <View style={styles.flatListContainer}>
+          <FlatList
+            data={filteredData}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({item}) => (
+              <View style={[styles.shadow, styles.registerItemContainer]}>
+                <View style={styles.registerItemRow}>
+                  <Image
+                    source={{uri: item.image}}
+                    style={styles.registerItemImage}
+                  />
+                  <View style={styles.registerItemTextContainer}>
+                    <Text style={styles.registerItemTitle}>{item.name}</Text>
+                    <Text style={styles.registerItemDescription}>
+                      {item.description}
+                    </Text>
                   </View>
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      setModalVisible(true)
-                      setregisterId(item)
-                    }}
-                    style={styles.registerButton}>
-                    <Text style={styles.registerButtonText}>Register</Text>
-                  </TouchableOpacity>
                 </View>
-              )}
-            />
-        
-           </View>
-}
-    {submissionsList.length  == 0 || RegistraionList.length  == 0 (
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              <Text>No Form found</Text>
-            </View>
-          )}
-<BottomToTopModal
-                  visible={ModalVisible}
-                  data={registerId}
-                  onClose={() => setModalVisible(false)}
-                />
-
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible(true);
+                    setRegisterId(item);
+                  }}
+                  style={styles.registerButton}>
+                  <Text style={styles.registerButtonText}>Register</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        </View>
+      ) : (
+        <View style={styles.noDataContainer}>
+          <Text>No Form found</Text>
+        </View>
+      )}
+      <BottomToTopModal
+        visible={modalVisible}
+        data={registerId}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
@@ -208,6 +198,28 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   addButton: {},
+  registrationTypeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  registrationTypeButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+  },
+  activeButton: {
+    backgroundColor: '#DDFBE8',
+    borderWidth: 0,
+  },
+  registrationTypeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#000',
+  },
   searchContainer: {
     marginTop: 10,
     height: hp(8),
@@ -275,6 +287,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#874BE9',
+  },
+  noDataContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
   shadow: {
     shadowColor: '#000',

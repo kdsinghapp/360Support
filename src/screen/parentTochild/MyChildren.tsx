@@ -89,7 +89,7 @@ data.append(`${[key]}`, value);
      data: data,
     };
 
-    console.log('updateNotificationSettings=<>',params);
+    console.log('updateNotificationSettings=<>',params.data);
     
     dispatch(update_details(params)).then(res=>{
       get_profile_notification()
@@ -110,7 +110,7 @@ data.append(`${[key]}`, value);
               <BackBtn />
             </TouchableOpacity>
             <View style={{ width: '65%' }}>
-              <Text style={styles.title}>My Children</Text>
+              <Text style={styles.title}>Account settings</Text>
             </View>
           </View>
 
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: '700',
-    fontSize: 22,
+    fontSize:18,
     lineHeight: 32,
     color: '#FFF',
   },

@@ -20,7 +20,8 @@ import EventModal from '../modal/Addevent';
 import Loading from '../../../configs/Loader';
 import {get_event} from '../../../redux/feature/featuresSlice';
 import Line from '../../../assets/svg/Line.svg';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getCurrencies, getLocales,getCountry } from "react-native-localize";
+
 import ScreenNameEnum from '../../../routes/screenName.enum';
 interface PostItem {
   id: string;
@@ -52,68 +53,33 @@ export default function cocheEvent() {
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const user_data = useSelector(state => state.auth.userData);
 
+
+  
   const [Eventtype, setEventtype] = useState('user');
   const get_monthName = dateStr => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-
-    const dateObject = new Date(year, month, day);
-
-    const monthName = dateObject.toLocaleString('default', {month: 'long'});
+    // Parse the date string directly
+    const date = new Date(dateStr);
+  
+    // Get the month name using toLocaleString
+    const monthName = date.toLocaleString('default', { month: 'long' });
+  
     return monthName;
   };
-
   const get_DayName = dateStr => {
-    const dateParts = dateStr.split('/');
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]) - 1; // Month is zero-based
-    const day = parseInt(dateParts[1]);
-    const dayOfWeekIndex = new Date(year, month, day).getDay();
-
-    // Convert day of week index to string representation
-    let dayOfWeek;
-    switch (dayOfWeekIndex) {
-      case 0:
-        dayOfWeek = 'Sunday';
-        break;
-      case 1:
-        dayOfWeek = 'Monday';
-        break;
-      case 2:
-        dayOfWeek = 'Tuesday';
-        break;
-      case 3:
-        dayOfWeek = 'Wednesday';
-        break;
-      case 4:
-        dayOfWeek = 'Thursday';
-        break;
-      case 5:
-        dayOfWeek = 'Friday';
-        break;
-      case 6:
-        dayOfWeek = 'Saturday';
-        break;
-      default:
-        dayOfWeek = 'Invalid day';
-    }
-
-    return dayOfWeek;
+    // Parse the date string directly
+    const date = new Date(dateStr);
+  
+    // Get the day name using toLocaleString
+    const dayName = date.toLocaleString('default', { weekday: 'long' });
+  
+    return dayName;
   };
   const get_dayDate = dateStr => {
-    const parts = dateStr.split('/');
-    const month = parseInt(parts[0], 10);
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    const date = new Date(year, month - 1, day); // Note: Month is zero-based in JavaScript Date objects
-
-    const dayOfMonth = date.getDate(); // This will give you the day of the month
-
+    const date = new Date(dateStr); // Parse the date string
+    const dayOfMonth = date.getDate(); // Get the day of the month
     return dayOfMonth;
   };
+  
   const isFocuse = useIsFocused();
   useEffect(() => {
     get_eventList('user');
@@ -230,14 +196,10 @@ export default function cocheEvent() {
                     },
                   ]}>
                   {item?.event_date != null &&
-                    get_dayDate(
-                      new Date(item?.event_date).toLocaleDateString(),
-                    )}
+                   get_dayDate(item.event_date)}
                 </Text>
                 <Text style={[styles.txt, { color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
-                  {get_monthName(
-                    new Date(item?.event_date).toLocaleDateString(),
-                  )}
+                  {get_monthName(item?.event_date)}
                 </Text>
               </View>
 
@@ -258,9 +220,7 @@ export default function cocheEvent() {
                   {item?.event_description}
                 </Text>
                 <Text style={[styles.txt,{    color:item.type=='Match'?'#326A3D':'#000'}]}>
-                  {get_DayName(
-                    new Date(item?.event_date).toLocaleDateString(),
-                  )}{' '}
+                  {get_DayName(item?.event_date)}{' '}
                   {new Date(item?.event_time).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',

@@ -50,7 +50,7 @@ import Loading from '../../../configs/Loader';
         const RecentListItem = ({item}) => (
           <TouchableOpacity
             onPress={() => {
-              item.titile == 'Log Out'? 
+              item.title == 'Log Out'? 
                 setIsVisible(true):navigation.navigate(item.screen);
             }}
             style={
@@ -74,7 +74,7 @@ import Loading from '../../../configs/Loader';
             </View>
             <View style={{marginLeft:20, width: '80%'}}>
               <Text style={{fontSize: 14, fontWeight: '500', color: '#FFF'}}>
-                {item.titile}
+                {item.title}
               </Text>
             </View>
             <View style={{}}>
@@ -247,66 +247,69 @@ import Loading from '../../../configs/Loader';
       });
       
       const data = [
-        // {
-        //   id: '1',
-        //   titile: 'Profile',
-        //   logo: require('../../../assets/Cropping/MyProfile-1.png'),
-        //   screen: ScreenNameEnum.MY_PROFILE,
-        // },
+        {
+          id: '1',
+          title: 'Profile',
+          logo: require('../../../assets/Cropping/MyProfile-1.png'),
+          screen: ScreenNameEnum.CHILD_PROFILE,
+        },
         {
           id: '2',
-          titile: 'Wall',
+          title: 'Wall',
           logo: require('../../../assets/Cropping/document-text.png'),
           screen:ScreenNameEnum.WALL_SCREEN,
         },
         {
           id: '3',
-          titile: 'Video',
+          title: 'Video',
           logo: require('../../../assets/Cropping/video-octagon.png'),
           screen: ScreenNameEnum.VIDEO_SCREEN,
         },
         {
           id: '4',
-          titile: 'Registration',
+          title: 'Events',
+          logo: require('../../../assets/Cropping/event.png'),
+          // screen: ScreenNameEnum.REGISTRATION_SCREEN,
+          screen: ScreenNameEnum.Event,
+        },
+        {
+          id: '5',
+          title: 'Matche Result',
+          logo: require('../../../assets/Cropping/results.png'),
+          // screen: ScreenNameEnum.REGISTRATION_SCREEN,
+          screen: ScreenNameEnum.Match,
+        },
+        {
+          id: '6',
+          title: 'Registration',
           logo: require('../../../assets/Cropping/user-octagon.png'),
           screen: ScreenNameEnum.REGISTRATION_SCREEN,
         },
         
       ];
       const data2 = [
+        
         {
           id: '1',
-          titile: 'Profile',
-          logo: require('../../../assets/Cropping/MyProfile-1.png'),
-          screen: ScreenNameEnum.CHILD_PROFILE,
-        },
-        {
-          id: '2',
-          titile: 'My children',
-          logo: require('../../../assets/Cropping/profile-2user.png'),
-          screen: ScreenNameEnum.MY_CHILDREN,
-        },
-        {
-          id: '3',
-          titile: 'Account settings',
+          title: 'Account settings',
           logo: require('../../../assets/Cropping/video-octagon.png'),
-          screen: ScreenNameEnum.MY_CHILDREN,
+          screen: ScreenNameEnum.AccountSettingPlayer,
         },
         // {
         //   id: '4',
-        //   titile: 'Billing',
+        //   title: 'Billing',
         //   logo: require('../../../assets/Cropping/card.png'),
         //   screen: ScreenNameEnum.NOTIFICAION_SETTING,
         // },
         {
-          id: '4',
-          titile: 'Support',
+          id: '2',
+          title: 'Support',
           logo: require('../../../assets/Cropping/info-circle.png'),
           screen: ScreenNameEnum.SUPPORT_SCREEN,
         },
         {
-          id: '5',
-          titile: 'Log Out',
+          id: '3',
+          title: 'Log Out',
           logo: require('../../../assets/Cropping/logout.png'),
          // screen: ScreenNameEnum.LOGIN_SCREEN,
         },

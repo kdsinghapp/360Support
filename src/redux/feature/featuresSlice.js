@@ -27,6 +27,7 @@ const initialState = {
   TeamDetails: [],
   getMyChild:[],
   getTeam_by_Member:[],
+  GeneralDetails:[]
 
 
 };
@@ -817,6 +818,7 @@ export const get_event_by_member_id = createAsyncThunk(
   'get_event_by_member_id',
   async (params, thunkApi) => {
     try {
+      console.log('==============get_event_by_member_id======================',params);
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -825,7 +827,7 @@ export const get_event_by_member_id = createAsyncThunk(
       let data = new FormData();
       data.append('user_id', params.user_id);
       const response = await API.post('/get_event_by_member_id', data, config);
-      console.log('==============get_event_by_member_id======================');
+    
       console.log(response.data);
       console.log('====================================');
       if (response.data.status == '1') {
@@ -834,6 +836,34 @@ export const get_event_by_member_id = createAsyncThunk(
       return response.data.result;
     } catch (error) {
       console.log('🚀 ~ file: get_event_by_member_id .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const report_bug = createAsyncThunk(
+  'report_bug',
+  async (params, thunkApi) => {
+    try {
+      console.log('==============report_bug======================',params);
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('user_id', params.user_id);
+      data.append('message', params.message);
+      const response = await API.post('/report_bug', data, config);
+
+      console.log('====================================',);
+
+      if (response.data.status == '1') {
+   successToast('Your Issue Sent Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('report_bug .js:16 ~  ~ error:', error);
 
       return thunkApi.rejectWithValue(error);
     }
@@ -1050,7 +1080,7 @@ export const add_event_memeber = createAsyncThunk(
 
       }
       else {
-        successToast(response.data.message)
+        errorToast(response.data.message)
       }
       return response.data.result;
     } catch (error) {
@@ -1200,6 +1230,27 @@ export const get_individual_chat = createAsyncThunk(
     }
   },
 );
+export const get_general_details = createAsyncThunk(
+  'get_general_details',
+  async (params, thunkApi) => {
+    try {
+     
+
+      const response = await API.get(`/get-general-details`, null, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+
+      return response.data.result;
+    } catch (error) {
+      console.log('get_general_details .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 
 const FeatureSlice = createSlice({
   name: 'featureSlice',
@@ -1217,6 +1268,20 @@ const FeatureSlice = createSlice({
       state.get_PostList = action.payload;
     });
     builder.addCase(get_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_general_details.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_general_details.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.GeneralDetails = action.payload;
+    });
+    builder.addCase(get_general_details.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
@@ -1248,6 +1313,7 @@ const FeatureSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
+      state.Event_list = []
     });
     builder.addCase(get_my_child.pending, state => {
       state.isLoading = true;
@@ -1320,6 +1386,20 @@ const FeatureSlice = createSlice({
       state.isSuccess = false;
     });
     builder.addCase(add_team_member.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(report_bug.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+
+    });
+    builder.addCase(report_bug.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(report_bug.pending, state => {
       state.isLoading = true;
     });
     builder.addCase(add_team_member.fulfilled, (state, action) => {
