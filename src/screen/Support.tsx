@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
   bugText: {
     fontSize: 15,
-    marginTop: 10,
+
     fontWeight: '700',
     color: '#874BE9',
   },

@@ -6,10 +6,12 @@ import {
 } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../../routes/screenName.enum';
+import { useSelector } from 'react-redux';
 
 export default function LoginOption() {
   const navigation = useNavigation();
 
+  
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>

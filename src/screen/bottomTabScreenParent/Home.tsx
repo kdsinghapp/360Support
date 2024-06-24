@@ -29,6 +29,7 @@ import {
   get_event,
   get_game_result,
   get_post,
+  get_registration_category,
   get_training,
   get_video,
 } from '../../redux/feature/featuresSlice';
@@ -64,6 +65,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRegisterList, setFilteredRegisterList] = useState(RegisterList);
  
+
+
+  
   useEffect(() => {
     if (searchQuery === '') {
       setFilteredRegisterList(RegisterList);
@@ -145,7 +149,16 @@ export default function Home() {
 
     await dispatch(get_profile(params));
   };
+  useEffect(() => {
+    get_Registration();
+  }, [user_data]);
 
+  const get_Registration = async () => {
+    const params = {
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_registration_category(params));
+  };
   const getGroupDetails = async (): Promise<void> => {
     const params = {
       group_code: user_data?.group_code,

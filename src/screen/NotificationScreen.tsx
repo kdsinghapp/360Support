@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,16 +14,37 @@ import Back from '../assets/svg/back.svg';
 import Plus from '../assets/svg/Plus.svg';
 import File from '../assets/svg/file.svg';
 import ScreenNameEnum from '../routes/screenName.enum';
+import { get_notifications } from '../redux/feature/featuresSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import Loading from '../configs/Loader';
 
 interface Item {
-  id: string;
-  titile: string;
-  time: string;
-  type: string;
+  notify_id: string;
+  title: string;
+  body: string;
+  user_id: string;
+  notify_type: string;
+  created_at: string;
+  related_id: string;
 }
 
 const NotificationScreen: React.FC = () => {
   const navigation = useNavigation();
+  const user_data = useSelector((state: RootState) => state.auth.userData);
+  const notificationsList = useSelector((state: RootState) => state.feature.notificationsList);
+  const isLoading = useSelector((state) => state.feature.isLoading);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    get_notification_list();
+  }, [user_data]);
+
+  const get_notification_list = async () => {
+    const params = {
+      group_code: user_data?.group_code,
+    };
+    await dispatch(get_notifications(params));
+  };
 
   const RecentListItem: React.FC<{ item: Item }> = ({ item }) => (
     <TouchableOpacity
@@ -39,11 +60,12 @@ const NotificationScreen: React.FC = () => {
           />
         </View>
         <View style={styles.itemText}>
-          <Text style={styles.itemTitle}>{item.titile}</Text>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemBody}>{item.body}</Text>
         </View>
       </View>
 
-      {item.type == 'btn' && (
+      {item.notify_type == 'btn' && (
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Button</Text>
@@ -53,7 +75,7 @@ const NotificationScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       )}
-      {item.type == 'fav' && (
+      {item.notify_type == 'fav' && (
         <View style={styles.favoriteContainer}>
           <TouchableOpacity style={styles.favoriteButton}>
             <Plus height={15} width={15} />
@@ -61,22 +83,23 @@ const NotificationScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       )}
-      {item.type == 'file' && (
+      {item.notify_type == 'file' && (
         <View style={styles.fileContainer}>
           <TouchableOpacity style={styles.fileButton}>
             <File height={25} width={25} />
-            <Text style={styles.fileText}>landing_paage_ver2.fig</Text>
+            <Text style={styles.fileText}>landing_page_ver2.fig</Text>
           </TouchableOpacity>
         </View>
       )}
       <View>
-        <Text style={styles.timeText}>{item.time}</Text>
+        <Text style={styles.timeText}>{item.created_at}</Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
+      {isLoading?<Loading />:null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
           <View style={styles.header}>
@@ -94,12 +117,18 @@ const NotificationScreen: React.FC = () => {
         </View>
 
         <View style={styles.notificationContainer}>
-          <FlatList
-            data={data}
-            renderItem={({ item }) => <RecentListItem item={item} />}
-            keyExtractor={(item) => item.id}
-            ListFooterComponent={() => <View style={styles.footer} />}
-          />
+          {notificationsList && notificationsList.length > 0 ? (
+            <FlatList
+              data={notificationsList}
+              renderItem={({ item }) => <RecentListItem item={item} />}
+              keyExtractor={(item) => item.notify_id}
+              ListFooterComponent={() => <View style={styles.footer} />}
+            />
+          ) : (
+            <View style={styles.noNotifications}>
+              <Text style={styles.noNotificationsText}>No notifications found</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -164,6 +193,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#1A1F36',
   },
+  itemBody: {
+    fontSize: 10,
+    color: '#A5ACB8',
+  },
   buttonContainer: {
     paddingVertical: 10,
     flexDirection: 'row',
@@ -227,38 +260,14 @@ const styles = StyleSheet.create({
   footer: {
     height: hp(6),
   },
+  noNotifications: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: hp(50),
+  },
+  noNotificationsText: {
+    fontSize: 16,
+    color: '#A5ACB8',
+  },
 });
-
-const data: Item[] = [
-  {
-    id: '1',
-    titile:
-      'Dennisa Nedry requested access to Isla Nublar SOC2 compliance report',
-    time: 'Last Wednesday at 9:42 AM',
-    type: 'btn',
-  },
-  {
-    id: '2',
-    titile: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report',
-    time: 'Last Wednesday at 9:42 AM',
-    type: 'no',
-  },
-  {
-    id: '3',
-    titile: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report',
-    time: 'Last Wednesday at 9:42 AM',
-    type: 'tag',
-  },
-  {
-    id: '4',
-    titile: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report',
-    time: 'Last Wednesday at 9:42 AM',
-    type: 'file',
-  },
-  {
-    id: '5',
-    titile: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report',
-    time: 'Last Wednesday at 9:42 AM',
-    type: 'fav',
-  },
-];

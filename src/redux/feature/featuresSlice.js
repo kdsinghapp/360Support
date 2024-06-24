@@ -27,7 +27,8 @@ const initialState = {
   TeamDetails: [],
   getMyChild:[],
   getTeam_by_Member:[],
-  GeneralDetails:[]
+  GeneralDetails:[],
+  notificationsList:[]
 
 
 };
@@ -1214,8 +1215,29 @@ export const get_individual_chat = createAsyncThunk(
   async (params, thunkApi) => {
     try {
       let data = new FormData();
-      data.append('user_id', '101');
+      data.append('user_id', params.user_id);
       const response = await API.post(`/get_chat_user`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_individual_chat .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_notifications = createAsyncThunk(
+  'get_notifications',
+  async (params, thunkApi) => {
+    try {
+      let data = new FormData();
+      data.append('group_code', params.group_code);
+      const response = await API.post(`/get-notifications`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Accept: 'application/json',
@@ -1268,6 +1290,20 @@ const FeatureSlice = createSlice({
       state.get_PostList = action.payload;
     });
     builder.addCase(get_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_notifications.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_notifications.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.notificationsList = action.payload;
+    });
+    builder.addCase(get_notifications.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

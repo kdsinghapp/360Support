@@ -50,6 +50,7 @@ export default function AccountSettingPlayer() {
     dispatch(get_privacy_policy())
   }, [isFocuse]);
 
+console.log(' My_Profile.id', My_Profile.id);
 
 
   const get_profile_notification = async () => {

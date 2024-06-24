@@ -34,28 +34,32 @@ export const login = createAsyncThunk('login', async (params, thunkApi) => {
     const response = await API.post('/login', params.data, config);
 
     console.log('===============login=====================', response.data);
-    if (response.data.status == '1') {
-  
 
-      if(response.data?.result.child_details){
-     params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
-       await AsyncStorage.setItem('user_id',response.data?.result.id)
+    if (response.data.status === '1') {
+      // Navigate to the bottom tab or login screen based on child details
+      if (response.data?.result.child_details) {
+        params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+      } else {
+        params.navigation.navigate(ScreenNameEnum.WELCOME_SCREEN);
+      }
 
-       thunkApi.dispatch(loginSuccess(response.data.data));
-      }
-      else{
-        params.navigation.navigate(ScreenNameEnum.LOGIN_SCREEN);
-      }
+      // Store user ID in AsyncStorage
+      await AsyncStorage.setItem('user_id', response.data?.result.id);
+
+      // Dispatch login success action
+      thunkApi.dispatch(loginSuccess(response.data.result));
+
+      // Show success toast
       successToast(response.data.message);
     } else {
+      // Show error toast if status is not 1
       errorToast(`${response.data.message}`);
     }
 
     return response.data.result;
   } catch (error) {
     console.log('Error:', error);
-    errorToast(`Network error`);
-
+    errorToast('Network error');
     return thunkApi.rejectWithValue(error);
   }
 });
