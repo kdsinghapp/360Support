@@ -147,7 +147,7 @@ export default function ChatPage() {
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Chat</Text>
             </View>
-            {user?.type === 'Coache' ? (
+            {user?.type === 'Coach' ? (
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible(true);

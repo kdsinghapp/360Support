@@ -140,7 +140,7 @@ export default function Event() {
             style={[
               styles.shdow,
               styles.Event,
-              { marginVertical: 10, alignSelf: 'center', backgroundColor: item.type == 'Metting' ? '#e7cbf2' : item.type == 'Match' ? '#DDFBE8' : '#fff9cd' },
+              { marginVertical: 10, alignSelf: 'center', backgroundColor: item.type == 'Metting' ? '#e7cbf2' : item.type == 'Match' ? '#DDFBE8' : item.type == 'Training'?'#a1ede6':'#fff9cd' },
             ]}>
             <View>
               <Line />

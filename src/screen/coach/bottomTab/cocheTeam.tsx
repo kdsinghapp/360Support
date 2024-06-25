@@ -179,15 +179,17 @@ export default function CocheTeamScreen() {
           </View>
         )}
         {teamList?.length == 0 && (
+              <View style={{flex: 1, backgroundColor: '#FFF',justifyContent:'center',alignItems:'center'}}>
           <Text
             style={{
               marginTop: 30,
-              fontSize: 18,
-              color: '#000',
+              fontSize: 14,
+              color: '#777777',
               fontWeight: '500',
             }}>
             No team found
           </Text>
+          </View>
         )}
 
         <CreateTeam

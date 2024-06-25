@@ -327,8 +327,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    minHeight: hp(70),
-    marginTop: hp(30),
+    minHeight: hp(80),
+    marginTop: hp(20),
     elevation: 5, // Add this for Android shadow
   },
 });

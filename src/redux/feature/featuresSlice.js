@@ -28,7 +28,8 @@ const initialState = {
   getMyChild:[],
   getTeam_by_Member:[],
   GeneralDetails:[],
-  notificationsList:[]
+  notificationsList:[],
+  groupMembers:[]
 
 
 };
@@ -1252,6 +1253,69 @@ export const get_notifications = createAsyncThunk(
     }
   },
 );
+export const add_group_member = createAsyncThunk(
+  'add_group_member',
+  async (params, thunkApi) => {
+    try {
+      
+      const response = await API.post(`/add_group_member`, params.data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: add_group_member .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const get_group_members = createAsyncThunk(
+  'get_group_members',
+  async (params, thunkApi) => {
+    try {
+      let data = new FormData();
+      data.append('group_id', params.group_id);
+      const response = await API.post(`/get_group_members`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_group_members .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const delete_group_members = createAsyncThunk(
+  'delete_group_members',
+  async (params, thunkApi) => {
+    try {
+      let data = new FormData();
+      data.append('group_id', params.group_id);
+      data.append('user_id', params.user_id);
+      const response = await API.post(`/delete_group_members`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: get_individual_chat .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
 export const get_general_details = createAsyncThunk(
   'get_general_details',
   async (params, thunkApi) => {
@@ -1290,6 +1354,48 @@ const FeatureSlice = createSlice({
       state.get_PostList = action.payload;
     });
     builder.addCase(get_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(delete_group_members.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(delete_group_members.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+   
+    });
+    builder.addCase(delete_group_members.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(get_group_members.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(get_group_members.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.groupMembers = action.payload;
+    });
+    builder.addCase(get_group_members.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(add_group_member.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(add_group_member.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+     
+    });
+    builder.addCase(add_group_member.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

@@ -1,4 +1,4 @@
-import { View, Text, Image, Platform, Keyboard } from 'react-native';
+import { View, Text, Image, Platform, Keyboard,ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Add from '../assets/svg/Add.svg';
@@ -83,9 +83,7 @@ export default function TabNavigator() {
   if (!userData) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', color: 'green' }}>
-          Please ReLogin{' '}
-        </Text>
+       <ActivityIndicator  size={30} color={'#874be9'}/>
       </View>
     );
   }

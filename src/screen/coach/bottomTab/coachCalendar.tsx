@@ -1,11 +1,9 @@
-
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   FlatList,
   ScrollView,
 } from 'react-native';
@@ -14,68 +12,54 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-
-import { Agenda, Calendar, LocaleConfig } from 'react-native-calendars';
-import LeftIcon from '../../../assets/svg/leftIcon.svg';
-import RightIcon from '../../../assets/svg/rightIcon.svg';
-import Filter from '../../../assets/svg/filter.svg';
-import Line from '../../../assets/svg/Line.svg';
-import moment from 'moment';
-import Timetable from 'react-native-calendar-timetable';
-
-import CustomCalendar from '../../Modal/CustomCalendar';
-import FilterMOdal from '../../Modal/FilterModal';
-import { FLUSH } from 'redux-persist';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { get_event } from '../../../redux/feature/featuresSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
+
+import Line from '../../../assets/svg/Line.svg';
 import Loading from '../../../configs/Loader';
+import { get_event } from '../../../redux/feature/featuresSlice';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 
-export default function coachCalendar() {
+export default function CoachCalendar() {
   const [Selected, setSelected] = useState('Team Event');
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
-  const user_data = useSelector(state => state.auth.userData);
-  const Event_List = useSelector(
-    state => state.feature.Event_list,
-  );
-  const [Eventtype, setEventtype] = useState('user');
-  const navigation =useNavigation()
+  const isLoading = useSelector((state) => state.feature.isLoading);
+  const user_data = useSelector((state) => state.auth.userData);
+  const Event_List = useSelector((state) => state.feature.Event_list);
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
 
-  const get_monthName = dateStr => {
-    // Parse the date string directly
+  const isValidDate = (dateStr) => {
+    return !isNaN(Date.parse(dateStr));
+  };
+
+  const get_monthName = (dateStr) => {
+    if (!isValidDate(dateStr)) return '';
     const date = new Date(dateStr);
-  
-    // Get the month name using toLocaleString
-    const monthName = date.toLocaleString('default', { month: 'long' });
-  
-    return monthName;
+    return date.toLocaleString('default', { month: 'long' });
   };
-  const get_DayName = dateStr => {
-    // Parse the date string directly
+
+  const get_DayName = (dateStr) => {
+    if (!isValidDate(dateStr)) return '';
     const date = new Date(dateStr);
-  
-    // Get the day name using toLocaleString
-    const dayName = date.toLocaleString('default', { weekday: 'long' });
-  
-    return dayName;
+    return date.toLocaleString('default', { weekday: 'long' });
   };
-  const get_dayDate = dateStr => {
-    const date = new Date(dateStr); // Parse the date string
-    const dayOfMonth = date.getDate(); // Get the day of the month
-    return dayOfMonth;
+
+  const get_dayDate = (dateStr) => {
+    if (!isValidDate(dateStr)) return '';
+    const date = new Date(dateStr);
+    return date.getDate();
   };
-  const isFocuse = useIsFocused();
+
+
   useEffect(() => {
     get_eventList('user');
-  }, [isFocuse, modalVisible]);
+  }, [isFocused, modalVisible]);
 
-  const get_eventList = async Eventtype => {
-
+  const get_eventList = async (Eventtype) => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
@@ -84,194 +68,208 @@ export default function coachCalendar() {
     await dispatch(get_event(params));
   };
 
-
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFDF5' }}>
       {isLoading ? <Loading /> : null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.colorDiv}>
-          <View
-            style={{
-              justifyContent: 'center',
-              paddingHorizontal: 20,
-              flexDirection: 'row',
-              marginTop: 20,
-              alignItems: 'center',
-            }}>
-            <View style={{}}>
-              <Text
-                style={{
-                  fontWeight: '700',
-                  fontSize: 22,
-                  lineHeight: 32,
-                  color: '#FFF',
-                }}>
-                Calendar
-              </Text>
-            </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>Calendar</Text>
           </View>
 
-          <View
-            style={{
-              height: hp(7),
-              marginTop: 5,
-              paddingHorizontal: 10,
-            }}>
+          <View style={styles.tabContainer}>
             <FlatList
               data={tabData}
               horizontal
               scrollEnabled={false}
               showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => (
+              renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
                     setSelected(item.name);
-                    get_eventList(item.name == 'Team Event' ? 'all' : 'user')
+                    get_eventList(item.name === 'Team Event' ? 'all' : 'user');
                   }}
                   style={[
-                    {
-
-                      width: 180,
-                      marginLeft: 12,
-                      marginRight: 7,
-                      backgroundColor:
-                        Selected === item.name ? '#9271c9' : '#874be9',
-                      height: 35,
-                      marginVertical: 10,
-                      borderRadius: 30,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      paddingHorizontal: 5,
-                    },
-                    Selected === item.name && styles.shdow,
+                    styles.tabButton,
+                    Selected === item.name && styles.selectedTabButton,
                   ]}>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      marginHorizontal: 5,
-                      fontWeight: '500',
-                      color: '#FFF',
-                    }}>
-                    {item.name}
-                  </Text>
+                  <Text style={styles.tabButtonText}>{item.name}</Text>
                 </TouchableOpacity>
               )}
             />
           </View>
-
         </View>
-        {Event_List?.length > 0 && <FlatList
-          data={Event_List}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-            
+
+        {Event_List?.length > 0 ? (
+          <FlatList
+            data={Event_List}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
                 onPress={() => {
                   navigation.navigate(ScreenNameEnum.EventDetilas, {
                     event_id: item.id,
                   });
                 }}
-           
-              style={[
-                styles.shdow,
-                styles.Event,
-                { marginVertical: 10, alignSelf: 'center', backgroundColor: item.type == 'Metting' ? '#e7cbf2' : item.type == 'Match' ? '#DDFBE8' : '#fff9cd' },
-              ]}>
-              <View>
-                <Line />
-              </View>
-              <View>
-                <Text
-                  style={[
-                    styles.txt,
-                    {
-                      fontSize: 22,
-                      fontWeight: '700',
-                      lineHeight: 33,
-                      color: item.type == 'Match' ? '#326A3D' : '#000'
-                    },
-                  ]}>
-                  {item?.event_date != null &&
-                    get_dayDate(
-                    item?.event_date
-                    )}
-                </Text>
-                <Text style={[styles.txt, { color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
-                  {get_monthName(
-                    item?.event_date
-                  )}
-                </Text>
-              </View>
-
-              <View style={{ width: '65%' }}>
-                <Text
-                  style={[
-                    styles.txt,
-                    {
-                      fontSize: 18,
-                      fontWeight: '700',
-                      lineHeight: 24,
-                      color: item.type == 'Match' ? '#326A3D' : '#000'
-                    },
-                  ]}>
-                  {item?.event_name}
-                </Text>
-                <Text style={[styles.txt, { fontSize: 10, color: item.type == 'Match' ? '#326A3D' : '#000' }]}>
-                  {item?.event_description}
-                </Text>
-                <Text style={[styles.txt,{    color:item.type=='Match'?'#326A3D':'#000'}]}>
-                  {get_DayName(
-                item?.event_date
-                  )}{' '}
-                  {new Date(item?.event_time).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image
-                    source={require('../../../assets/Cropping/pin.png')}
-                    style={{ height: 12, width: 12 }}
-                  />
-                  <Text style={[styles.txt, { marginLeft: 5,    color:item.type=='Match'?'#326A3D':'#000' }]}>
-                    {item?.event_location}
+                style={[
+                  styles.shadow,
+                  styles.eventItem,
+                  {
+                    paddingVertical: 10,
+                    backgroundColor:
+                      item.type === 'Meeting'
+                        ? '#e7cbf2'
+                        : item.type === 'Match'
+                        ? '#DDFBE8'
+                        : item.type === 'Training'
+                        ? '#a1ede6'
+                        : '#fff9cd',
+                  },
+                ]}>
+                <View>
+                  <Line />
+                </View>
+                <View>
+                  <Text
+                    style={[
+                      styles.eventDate,
+                      {
+                        color: item.type === 'Match' ? '#326A3D' : '#000',
+                      },
+                    ]}>
+                    {item?.event_date && get_dayDate(item.event_date)}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.eventMonth,
+                      {
+                        color: item.type === 'Match' ? '#326A3D' : '#000',
+                      },
+                    ]}>
+                    {item?.event_date && get_monthName(item.event_date)}
                   </Text>
                 </View>
-              </View>
-              <View>
+
+                <View style={{ width: '65%' }}>
+                  <Text
+                    style={[
+                      styles.eventName,
+                      {
+                        color: item.type === 'Match' ? '#326A3D' : '#000',
+                      },
+                    ]}>
+                    {item?.event_name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.eventDescription,
+                      {
+                        color: item.type === 'Match' ? '#326A3D' : '#000',
+                      },
+                    ]}>
+                    {item?.event_description}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.eventDayTime,
+                      {
+                        color: item.type === 'Match' ? '#326A3D' : '#000',
+                      },
+                    ]}>
+                    {item?.event_date && get_DayName(item.event_date)}{' '}
+                    {new Date(item?.event_time).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                  <View style={styles.eventLocationContainer}>
+                    <Image
+                      source={require('../../../assets/Cropping/pin.png')}
+                      style={styles.eventLocationIcon}
+                    />
+                    <Text
+                      style={[
+                        styles.eventLocation,
+                        {
+                          color: item.type === 'Match' ? '#326A3D' : '#000',
+                        },
+                      ]}>
+                      {item?.event_location}
+                    </Text>
+                  </View>
+                </View>
                 <Text
-                  style={[styles.txt, { alignSelf: 'flex-end', fontSize: 10,color:item.type=='Match'?'#326A3D':'#000' }]}>
+                  style={[
+                    styles.eventType,
+                    {
+                      color: item.type === 'Match' ? '#326A3D' : '#000',
+                    },
+                  ]}>
                   {item.type}
                 </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />}
-        {Event_List.length == 0 && <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-          <Text style={{ fontSize: 14, color: '#777777', fontWeight: '500' }}>No Event Found</Text>
-        </View>
-        }
-
-
+              </TouchableOpacity>
+            )}
+            ListFooterComponent={() => <View style={{ height: 20 }} />}
+          />
+        ) : (
+          <View style={styles.noEventContainer}>
+            <Text style={styles.noEventText}>No Event Found</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
 }
 
-
-
 const styles = StyleSheet.create({
-
-  txt: {
-    color: '#326A3D',
-    fontWeight: '500',
-    fontSize: 12,
-    lineHeight: 18,
+  headerContainer: {
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    marginTop: 20,
+    alignItems: 'center',
   },
-  Event: {
+  headerText: {
+    fontWeight: '700',
+    fontSize: 22,
+    lineHeight: 32,
+    color: '#FFF',
+  },
+  tabContainer: {
+    height: hp(7),
+    marginTop: 5,
+  },
+  tabButton: {
+    width: wp(43),
+    marginLeft: 16,
+    marginRight: 7,
+    height: 35,
+    marginVertical: 10,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#874be9',
+  },
+  selectedTabButton: {
+    backgroundColor: '#9271c9',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
+  tabButtonText: {
+    fontSize: 12,
+    marginHorizontal: 5,
+    fontWeight: '500',
+    color: '#FFF',
+  },
+  eventItem: {
     justifyContent: 'space-between',
-    height: hp(12),
-    backgroundColor: '#DDFBE8',
+    height: hp(15),
     marginTop: 20,
     marginHorizontal: 10,
     width: wp(90),
@@ -280,129 +278,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
   },
-  shdow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-
-    elevation: 7,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF',
-  },
-  colorDiv: {
-    backgroundColor: '#874be9',
-    height: hp(12),
-    borderBottomRightRadius: 50,
-    borderBottomLeftRadius: 50,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  backButton: {
-    width: '25%',
-  },
-  titleContainer: {
-    width: '25%',
-  },
-  title: {
-    fontWeight: '700',
+  eventDate: {
     fontSize: 22,
-    lineHeight: 32,
-    color: '#FFF',
+    fontWeight: '700',
+    lineHeight: 33,
   },
-  addButton: {},
-  addButtonIcon: {
-    height: 50,
-    width: 50,
-  },
-  content: {
-    flex: 1,
-    paddingTop: 20,
-  },
-  recentListItem: {
-    paddingVertical: 15,
-    padding: 10,
-    marginHorizontal: 15,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    marginVertical: 10,
-  },
-  stickyPostContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  stickyPostText: {
+  eventMonth: {
     fontSize: 12,
     fontWeight: '500',
     lineHeight: 18,
-    color: '#294247',
   },
-  postContent: {
-    flexDirection: 'row',
-    marginTop: 10,
-    alignItems: 'center',
+  eventName: {
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
   },
-  profileImage: {
-    height: 40,
-    width: 40,
-    borderRadius: 20,
-  },
-  postDetails: {
-    marginLeft: 10,
-    justifyContent: 'center',
-  },
-  postTitle: {
-    color: '#000000',
-    fontSize: 14,
-    fontWeight: '800',
-    lineHeight: 18,
-  },
-  postDescription: {
-    color: '#B0B0B0',
-    fontSize: 12,
-    fontWeight: '400',
-    lineHeight: 18,
-  },
-  postDateTime: {
-    color: '#B0B0B0',
+  eventDescription: {
     fontSize: 10,
-    fontWeight: '400',
+  },
+  eventDayTime: {
+    fontSize: 12,
     lineHeight: 18,
   },
-  postImage: {
-    marginTop: 15,
-    width: '100%',
-    height: 190,
-  },
-  interactionContainer: {
-    flexDirection: 'row',
-    marginTop: 15,
-  },
-  interactionItem: {
-    marginHorizontal: 5,
+  eventLocationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  interactionIcon: {
-    height: 15,
-    width: 15,
-    marginHorizontal: 10,
+  eventLocationIcon: {
+    height: 12,
+    width: 12,
   },
-  interactionText: {
-    fontSize: 12,
-    lineHeight: 18,
+  eventLocation: {
+    marginLeft: 5,
+  },
+  eventType: {
+    alignSelf: 'flex-end',
+    fontSize: 10,
+  },
+  noEventContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noEventText: {
+    fontSize: 14,
+    color: '#777777',
     fontWeight: '500',
-    color: '#292D32',
   },
   shadow: {
     shadowColor: '#000',
@@ -414,23 +335,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 7,
   },
-
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-
-    elevation: 5,
-  },
   colorDiv: {
-    backgroundColor: '#874be9',
-
-    borderBottomRightRadius: 50,
-    borderBottomLeftRadius: 50,
+    backgroundColor: '#854be9',
+    height: hp(15),
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
 });
 
@@ -441,16 +350,4 @@ const tabData = [
   {
     name: 'My Event',
   },
-
-
-];
-const EventList = [
-  {
-    name: 'Team Event',
-  },
-  {
-    name: 'My Event',
-  },
-
-
 ];

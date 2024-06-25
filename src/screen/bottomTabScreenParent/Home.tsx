@@ -345,7 +345,7 @@ export default function Home() {
               style={[
                 styles.shdow,
                 styles.Event,
-                {marginVertical: 10, alignSelf: 'center', padding: 15},
+                {marginVertical: 10, alignSelf: 'center', padding: 15, backgroundColor:Event_List[Event_List?.length - 1]?.type == 'Metting' ? '#e7cbf2' : Event_List[Event_List?.length - 1].type == 'Match' ? '#DDFBE8' : Event_List[Event_List?.length - 1].type == 'Training'?'#a1ede6':'#fff9cd'},
               ]}>
               <View>
                 <Line />
@@ -358,6 +358,7 @@ export default function Home() {
                       fontSize: 14,
                       fontWeight: '700',
                       lineHeight: 33,
+                      color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'
                     },
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_date != null &&
@@ -367,7 +368,7 @@ export default function Home() {
                      
                     )}
                 </Text>
-                <Text style={styles.txt}>
+                <Text style={[styles.txt,{    color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {get_monthName(
                
                       Event_List[Event_List?.length - 1]?.event_date,
@@ -384,6 +385,7 @@ export default function Home() {
                       fontSize: 18,
                       fontWeight: '700',
                       lineHeight: 24,
+                      color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'
                     },
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_name?.substring(
@@ -391,12 +393,12 @@ export default function Home() {
                     20,
                   )}
                 </Text>
-                <Text style={[styles.txt, {fontSize: 10}]}>
+                <Text style={[styles.txt, {fontSize: 10,color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {Event_List[
                     Event_List?.length - 1
                   ]?.event_description?.substring(0, 30)}
                 </Text>
-                <Text style={styles.txt}>
+                <Text style={[styles.txt,{color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {get_DayName(
                  
                       Event_List[Event_List?.length - 1]?.event_date,
@@ -411,7 +413,7 @@ export default function Home() {
                     source={require('../../assets/Cropping/pin.png')}
                     style={{height: 12, width: 12}}
                   />
-                  <Text style={[styles.txt, {marginLeft: 5}]}>
+                  <Text style={[styles.txt, {marginLeft: 5,color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                     {Event_List[
                       Event_List?.length - 1
                     ]?.event_location?.substring(0, 15)}
@@ -420,7 +422,7 @@ export default function Home() {
               </View>
               <View>
                 <Text
-                  style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
+                  style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10,color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {Event_List[Event_List?.length - 1]?.type}
                 </Text>
               </View>

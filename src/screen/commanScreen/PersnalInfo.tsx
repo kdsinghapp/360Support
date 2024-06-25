@@ -240,7 +240,7 @@ catch(err){
                {item.email}
               </Text>
             </View>
-            <TouchableOpacity
+          {user?.id !== item?.id &&  <TouchableOpacity
 
             onPress={()=>{
               handleSubmit()
@@ -268,7 +268,7 @@ catch(err){
                 ]}>
                 send message
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity>}
           </View>
 
           <View style={styles.emptySpace} />

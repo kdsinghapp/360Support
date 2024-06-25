@@ -45,38 +45,29 @@ import AddMatchResult from '../modal/AddMatchResult';
 import AddGroup from '../modal/AddGroup';
 export default function coachHome() {
   const navigation = useNavigation();
-  const user_data = useSelector((state: RootState) => state.auth.userData);
-  const isLoading = useSelector((state: RootState) => state.feature.isLoading);
-  const LastGameresult = useSelector((state: RootState) => state.feature.LastGameresult);
-  const isLoading2 = useSelector((state: RootState) => state.auth.isLoading);
-  const My_Profile = useSelector(
-    (state: RootState) => state.auth.GetUserProfile,
-  );
-  const get_PostList = useSelector(
-    (state: RootState) => state.feature.get_PostList,
-  );
-  const Traininglist: EventList[] = useSelector(
-    (state: RootState) => state.feature.Training_list,
-  );
-  const [OpenModal, setOpenModal] = useState<string>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [ModalVisiblePost, setModalVisiblePost] = useState<boolean>(false);
-  const [ModalVisibleVideo, setModalVisibleVideo] = useState<boolean>(false);
-  const [AddGroupModal, setAddGroupModal] = useState<boolean>(false);
-  const [TrainingVisible, setTrainingVisible] = useState<boolean>(false);
-  const Registration_list = useSelector((state: RootState) => state.feature.Registration_list);
-  const [AddMatchResultModal, setAddMatchResultModal] =
-    useState<boolean>(false);
-  const [eventVisible, setEventVisible] = useState<boolean>(false);
-  const isFocuse = useIsFocused();
-  const GroupDetails = useSelector(
-    (state: RootState) => state.auth.Group_Details,
-  );
-  const Video_list = useSelector(
-    (state: RootState) => state.feature.Video_list,
-  );
   const dispatch = useDispatch();
-  const [playing, setPlaying] = useState<boolean>(false);
+  const isFocused = useIsFocused();
+
+  const user_data = useSelector((state) => state.auth.userData);
+  const isLoading = useSelector((state) => state.feature.isLoading);
+  const LastGameresult = useSelector((state) => state.feature.LastGameresult);
+  const isLoading2 = useSelector((state) => state.auth.isLoading);
+  const My_Profile = useSelector((state) => state.auth.GetUserProfile);
+  const get_PostList = useSelector((state) => state.feature.get_PostList);
+  const Registration_list = useSelector((state) => state.feature.Registration_list);
+  const GroupDetails = useSelector((state) => state.auth.Group_Details);
+  const Video_list = useSelector((state) => state.feature.Video_list);
+  const Event_List = useSelector((state) => state.feature.Event_list);
+
+  const [OpenModal, setOpenModal] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [ModalVisiblePost, setModalVisiblePost] = useState(false);
+  const [ModalVisibleVideo, setModalVisibleVideo] = useState(false);
+  const [AddGroupModal, setAddGroupModal] = useState(false);
+  const [TrainingVisible, setTrainingVisible] = useState(false);
+  const [AddMatchResultModal, setAddMatchResultModal] = useState(false);
+  const [eventVisible, setEventVisible] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRegisterList, setFilteredRegisterList] = useState(Registration_list);
 
@@ -85,15 +76,16 @@ export default function coachHome() {
       setFilteredRegisterList(Registration_list);
     } else {
       setFilteredRegisterList(
-        Registration_list.filter(item =>
+        Registration_list.filter((item) =>
           item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           item.description.toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
     }
-  }, [searchQuery]);
+  }, [searchQuery, Registration_list]);
+
   useEffect(() => {
-    get_Registration();
+    // Add logic here if needed when user_data changes
   }, [user_data]);
 
   const get_Registration = async () => {
@@ -104,76 +96,56 @@ export default function coachHome() {
   };
 
   useEffect(() => {
-    get_profileDetails();
-    get_Post();
-    get_eventList();
-    getGroupDetails();
-    get_videoList('all');
-    Get_Training('all');
-    LastGame_result()
-  }, [isFocuse, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
-
-  function getYouTubeVideoId(url: string): string | null {
-    const regExp =
-      /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-
-    if (match && match[2].length === 11) {
-      // If match is found and it's a valid YouTube video ID
-      return match[2];
-    } else {
-      return null;
+    if (isFocused) {
+      get_profileDetails();
+      get_Post();
+      get_eventList();
+      getGroupDetails();
+      get_videoList('all');
+      Get_Training('all');
+      LastGame_result();
+      get_Registration();
     }
+  }, [isFocused, user_data, ModalVisiblePost, eventVisible, ModalVisibleVideo]);
+
+  function getYouTubeVideoId(url) {
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
   }
 
-  const onStateChange = useCallback((state: string) => {
+  const onStateChange = useCallback((state) => {
     if (state === 'ended') {
       setPlaying(false);
       successToast('video has finished playing!');
     }
   }, []);
 
-  const Event_List = useSelector(
-    (state: RootState) => state.feature.Event_list,
-  );
-
-  const get_monthName = dateStr => {
-    // Parse the date string directly
+  const get_monthName = (dateStr) => {
     const date = new Date(dateStr);
-
-    // Get the month name using toLocaleString
-    const monthName = date.toLocaleString('default', { month: 'long' });
-
-    return monthName;
+    return date.toLocaleString('default', { month: 'long' });
   };
-  const get_DayName = dateStr => {
-    // Parse the date string directly
+
+  const get_DayName = (dateStr) => {
     const date = new Date(dateStr);
-
-    // Get the day name using toLocaleString
-    const dayName = date.toLocaleString('default', { weekday: 'long' });
-
-    return dayName;
-  };
-  const get_dayDate = dateStr => {
-    const date = new Date(dateStr); // Parse the date string
-    const dayOfMonth = date.getDate(); // Get the day of the month
-    return dayOfMonth;
+    return date.toLocaleString('default', { weekday: 'long' });
   };
 
-  const get_time = dateString => {
-    // Regular expression to extract the time portion
-    let timeMatch = dateString.match(/(\d{2}:\d{2}:\d{2})/);
+  const get_dayDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.getDate();
+  };
 
-    // If a match is found, return the matched time
+  const get_time = (dateString) => {
+    const timeMatch = dateString.match(/(\d{2}:\d{2}:\d{2})/);
     if (timeMatch) {
       return timeMatch[0];
     } else {
       throw new Error("Time format not found in the provided date string.");
     }
-  }
-  const Get_Training = async (type): Promise<void> => {
+  };
 
+  const Get_Training = async (type) => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
@@ -181,15 +153,15 @@ export default function coachHome() {
     };
     await dispatch(get_training(params));
   };
-  const LastGame_result = async (type): Promise<void> => {
-   
-    const params = {  
-      Group_code: user_data?.group_code,    
+
+  const LastGame_result = async () => {
+    const params = {
+      Group_code: user_data?.group_code,
     };
     await dispatch(get_game_result(params));
   };
 
-  const get_Post = async (): Promise<void> => {
+  const get_Post = async () => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
@@ -198,34 +170,31 @@ export default function coachHome() {
     await dispatch(get_post(params));
   };
 
-  const get_profileDetails = async (): Promise<void> => {
+  const get_profileDetails = async () => {
     const params = {
       user_id: user_data?.id,
     };
-
     await dispatch(get_profile(params));
   };
 
-  const getGroupDetails = async (): Promise<void> => {
+  const getGroupDetails = async () => {
     const params = {
       group_code: user_data?.group_code,
       profile: true,
-      //GroupDetails?.group_code,
     };
-
-    dispatch(Get_Group(params));
+    await dispatch(Get_Group(params));
   };
-  const get_eventList = async (): Promise<void> => {
 
+  const get_eventList = async () => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
-      type:'all'
+      type: 'all',
     };
     await dispatch(get_event(params));
   };
 
-  const get_videoList = async (type): Promise<void> => {
+  const get_videoList = async (type) => {
     const params = {
       user_id: user_data?.id,
       group_code: user_data?.group_code,
@@ -304,7 +273,7 @@ export default function coachHome() {
             </View>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate(ScreenNameEnum.MY_PROFILE);
+                navigation.navigate(ScreenNameEnum.coachProfile);
               }}>
               <Image
                 source={{uri: My_Profile?.image}}
@@ -404,7 +373,7 @@ export default function coachHome() {
               style={[
                 styles.shdow,
                 styles.Event,
-                {marginVertical: 10, alignSelf: 'center', padding: 15},
+                {marginVertical: 10, alignSelf: 'center', padding: 15, backgroundColor:Event_List[Event_List?.length - 1]?.type == 'Metting' ? '#e7cbf2' : Event_List[Event_List?.length - 1].type == 'Match' ? '#DDFBE8' : Event_List[Event_List?.length - 1].type == 'Training'?'#a1ede6':'#fff9cd'},
               ]}>
               <View>
                 <Line />
@@ -417,6 +386,7 @@ export default function coachHome() {
                       fontSize: 14,
                       fontWeight: '700',
                       lineHeight: 33,
+                      color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'
                     },
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_date != null &&
@@ -426,7 +396,7 @@ export default function coachHome() {
                      
                     )}
                 </Text>
-                <Text style={styles.txt}>
+                <Text style={[styles.txt,{    color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {get_monthName(
                
                       Event_List[Event_List?.length - 1]?.event_date,
@@ -443,6 +413,7 @@ export default function coachHome() {
                       fontSize: 18,
                       fontWeight: '700',
                       lineHeight: 24,
+                      color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'
                     },
                   ]}>
                   {Event_List[Event_List?.length - 1]?.event_name?.substring(
@@ -450,12 +421,12 @@ export default function coachHome() {
                     20,
                   )}
                 </Text>
-                <Text style={[styles.txt, {fontSize: 10}]}>
+                <Text style={[styles.txt, {fontSize: 10,color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {Event_List[
                     Event_List?.length - 1
                   ]?.event_description?.substring(0, 30)}
                 </Text>
-                <Text style={styles.txt}>
+                <Text style={[styles.txt,{color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {get_DayName(
                  
                       Event_List[Event_List?.length - 1]?.event_date,
@@ -470,7 +441,7 @@ export default function coachHome() {
                     source={require('../../../assets/Cropping/pin.png')}
                     style={{height: 12, width: 12}}
                   />
-                  <Text style={[styles.txt, {marginLeft: 5}]}>
+                  <Text style={[styles.txt, {marginLeft: 5,color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                     {Event_List[
                       Event_List?.length - 1
                     ]?.event_location?.substring(0, 15)}
@@ -479,7 +450,7 @@ export default function coachHome() {
               </View>
               <View>
                 <Text
-                  style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
+                  style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10,color:Event_List[Event_List?.length - 1]?.type == 'Match' ? '#326A3D' : '#000'}]}>
                   {Event_List[Event_List?.length - 1]?.type}
                 </Text>
               </View>
@@ -1431,18 +1402,7 @@ const styles = StyleSheet.create({
     marginTop: 10, // Adding margin to avoid overlapping or alignment issues
   },
 });
-const RegisterList = [
-  {
-    titile: 'Summer Camp 2024',
-    description: 'test',
-    img: require('../../../assets/Cropping/img1.png'),
-  },
-  {
-    titile: 'Spring camp 2024',
-    description: 'Apply for our Spring Camp before 10th of jun 2024!',
-    img: require('../../../assets/Cropping/img1.png'),
-  },
-];
+
 
 const Create = [
   {

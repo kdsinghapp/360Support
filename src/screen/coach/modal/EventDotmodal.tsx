@@ -63,6 +63,7 @@ const navigation = useNavigation()
     };
     await dispatch(delete_event(params)).then(res=>{
         onClose();
+        navigation.goBack()
     })
   };
 
