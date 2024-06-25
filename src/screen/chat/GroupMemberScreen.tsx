@@ -113,12 +113,12 @@ export default function GroupmemberPage() {
           </Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity
+     {user?.type == 'Coach' && <TouchableOpacity
         onPress={() => handleRemoveMember(item.user_data.id)}
         style={styles.removeButton}
       >
         <Text style={styles.removeButtonText}>Remove</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>}
     </View>
   );
 
@@ -137,7 +137,7 @@ export default function GroupmemberPage() {
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Group Member</Text>
             </View>
-            <TouchableOpacity
+            {user?.type == 'Coach' &&    <TouchableOpacity
               onPress={() => {
                 setMember(true);
               }}
@@ -148,7 +148,7 @@ export default function GroupmemberPage() {
                 style={styles.addButtonIcon}
                 resizeMode="contain"
               />
-            </TouchableOpacity>
+            </TouchableOpacity> }
           </View>
         </View>
         <View style={styles.listContainer}>
