@@ -164,7 +164,7 @@ export default function TeamListScreen() {
               {TeamDetails.team_name}
             </Text>
           </View>
-          {user?.type == 'Coache' &&   <TouchableOpacity
+          {user?.type == 'Coach' &&   <TouchableOpacity
             onPress={() => {
               setMember(true);
             }}
@@ -183,7 +183,7 @@ export default function TeamListScreen() {
           flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 20, fontWeight: '700', color: '#000' }}>Team Members</Text>
 
-          {user?.type == 'Coache' &&<TouchableOpacity
+          {user?.type == 'Coach' &&<TouchableOpacity
             onPress={() => {
               setRemoveMember(RemoveMember=>!RemoveMember)
             }}
