@@ -287,6 +287,7 @@ export const Add_UserInfo = createAsyncThunk(
         params.navigation.navigate(ScreenNameEnum.CONTINUE_USERDETAILS);
       } else {
         errorToast(response.data.message);
+        //params.navigation.navigate(ScreenNameEnum.CONTINUE_USERDETAILS);
       }
 
       return response.data.result;
@@ -330,6 +331,9 @@ export const Updated_UserInfo = createAsyncThunk(
             ScreenNameEnum.CREATE_OR_REQUESTCONNECTION,
           );
         }
+    
+      // Dispatch login success action
+      thunkApi.dispatch(loginSuccess(response.data.result));
       } else {
         errorToast(response.data.message);
       }
@@ -437,7 +441,7 @@ export const log_out = createAsyncThunk('log_out', async (params, thunkApi) => {
   try {
     console.log(' AuthSlice.js:29 ~ logout ~ called:');
 
-    const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/logout', {
+    const response = await fetch('https://jbservicesus.com/sports/api/logout', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -585,6 +589,7 @@ const AuthSlice = createSlice({
       state.isError = false;
       state.isLogin = false;
       state.isLogOut = true;
+      state.selectedRole = null
     });
     builder.addCase(log_out.rejected, (state, action) => {
       state.isLoading = false;
@@ -679,7 +684,7 @@ const AuthSlice = createSlice({
     builder.addCase(Updated_UserInfo.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isError = false;
-      state.UserInformation = action.payload;
+      state.userData = action.payload;
     });
     builder.addCase(Updated_UserInfo.rejected, (state, action) => {
       state.isLoading = false;

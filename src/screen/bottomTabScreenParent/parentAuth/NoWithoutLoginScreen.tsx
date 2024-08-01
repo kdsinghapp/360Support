@@ -18,6 +18,7 @@ import { ResetPasswordEmail, get_profile } from '../../../redux/feature/authSlic
 import Loading from '../../../configs/Loader';
 import SettingModal from '../../Modal/SettignModal';
 import ScreenNameEnum from '../../../routes/screenName.enum';
+import JoinTeamModal from '../../Modal/JoinTeam';
 
 interface UserProfile {
   first_name: string;
@@ -51,28 +52,28 @@ export default function NoWithoutLoginScreen() {
   );
 
   const [ModalVisible, setModalVisible] = useState(false);
+  const [TeamModalVisible, setTeamModalVisible] = useState(false);
 
   const idFousce = useIsFocused();
 
-console.log('NOWITHOUTSCREEN',Get_profile);
 
 
   const dispatch = useDispatch();
-  const get_profileDetails = async () => {
-
+const get_profileDetails = async () => {
+    const id = await AsyncStorage.getItem('user_id');
     
-  //  if (!id) return  navigation.navigate(ScreenNameEnum.USER_DETAILS);;
-  //   const params = {
-  //     user_id: id,
-  //     navigation: navigation,
-  //   };
+   if (!id) return  navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+    const params = {
+      user_id: id,
+      navigation: navigation,
+    };
 
-  //   dispatch(get_profile(params));
+    dispatch(get_profile(params));
   };
 
   useEffect(() => {
     get_profileDetails();
-  }, [idFousce]);
+ }, [idFousce]);
 
   return (
     <View style={styles.container}>
@@ -165,11 +166,19 @@ console.log('NOWITHOUTSCREEN',Get_profile);
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+            setTeamModalVisible(true)
            
           }}
           style={[styles.btn, { backgroundColor: '#294247', marginTop: hp(5) }]}>
           <Text style={styles.btnText}>Take me to the team!</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+          navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+           
+          }}
+          style={[styles.btn, { }]}>
+          <Text style={styles.btnText}>Skip</Text>
         </TouchableOpacity>
         {/* <Text style={styles.orText}>Or</Text>
         <TouchableOpacity
@@ -185,6 +194,10 @@ console.log('NOWITHOUTSCREEN',Get_profile);
         <SettingModal
           visible={ModalVisible}
           onClose={() => setModalVisible(false)}
+        />
+        <JoinTeamModal
+          visible={TeamModalVisible}
+          onClose={() => setTeamModalVisible(false)}
         />
       </ScrollView>
     </View>

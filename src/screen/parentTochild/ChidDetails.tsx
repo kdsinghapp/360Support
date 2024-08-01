@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import {
@@ -56,11 +57,28 @@ export default function ChidDetails({ route }: Props) {
   const dispatch = useDispatch();
   const group_code = useSelector((state: any) => state.auth.group_code);
 
-  
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setIsKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setIsKeyboardVisible(false)
+    );
+
+    // Clean up listeners on component unmount
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   const openImageLibrary = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
+      width: 500,
+      height: 500,
       cropping: true,
     })
       .then((image: ImageType) => {
@@ -148,8 +166,9 @@ export default function ChidDetails({ route }: Props) {
             {Country_List && (
               <Dropdown
                 data={Country_List}
+              
                 search
-                maxHeight={200}
+                maxHeight={300}
                 labelField="name"
                 valueField="name"
                 placeholder={!isFocus ? 'Select Country' : '...'}
@@ -157,6 +176,7 @@ export default function ChidDetails({ route }: Props) {
                 value={value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
+                dropdownPosition={isKeyboardVisible?'top':'bottom'}
                 onChange={item => {
                   setValue(item.name);
                   setIsFocus(false);

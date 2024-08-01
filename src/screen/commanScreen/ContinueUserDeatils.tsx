@@ -16,6 +16,7 @@ export default function ContinueUserDeatils() {
   const UserInformation = useSelector(state => state.auth.UserInformation);
   const selected = useSelector(state => state.auth.selectedRole);
 
+
   
   return (
     <View style={{flex: 1, backgroundColor: '#874be9'}}>

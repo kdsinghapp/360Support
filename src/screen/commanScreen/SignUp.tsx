@@ -29,8 +29,12 @@ export default function SignUp() {
   const [Cemail, setCEmail] = useState('');
   const [Cpassword, setCPassword] = useState('');
 
+
+
+  
   const dispatch = useDispatch();
   const isLoading = useSelector(state => state.auth.isLoading);
+console.log('UserInformation',UserInformation);
 
   const [isValidEmail, setIsValidEmail] = useState(true);
   const navigation = useNavigation();

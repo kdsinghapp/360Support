@@ -19,26 +19,30 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import CreateTeam from '../modal/CreateTeam';
 import {useDispatch, useSelector} from 'react-redux';
-import {get_team_list} from '../../../redux/feature/featuresSlice';
+import {get_team_by_member_id, get_team_list} from '../../../redux/feature/featuresSlice';
 import Loading from '../../../configs/Loader';
+import JoinTeamModal from '../../Modal/JoinTeam';
 
 export default function CocheTeamScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
-  const teamList = useSelector((state: RootState) => state.feature.teamList);
+  const teamList = useSelector((state: RootState) => state.feature.getTeam_by_Member);
   const user_data = useSelector(state => state.auth.userData);
   const navigation = useNavigation();
   const isFocuse = useIsFocused();
+  const [TeamModalVisible, setTeamModalVisible] = useState(false);
   useEffect(() => {
     getTeam_result();
-  }, [isFocuse, modalVisible]);
+  }, [isFocuse, modalVisible,TeamModalVisible]);
 
+
+  
   const getTeam_result = async () => {
     const params = {
-      Group_code: user_data?.group_code,
+      user_id: user_data?.id,
     };
-    await dispatch(get_team_list(params));
+    await dispatch(get_team_by_member_id(params));
   };
 
   const RecentListItem = ({item}) => {
@@ -104,6 +108,16 @@ export default function CocheTeamScreen() {
               Team
             </Text>
           </View>
+
+          <TouchableOpacity 
+          onPress={()=>{
+setTeamModalVisible(true)
+          }}
+          style={{position:'absolute',top:10,right:20}}>
+            <Image  source={require('../../../assets/Cropping/WhiteAdd.png')} 
+            
+            style={{height:45,width:45}} />
+          </TouchableOpacity>
         </View>
         <View style={{marginTop: 10, height: hp(8), justifyContent: 'center'}}>
           <View style={[styles.shdow, styles.search]}>
@@ -120,45 +134,7 @@ export default function CocheTeamScreen() {
             />
           </View>
         </View>
-        {/* <View style={{height: hp(8), marginTop: 10, marginHorizontal: 15}}>
-          <FlatList
-            data={Create}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            renderItem={({item}) => (
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(true);
-                }}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginLeft: 15,
-                }}>
-                <View style={{paddingTop: 5}}>
-                  <Image
-                    source={item.logo}
-                    style={{
-                      height: 40,
-                      width: 40,
-                    }}
-                    resizeMode="contain"
-                  />
-                </View>
-                <View style={{marginLeft: 10}}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: '#000',
-                      fontWeight: '700',
-                    }}>
-                    {item.name}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View> */}
+       
 
         <View style={{marginHorizontal: 20, marginTop: 20}}>
           <Text style={{fontSize: 20, fontWeight: '700', color: '#000'}}>
@@ -195,6 +171,11 @@ export default function CocheTeamScreen() {
         <CreateTeam
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
+        />
+         <JoinTeamModal
+          visible={TeamModalVisible}
+          data={true}
+          onClose={() => setTeamModalVisible(false)}
         />
       </ScrollView>
     </View>

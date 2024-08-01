@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import { useSelector } from 'react-redux';
+import JoinTeamModal from '../../Modal/JoinTeam';
 
 export default function CoachStep1() {
   const navigation = useNavigation();
   const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const [TeamModalVisible, setTeamModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -54,7 +56,22 @@ export default function CoachStep1() {
           <Text style={styles.btnText}>Continue to club lobby</Text>
         </TouchableOpacity>
       </View>
-
+      <TouchableOpacity
+          onPress={() => {
+             setTeamModalVisible(true)
+           
+          }}
+          style={[styles.btn, { backgroundColor: '#294247', marginTop: hp(5) }]}>
+          <Text style={styles.btnText}>Take me to the team!</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+          navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+           
+          }}
+          style={[styles.btn, { marginTop:30}]}>
+          <Text style={styles.btnText}>Skip</Text>
+        </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           navigation.goBack();
@@ -62,6 +79,10 @@ export default function CoachStep1() {
         style={styles.logoutButton}>
         <Text style={styles.logoutButtonText}>Log out</Text>
       </TouchableOpacity>
+      <JoinTeamModal
+          visible={TeamModalVisible}
+          onClose={() => setTeamModalVisible(false)}
+        />
     </View>
   );
 }
@@ -110,6 +131,7 @@ const styles = StyleSheet.create({
   },
   pendingRequestContainer: {
     paddingHorizontal: 15,
+    marginTop:60
   },
   pendingRequestTitle: {
     fontSize: 24,

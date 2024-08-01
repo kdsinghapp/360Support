@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
@@ -6,10 +6,12 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
 import { useSelector } from 'react-redux';
 import Logo from '../assets/svg/Step1.svg';
 import GoBack from '../assets/svg/GoBack.svg';
+import JoinTeamModal from '../../Modal/JoinTeam';
 
 const PlayerStep1: React.FC = () => {
   const navigation = useNavigation();
   const GroupDetails = useSelector(state => state.auth.Group_Details);
+  const [TeamModalVisible, setTeamModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -49,11 +51,26 @@ const PlayerStep1: React.FC = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={() => navigation.navigate(ScreenNameEnum.BOTTOM_TAB)}
+      onPress={() => {
+        setTeamModalVisible(true)
+      
+     }}
           style={[styles.btn, { backgroundColor: '#294247' }]}>
           <Text style={styles.btnText}>Take me to my team!</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+          navigation.navigate(ScreenNameEnum.BOTTOM_TAB);
+           
+          }}
+          style={[styles.btn, { marginTop:30}]}>
+          <Text style={styles.btnText}>Skip</Text>
+        </TouchableOpacity>
       </View>
+      <JoinTeamModal
+          visible={TeamModalVisible}
+          onClose={() => setTeamModalVisible(false)}
+        />
     </View>
   );
 };

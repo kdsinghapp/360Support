@@ -100,9 +100,7 @@ export default function Step2Requestsent() {
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(ScreenNameEnum.SENT_CONNECTIONREQ, {
-              showCreateaccount: true,
-            });
+            navigation.navigate(ScreenNameEnum.CREATE_OR_REQUESTCONNECTION, );
           }}
           style={[styles.tab, {marginHorizontal: 15}]}>
           <View style={styles.plusIconContainer}>

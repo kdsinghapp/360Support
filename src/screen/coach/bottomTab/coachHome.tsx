@@ -71,6 +71,9 @@ export default function coachHome() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRegisterList, setFilteredRegisterList] = useState(Registration_list);
 
+
+  console.log('user_data',user_data?.type);
+  
   useEffect(() => {
     if (searchQuery === '') {
       setFilteredRegisterList(Registration_list);
@@ -202,6 +205,7 @@ export default function coachHome() {
     };
     await dispatch(get_video(params));
   };
+
 
 
   return (
@@ -494,17 +498,14 @@ export default function coachHome() {
             onPress={() => {
               navigation.navigate(ScreenNameEnum.coachWall);
             }}
-            style={{paddingHorizontal: 15}}>
-            <Text
-              style={[
-                styles.txt,
-                {
-                  color: '#874BE9',
-                  fontSize: 16,
-                  fontWeight: '700',
-                  lineHeight: 24,
-                },
-              ]}>
+            style={{}}>
+                <Text
+              style={{
+                fontSize: 14,
+                color: '#874BE9',
+                fontWeight: '700',
+                lineHeight: 24,
+              }}>
               See all
             </Text>
           </TouchableOpacity>
@@ -632,219 +633,7 @@ export default function coachHome() {
             </View>
           )}
         </View>
-        {/* <View
-          style={{
-            marginHorizontal: 15,
-            marginTop: 30,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <Text
-            style={[
-              styles.txt,
-              {
-                color: '#000000',
-                fontSize: 20,
-                fontWeight: '700',
-                lineHeight: 24,
-              },
-            ]}>
-            Recent Training
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              Get_Training('all');
-              navigation.navigate(ScreenNameEnum.cocheTraning);
-            }}>
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#874BE9',
-                fontWeight: '700',
-                lineHeight: 24,
-              }}>
-              See all
-            </Text>
-          </TouchableOpacity>
-        </View> */}
-{/* 
-        {Traininglist.length > 0 && (
-          <View
-            style={[
-              styles.shdow,
-              {
-                backgroundColor: '#fff',
-                marginHorizontal: 10,
-                borderRadius: 20,
-                marginVertical: 10,
-                padding: 10,
-              },
-            ]}>
-            <View
-              style={{height: 50, flexDirection: 'row', paddingHorizontal: 10}}>
-              <Image
-                source={{
-                  uri: Traininglist[Traininglist.length - 1]?.user_details
-                    ?.image,
-                }}
-                style={{height: 45, width: 45, borderRadius: 22.5}}
-              />
-              <View style={{marginLeft: 5}}>
-                <Text style={{fontSize: 12, color: '#000', fontWeight: '600'}}>
-                  {
-                    Traininglist[Traininglist.length - 1]?.user_details
-                      .first_name
-                  }{' '}
-                  {
-                    Traininglist[Traininglist.length - 1]?.user_details
-                      .last_name
-                  }
-                </Text>
-                <Text
-                  style={{fontSize: 11, color: '#777777', fontWeight: '600'}}>
-                  {Traininglist[Traininglist.length - 1]?.user_details.type}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={[styles.Event, {marginVertical: 10, alignSelf: 'center'}]}>
-              <View>
-                <Line />
-              </View>
-              <View>
-                <Text
-                  style={[
-                    styles.txt,
-                    {
-                      fontSize: 18,
-                      fontWeight: '700',
-                      lineHeight: 33,
-                    },
-                  ]}>
-                  {Traininglist[Traininglist.length - 1]?.training_date !=
-                    null &&
-                    get_dayDate(
-                      new Date(
-                        Traininglist[Traininglist.length - 1]?.training_date,
-                      ).toLocaleDateString(),
-                    )}
-                </Text>
-                <Text style={styles.txt}>
-                  {get_monthName(
-                    new Date(
-                      Traininglist[Traininglist.length - 1]?.training_date,
-                    ).toLocaleDateString(),
-                  ).substring(0, 3)}
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={[
-                    styles.txt,
-                    {
-                      fontSize: 14,
-                      fontWeight: '700',
-                      lineHeight: 24,
-                    },
-                  ]}>
-                  {Traininglist[Traininglist.length - 1]?.name.substring(0, 15)}
-                  ...
-                </Text>
-                <Text style={[styles.txt, {fontSize: 10}]}>
-                  {Traininglist[
-                    Traininglist.length - 1
-                  ]?.training_description.substring(0, 15)}
-                </Text>
-                <Text style={styles.txt}>
-                  {get_DayName(
-                    new Date(
-                      Traininglist[Traininglist.length - 1]?.training_date,
-                    ).toLocaleDateString(),
-                  )}
-                </Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={[styles.txt, {}]}>
-                    start time :{' '}
-                    {new Date(
-                      Traininglist[Traininglist.length - 1]?.training_time,
-                    ).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={[styles.txt, {}]}>
-                    end time :{' '}
-                    {new Date(
-                      Traininglist[Traininglist.length - 1]?.training_duration,
-                    ).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Image
-                    source={require('../../../assets/Cropping/pin.png')}
-                    style={{height: 12, width: 12}}
-                  />
-                  <Text style={[styles.txt, {marginLeft: 5}]}>
-                    {Traininglist[
-                      Traininglist.length - 1
-                    ]?.training_location.substring(0, 20)}
-                  </Text>
-                </View>
-                {Traininglist[Traininglist.length - 1]?.user_id !=
-                  user_data?.id && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      errorToast('coming soon');
-                    }}
-                    style={{
-                      backgroundColor: '#7cc2a2',
-
-                      marginTop: 30,
-                      borderRadius: 30,
-                      height: 30,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: '#fff',
-                        fontWeight: '700',
-                      }}>
-                      Join
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <View>
-                <Text
-                  style={[styles.txt, {alignSelf: 'flex-end', fontSize: 10}]}>
-                  {Traininglist[Traininglist.length - 1]?.training_type}
-                </Text>
-              </View>
-            </View>
-          </View>
-        )}
-        {Traininglist.length == 0 && (
-          <Text
-            style={{
-              fontSize: 14,
-              color: '#777777',
-              fontWeight: '500',
-              alignSelf: 'center',
-              marginTop: 10,
-            }}>
-            No training Found
-          </Text>
-        )} */}
+       
         <View
           style={{
             marginHorizontal: 15,
@@ -870,7 +659,7 @@ export default function coachHome() {
               get_videoList('all');
               navigation.navigate(ScreenNameEnum.cocheVideo);
             }}>
-            <Text
+              <Text
               style={{
                 fontSize: 14,
                 color: '#874BE9',
@@ -938,7 +727,7 @@ export default function coachHome() {
                 lineHeight: 24,
               },
             ]}>
-            Recent Match Result
+            Recent Match Result 
           </Text>
           <TouchableOpacity
             onPress={() => {
@@ -1329,6 +1118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: hp(25),
     marginHorizontal: 20,
+  
     borderRadius: 20,
     marginTop: 20,
     padding: 10,
@@ -1352,7 +1142,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     justifyContent: 'space-between',
-    width: '100%',
+paddingHorizontal:20
   },
   team: {
     alignItems: 'center',

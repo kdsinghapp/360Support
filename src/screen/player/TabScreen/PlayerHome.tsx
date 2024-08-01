@@ -64,6 +64,9 @@ export default function PlayerHome() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRegisterList, setFilteredRegisterList] = useState(Registration_list);
 
+
+  console.log('user_data',user_data);
+  
   useEffect(() => {
     if (searchQuery === '') {
       setFilteredRegisterList(Registration_list);
@@ -667,7 +670,7 @@ export default function PlayerHome() {
                 lineHeight: 24,
               },
             ]}>
-            Recent Match Result
+            Recent Match Result 
           </Text>
           <TouchableOpacity
             onPress={() => {
@@ -1026,6 +1029,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: hp(25),
     marginHorizontal: 20,
+
     borderRadius: 20,
     marginTop: 20,
     padding: 10,

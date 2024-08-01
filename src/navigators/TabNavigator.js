@@ -35,16 +35,16 @@ export default function TabNavigator() {
   }, []);
 
   const renderTabScreens = () => {
-    if (!userData) {
+    if (!userData && !selected) {
       return null;
     }
 
     let screens = [];
-    if (userData.type === 'Parent') {
+    if (userData?.type  === 'Parent') {
       screens = _routes.BOTTOMTAB_ROUTE;
-    } else if (userData.type === 'Coach') {
-      screens = _routes.BOTTOMTAB_COACH;
-    } else if (userData.type === 'Player') {
+    } else if (userData?.type  === 'Coach') {
+      screens = _routes?.BOTTOMTAB_COACH;
+    } else if (userData?.type === 'Player') {
       screens = _routes.BOTTOMTAB_PLAYER;
     }
 
@@ -80,7 +80,7 @@ export default function TabNavigator() {
     ));
   };
 
-  if (!userData) {
+  if (!userData?.type && !selected) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
        <ActivityIndicator  size={30} color={'#874be9'}/>
@@ -88,6 +88,7 @@ export default function TabNavigator() {
     );
   }
 
+  console.log('userData?.type',userData?.type);
   return (
     <Tab.Navigator
       initialRouteName="HOME_ROUTE" // Set the default tab to Home

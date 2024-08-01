@@ -36,6 +36,7 @@ export default function TeamListScreen() {
   const user = useSelector(state => state.auth.userData);
   const isLoading = useSelector((state: RootState) => state.feature.isLoading);
   const TeamDetails = useSelector((state: RootState) => state.feature.TeamDetails);
+console.log('item=>>>>>',item?.user_id);
 
 
   const dispatch = useDispatch()
@@ -183,7 +184,7 @@ export default function TeamListScreen() {
           flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 20, fontWeight: '700', color: '#000' }}>Team Members</Text>
 
-          {user?.type == 'Coach' &&<TouchableOpacity
+          {user?.type == 'Coach' && item?.user_id == user?.id &&<TouchableOpacity
             onPress={() => {
               setRemoveMember(RemoveMember=>!RemoveMember)
             }}

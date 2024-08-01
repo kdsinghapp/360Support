@@ -29,7 +29,8 @@ const initialState = {
   getTeam_by_Member:[],
   GeneralDetails:[],
   notificationsList:[],
-  groupMembers:[]
+  groupMembers:[],
+  TeamDetailsBycode:[]
 
 
 };
@@ -257,7 +258,7 @@ export const add_event = createAsyncThunk(
 
       console.log('FormData:', formData);
 
-      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/add_event', config);
+      const response = await fetch('https://jbservicesus.com/sports/api/add_event', config);
       console.log('members=>>>>>>>>', response);
       const data = await response.json();
 
@@ -294,7 +295,7 @@ export const update_password = createAsyncThunk(
 
       console.log('FormData:', formData);
 
-      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/update_password', config);
+      const response = await fetch('https://jbservicesus.com/sports/api/update_password', config);
   
       const data = await response.json();
    console.log('update_password=>>>>>>>>', data);
@@ -329,7 +330,7 @@ export const add_team_member = createAsyncThunk(
 
 
 
-      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/add_team_member', config);
+      const response = await fetch('https://jbservicesus.com/sports/api/add_team_member', config);
       const data = await response.json();
 
       if (data.status === '1') {
@@ -361,7 +362,7 @@ console.log('delete_team_member=>>>>>>>>>>>',params.data);
 
 
 
-      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/delete_team_member', config);
+      const response = await fetch('https://jbservicesus.com/sports/api/delete_team_member', config);
       const data = await response.json();
 
       if (data.status === '1') {
@@ -394,7 +395,7 @@ export const update_details = createAsyncThunk(
 
 
 
-      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/update_details', config);
+      const response = await fetch('https://jbservicesus.com/sports/api/update_details', config);
       const data = await response.json();
 
       if (data.status === '1') {
@@ -427,7 +428,7 @@ console.log('=>?.>>get_team_details>>>>>>>',params.data);
 
 
 
-      const response = await fetch('https://server-php-8-1.technorizen.com/Sport/api/get_team_details', config);
+      const response = await fetch('https://jbservicesus.com/sports/api/get_team_details', config);
       const data = await response.json();
 
       if (data.status === '1') {
@@ -709,6 +710,61 @@ export const get_club_users = createAsyncThunk(
     }
   },
 );
+export const team_details_by_code = createAsyncThunk(
+  'team_details_by_code',
+  async (params, thunkApi) => {
+    try {
+
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('team_code', params.team_code);
+      const response = await API.post('/team_details_by_code', data, config);
+
+      if (response.data.status == '1') {
+        console.log('get team_details_by_code Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: team_details_by_code .js:16 ~  ~ error:', error);
+
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+export const join_team = createAsyncThunk(
+  'join_team',
+  async (params, thunkApi) => {
+    try {
+
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      let data = new FormData();
+      data.append('team_code', params.team_code);
+      const response = await API.post('/join_team', data, config);
+
+      if (response.data.status == '1') {
+        successToast(response.data.message)
+        params.navigation.navigate(ScreenNameEnum.BOTTOM_TAB)
+        console.log('get join_team Successfully');
+      }
+      return response.data.result;
+    } catch (error) {
+      console.log('🚀 ~ file: join_team .js:16 ~  ~ error:', error);
+errorToast(response.data.message)
+      return thunkApi.rejectWithValue(error);
+    }
+  },
+);
+
 export const get_chat_groups_by_code = createAsyncThunk(
   'get_chat_groups_by_code',
   async (params, thunkApi) => {
@@ -775,6 +831,7 @@ export const get_team_list = createAsyncThunk(
       };
       let data = new FormData();
       data.append('group_code', params.Group_code);
+      data.append('user_id', params.user_id);
       const response = await API.post('/get_team_list', data, config);
       console.log('==============get_team_list======================');
       console.log(response.data);
@@ -1354,6 +1411,34 @@ const FeatureSlice = createSlice({
       state.get_PostList = action.payload;
     });
     builder.addCase(get_post.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(join_team.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(join_team.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+
+    });
+    builder.addCase(join_team.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+    });
+    builder.addCase(team_details_by_code.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(team_details_by_code.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.TeamDetailsBycode = action.payload;
+    });
+    builder.addCase(team_details_by_code.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

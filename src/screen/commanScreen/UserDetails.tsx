@@ -9,8 +9,9 @@ import {
   KeyboardAvoidingView,
   Alert,
   Platform,
+  Keyboard,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
 import {
   widthPercentageToDP as wp,
@@ -49,8 +50,8 @@ export default function UserDetails() {
   
   const openImageLibrary = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
+      width: 500,
+      height: 500,
       cropping: true
     }).then((image) => {
       setProfile(image);
@@ -58,7 +59,24 @@ export default function UserDetails() {
       console.log(err);
     });
   };
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setIsKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setIsKeyboardVisible(false)
+    );
+
+    // Clean up listeners on component unmount
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   const createUser = () => {
     if (firstName === '' && lastName === '') return errorToast('First Name or Last Name');
     if (Dd === '' && Mm === '' && YYYY === '') return errorToast('Please enter date of birth');
@@ -135,7 +153,7 @@ export default function UserDetails() {
           <View style={[styles.txtInput, { backgroundColor: '#FFFFFF', marginTop: 20 }]}>
             {Country_List && <Dropdown
               data={Country_List}
-              maxHeight={200}
+              maxHeight={300}
               labelField="name"
               valueField="name"
               placeholder={!isFocus ? 'Select Country' : '...'}
@@ -148,6 +166,7 @@ export default function UserDetails() {
                 setIsFocus(false);
               }}
               search
+              dropdownPosition={isKeyboardVisible?'top':'bottom'}
             />}
           </View>
 
